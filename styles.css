@@ -1,0 +1,549 @@
+/* ========================================================
+   Retro Picross Archaeologist UI - Game Boy Edition
+   Authentic 4-Tone Green LCD & Hardware Palette
+   ======================================================== */
+
+:root {
+  --gb-black: #081808;
+  --gb-darkest: #0f380f; /* Tone 1: Darkest ink/excavated pixel */
+  --gb-dark: #306230;    /* Tone 2: Mid-shadow / stone accent */
+  --gb-mid: #688c0a;     /* Accent mid */
+  --gb-light: #8bac0f;   /* Tone 3: Mid-highlight / LCD base */
+  --gb-bright: #9bbc0f;  /* Tone 4: Pure luminous LCD highlight */
+  --gb-lightest: #9bbc0f;
+  --gb-glow: #b2d41a;
+  
+  --stone-body: #7c9b2d;
+  --stone-shadow: #21421e;
+  --stone-highlight: #b0cd3b;
+  
+  --dmg-chassis: #d3d2ce;
+  --dmg-bezel: #757788;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Press Start 2P', monospace;
+  background-color: #061206;
+  color: var(--gb-darkest);
+  image-rendering: pixelated;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-font-smoothing: none;
+  touch-action: manipulation;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* ========================================================
+   LCD Screen Texture & Scanline Effects
+   ======================================================== */
+
+.lcd-screen {
+  background-color: var(--gb-light);
+  position: relative;
+  box-shadow: inset 0 0 16px rgba(15, 56, 15, 0.45);
+}
+
+.lcd-screen::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(139, 172, 15, 0) 50%, rgba(15, 56, 15, 0.12) 50%);
+  background-size: 100% 4px;
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.lcd-matrix {
+  background-image: 
+    radial-gradient(var(--gb-dark) 12%, transparent 13%),
+    radial-gradient(var(--gb-dark) 12%, transparent 13%);
+  background-size: 4px 4px;
+  background-position: 0 0, 2px 2px;
+  opacity: 0.15;
+}
+
+.lcd-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(15, 56, 15, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 56, 15, 0.07) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+.scanlines {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0) 50%,
+    rgba(15, 56, 15, 0.08) 50%,
+    rgba(15, 56, 15, 0.08)
+  );
+  background-size: 100% 4px;
+}
+
+.pixel-lcd {
+  background-color: var(--gb-lightest);
+  image-rendering: pixelated;
+  box-shadow: inset 0 0 10px rgba(15, 56, 15, 0.45);
+}
+
+.pixel-sharp {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ========================================================
+   Ancient Stone Architecture & Bevels
+   ======================================================== */
+
+.stone-bezel-outer {
+  border: 4px solid var(--gb-darkest);
+  box-shadow: 
+    inset 4px 4px 0 var(--gb-bright),
+    inset -4px -4px 0 var(--gb-dark),
+    0 6px 0 var(--gb-darkest);
+}
+
+.stone-plate {
+  background-color: var(--gb-light);
+  border: 4px solid var(--gb-darkest);
+  box-shadow: 
+    inset 4px 4px 0 var(--gb-bright),
+    inset -4px -4px 0 var(--gb-dark);
+}
+
+.stone-tablet-btn {
+  background-color: var(--gb-light);
+  border: 4px solid var(--gb-darkest);
+  box-shadow: 
+    inset 3px 3px 0 var(--gb-bright),
+    inset -3px -3px 0 var(--gb-dark),
+    0 5px 0 var(--gb-darkest);
+  transition: all 0.08s steps(2);
+  cursor: pointer;
+}
+
+.stone-tablet-btn:hover, .stone-tablet-btn.active-tab {
+  background-color: var(--gb-bright);
+  box-shadow: 
+    inset 3px 3px 0 var(--gb-glow),
+    inset -3px -3px 0 var(--gb-darkest),
+    0 5px 0 var(--gb-darkest);
+}
+
+.stone-tablet-btn:active {
+  transform: translateY(3px);
+  box-shadow: 
+    inset 3px 3px 0 var(--gb-dark),
+    inset -3px -3px 0 var(--gb-bright),
+    0 2px 0 var(--gb-darkest);
+}
+
+.stone-frame {
+  background-color: var(--gb-light);
+  border-color: var(--gb-darkest);
+  box-shadow: 
+    inset 3px 3px 0px 0px var(--gb-lightest),
+    inset -3px -3px 0px 0px var(--gb-dark),
+    0 4px 0px 0px var(--gb-darkest);
+}
+
+.stone-inset {
+  background-color: var(--gb-dark);
+  box-shadow: 
+    inset 3px 3px 0px 0px var(--gb-darkest),
+    inset -2px -2px 0px 0px var(--gb-light);
+}
+
+.carved-block {
+  background-color: var(--gb-light);
+  box-shadow: 
+    inset 2px 2px 0px 0px var(--gb-lightest),
+    inset -2px -2px 0px 0px var(--gb-dark);
+  border: 1px solid var(--gb-darkest);
+  cursor: pointer;
+  transition: transform 0.05s;
+}
+
+.carved-block:active, .carved-block.active {
+  box-shadow: 
+    inset 2px 2px 0px 0px var(--gb-dark),
+    inset -2px -2px 0px 0px var(--gb-lightest);
+}
+
+.excavated-tile {
+  background-color: var(--gb-darkest) !important;
+  box-shadow: inset 1px 1px 0px var(--gb-dark) !important;
+  color: var(--gb-lightest) !important;
+}
+
+.marked-x-tile {
+  background-color: var(--gb-light) !important;
+  color: var(--gb-darkest) !important;
+}
+
+/* ========================================================
+   Temple Pillars & Hieroglyphs
+   ======================================================== */
+
+.pillar-brick {
+  background-color: var(--gb-light);
+  border-right: 4px solid var(--gb-darkest);
+  border-left: 4px solid var(--gb-darkest);
+  position: relative;
+}
+
+.brick-row {
+  border-bottom: 3px solid var(--gb-darkest);
+  position: relative;
+}
+
+.brick-row::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  right: 1px;
+  height: 2px;
+  background: var(--gb-bright);
+  pointer-events: none;
+}
+
+.brick-crack {
+  position: absolute;
+  background-color: var(--gb-darkest);
+}
+
+.hieroglyph-bg {
+  background-color: #82a30d;
+  background-image: 
+    linear-gradient(45deg, var(--gb-darkest) 25%, transparent 25%), 
+    linear-gradient(-45deg, var(--gb-darkest) 25%, transparent 25%), 
+    linear-gradient(135deg, var(--gb-darkest) 25%, transparent 25%), 
+    linear-gradient(-135deg, var(--gb-darkest) 25%, transparent 25%);
+  background-size: 16px 16px;
+  background-position: 8px 0, 8px 0, 0 0, 0 0;
+  opacity: 0.12;
+}
+
+/* ========================================================
+   Game Boy Physical Controller Buttons
+   ======================================================== */
+
+.dpad-btn {
+  background-color: var(--gb-dark);
+  box-shadow: 
+    inset 2px 2px 0px var(--gb-light),
+    inset -2px -2px 0px var(--gb-darkest),
+    2px 2px 0px var(--gb-darkest);
+  cursor: pointer;
+}
+
+.dpad-btn:active {
+  box-shadow: 
+    inset 2px 2px 0px var(--gb-darkest),
+    inset -1px -1px 0px var(--gb-light);
+  transform: translate(1px, 1px);
+}
+
+.retro-round-btn {
+  background-color: var(--gb-dark);
+  box-shadow: 
+    inset 3px 3px 0px var(--gb-light),
+    inset -3px -3px 0px var(--gb-darkest),
+    3px 4px 0px var(--gb-darkest);
+  cursor: pointer;
+}
+
+.retro-round-btn:active {
+  box-shadow: 
+    inset 3px 3px 0px var(--gb-darkest),
+    inset -2px -2px 0px var(--gb-light);
+  transform: translate(2px, 2px);
+}
+
+.d-pad-btn {
+  box-shadow: 0 4px 0 #111, inset 1px 1px 1px rgba(255,255,255,0.2);
+  cursor: pointer;
+}
+.d-pad-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #111;
+}
+
+.action-btn {
+  box-shadow: 0 5px 0 #581830, inset 1px 1px 2px rgba(255,255,255,0.3);
+  cursor: pointer;
+}
+.action-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #581830;
+}
+
+.pill-btn {
+  transform: rotate(-25deg);
+  box-shadow: 0 2px 0 #4a4a4e;
+  cursor: pointer;
+}
+.pill-btn:active {
+  transform: rotate(-25deg) translateY(1px);
+  box-shadow: 0 1px 0 #4a4a4e;
+}
+
+/* ========================================================
+   Cursors & Animations
+   ======================================================== */
+
+@keyframes chisel-pulse {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-4px); }
+}
+
+.cursor-chisel-anim {
+  animation: chisel-pulse 0.8s steps(2) infinite;
+}
+
+@keyframes retro-blink {
+  0%, 100% { opacity: 1; transform: translate(0, 0); }
+  50% { opacity: 0.85; transform: translate(-2px, 0); }
+}
+
+.cursor-anim {
+  animation: retro-blink 0.75s steps(2, start) infinite;
+}
+
+@keyframes cursor-pulse {
+  0%, 100% { opacity: 1; outline-color: var(--gb-darkest); }
+  50% { opacity: 0.3; outline-color: transparent; }
+}
+
+.reticle-cursor {
+  position: relative;
+  outline: 2px dashed var(--gb-darkest) !important;
+  outline-offset: -1px;
+  animation: cursor-pulse 0.75s infinite steps(2, start);
+  z-index: 10;
+}
+
+/* Striped clue headers with high contrast & crisp readability */
+.stripe-odd { background-color: #8bac0f; }
+.stripe-even { background-color: #9bbc0f; }
+
+.clue-number-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  font-weight: 900 !important;
+  color: #0f380f !important;
+  letter-spacing: -0.5px;
+}
+
+/* Quick View Switcher Top Bar */
+.view-nav-bar {
+  background-color: #0b1f0b;
+  border-bottom: 2px solid var(--gb-darkest);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.nav-tab-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  padding: 6px 10px;
+  color: var(--gb-mid);
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.15s;
+}
+
+.nav-tab-btn:hover {
+  color: var(--gb-bright);
+}
+
+.nav-tab-btn.active {
+  background-color: var(--gb-darkest);
+  color: var(--gb-bright);
+  border: 1px solid var(--gb-light);
+  box-shadow: inset 0 0 4px var(--gb-glow);
+}
+
+/* Screen container transition & Fullscreen Responsive layout */
+.game-screen-wrapper {
+  display: none !important;
+}
+
+.game-screen-wrapper.active-screen {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  flex: 1 1 0%;
+  animation: screenFadeIn 0.15s steps(3);
+}
+
+@keyframes screenFadeIn {
+  from { opacity: 0.2; }
+  to { opacity: 1; }
+}
+
+/* ========================================================
+   Mario's Picross Penalty Shake & Flash
+   ======================================================== */
+
+@keyframes screenShake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  15% { transform: translate(-6px, 3px) rotate(-1deg); }
+  30% { transform: translate(6px, -3px) rotate(1deg); }
+  45% { transform: translate(-5px, -2px) rotate(-0.5deg); }
+  60% { transform: translate(5px, 2px) rotate(0.5deg); }
+  75% { transform: translate(-2px, 1px) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.shake-screen {
+  animation: screenShake 0.45s ease-in-out !important;
+}
+
+@keyframes penaltyTimerFlash {
+  0%, 100% { background-color: #0f380f; color: #9bbc0f; }
+  25%, 75% { background-color: #cc2222; color: #ffffff; }
+  50% { background-color: #550000; color: #ff8888; }
+}
+
+.timer-penalty-flash {
+  animation: penaltyTimerFlash 0.8s ease-in-out !important;
+}
+
+/* Clue completion dimming */
+.clue-dimmed {
+  opacity: 0.28 !important;
+  color: var(--gb-dark) !important;
+  text-decoration: line-through;
+  transition: opacity 0.2s ease;
+}
+
+/* Penalty Floating Notification Badge */
+.penalty-notification {
+  animation: penaltyFloat 1.2s ease-out forwards;
+}
+
+@keyframes penaltyFloat {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.8); }
+  20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
+  35% { transform: translate(-50%, -2px) scale(1); }
+  80% { opacity: 1; transform: translate(-50%, -10px); }
+  100% { opacity: 0; transform: translate(-50%, -25px); }
+}
+
+/* ========================================================
+   Level Select Cleared Slot Stamp & Roulette FX
+   ======================================================== */
+
+.slot-cleared {
+  background-color: var(--gb-darkest) !important;
+  color: var(--gb-bright) !important;
+  border-color: var(--gb-darkest) !important;
+  box-shadow: inset 2px 2px 0 var(--gb-dark), 0 0 4px rgba(178, 212, 26, 0.4) !important;
+  position: relative;
+}
+
+.slot-cleared::after {
+  content: "✦";
+  font-size: 7px;
+  color: var(--gb-glow);
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  line-height: 1;
+}
+
+@keyframes roulettePulse {
+  0%, 100% { background-color: var(--gb-bright); color: var(--gb-darkest); outline: 2px solid var(--gb-glow); }
+  50% { background-color: var(--gb-darkest); color: var(--gb-bright); outline: 2px solid var(--gb-dark); }
+}
+
+.roulette-active-col {
+  animation: roulettePulse 0.12s infinite !important;
+}
+
+.roulette-active-row {
+  animation: roulettePulse 0.12s infinite !important;
+}
+
+/* Custom Modal */
+.retro-modal-backdrop {
+  background-color: rgba(6, 18, 6, 0.85);
+  backdrop-filter: blur(2px);
+}
+
+/* ========================================================
+   Alien Reaction Animations (Happy Zap & Panic Misfire)
+   ======================================================== */
+
+@keyframes alien-bounce-happy {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.12); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes alien-panic-shake {
+  0% { transform: translate(-3px, 1px) rotate(-4deg); }
+  25% { transform: translate(3px, -2px) rotate(4deg); }
+  50% { transform: translate(-2px, -1px) rotate(-3deg); }
+  75% { transform: translate(2px, 2px) rotate(3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.alien-happy {
+  animation: alien-bounce-happy 0.35s ease-in-out infinite alternate !important;
+}
+
+.alien-panic {
+  animation: alien-panic-shake 0.1s linear infinite !important;
+}
+
+/* Starry Galaxy Background for Main Menu */
+.galaxy-stars-bg {
+  background-image: 
+    radial-gradient(1px 1px at 25px 35px, var(--gb-bright), rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 70px 85px, var(--gb-lightest), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 120px 45px, var(--gb-bright), rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 165px 145px, var(--gb-lightest), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 220px 95px, var(--gb-bright), rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 280px 175px, var(--gb-lightest), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 320px 60px, var(--gb-bright), rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  opacity: 0.28;
+}
+
+/* ========================================================
+   Difficulty Tabs & Settings Styles
+   ======================================================== */
+.diff-tab-btn.active {
+  background-color: var(--gb-darkest) !important;
+  color: var(--gb-bright) !important;
+  border-color: var(--gb-bright) !important;
+  box-shadow: inset 1px 1px 0 var(--gb-mid);
+}
+
+.diff-select-btn.active {
+  background-color: var(--gb-darkest) !important;
+  color: var(--gb-bright) !important;
+  border-color: var(--gb-bright) !important;
+  box-shadow: inset 2px 2px 0 var(--gb-mid), 0 0 6px var(--gb-glow);
+}
+
+.lang-select-btn.active {
+  background-color: var(--gb-darkest) !important;
+  color: var(--gb-bright) !important;
+  border-color: var(--gb-bright) !important;
+  box-shadow: inset 2px 2px 0 var(--gb-mid), 0 0 4px var(--gb-glow);
+}

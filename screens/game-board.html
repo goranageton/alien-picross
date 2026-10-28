@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Mario's Picross - Game Boy Edition</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Retro Pixel Font -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<!-- BEGIN: Custom Game Boy Theme Styles -->
+<style data-purpose="theme-palette">
+    :root {
+      --gb-lightest: #9bbc0f;
+      --gb-light: #8bac0f;
+      --gb-dark: #306230;
+      --gb-darkest: #0f380f;
+      --stone-body: #7c9b2d;
+      --stone-shadow: #21421e;
+      --stone-highlight: #b0cd3b;
+    }
+
+    body {
+      background-color: #0b1e0b;
+      font-family: 'Press Start 2P', monospace;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+  </style>
+<style data-purpose="pixel-textures">
+    /* Pixelated screen look */
+    .pixel-lcd {
+      background-color: var(--gb-lightest);
+      image-rendering: pixelated;
+      box-shadow: inset 0 0 10px rgba(15, 56, 15, 0.45);
+    }
+
+    /* Carved stone borders & cracks */
+    .stone-frame {
+      background-color: var(--gb-light);
+      border-color: var(--gb-darkest);
+      box-shadow: 
+        inset 3px 3px 0px 0px var(--gb-lightest),
+        inset -3px -3px 0px 0px var(--gb-dark),
+        0 4px 0px 0px var(--gb-darkest);
+    }
+
+    .stone-inset {
+      background-color: var(--gb-dark);
+      box-shadow: 
+        inset 3px 3px 0px 0px var(--gb-darkest),
+        inset -2px -2px 0px 0px var(--gb-light);
+    }
+
+    .carved-block {
+      background-color: var(--gb-light);
+      box-shadow: 
+        inset 2px 2px 0px 0px var(--gb-lightest),
+        inset -2px -2px 0px 0px var(--gb-dark);
+      border: 1px solid var(--gb-darkest);
+    }
+
+    .carved-block:active, .carved-block.active {
+      box-shadow: 
+        inset 2px 2px 0px 0px var(--gb-dark),
+        inset -2px -2px 0px 0px var(--gb-lightest);
+    }
+
+    .excavated-tile {
+      background-color: var(--gb-darkest) !important;
+      box-shadow: inset 1px 1px 0px var(--gb-dark) !important;
+    }
+
+    /* D-pad and buttons styling */
+    .dpad-btn {
+      background-color: var(--gb-dark);
+      box-shadow: 
+        inset 2px 2px 0px var(--gb-light),
+        inset -2px -2px 0px var(--gb-darkest),
+        2px 2px 0px var(--gb-darkest);
+    }
+
+    .dpad-btn:active {
+      box-shadow: 
+        inset 2px 2px 0px var(--gb-darkest),
+        inset -1px -1px 0px var(--gb-light);
+      transform: translate(1px, 1px);
+    }
+
+    .retro-round-btn {
+      background-color: var(--gb-dark);
+      box-shadow: 
+        inset 3px 3px 0px var(--gb-light),
+        inset -3px -3px 0px var(--gb-darkest),
+        3px 4px 0px var(--gb-darkest);
+    }
+
+    .retro-round-btn:active {
+      box-shadow: 
+        inset 3px 3px 0px var(--gb-darkest),
+        inset -2px -2px 0px var(--gb-light);
+      transform: translate(2px, 2px);
+    }
+
+    /* Blinking reticle cursor */
+    @keyframes cursor-pulse {
+      0%, 100% { opacity: 1; outline-color: var(--gb-darkest); }
+      50% { opacity: 0.3; outline-color: transparent; }
+    }
+
+    .reticle-cursor {
+      position: relative;
+      outline: 2px dashed var(--gb-darkest);
+      outline-offset: -1px;
+      animation: cursor-pulse 0.75s infinite steps(2, start);
+      z-index: 10;
+    }
+
+    /* Striped clue headers */
+    .stripe-odd { background-color: var(--gb-light); }
+    .stripe-even { background-color: var(--gb-lightest); }
+  </style>
+<!-- END: Custom Game Boy Theme Styles -->
+</head>
+<body class="flex justify-center items-center min-h-screen p-1 sm:p-4 text-[var(--gb-darkest)]">
+<!-- BEGIN: Game Boy Handheld Housing Outer Container -->
+<main class="w-full max-w-[420px] bg-[#7a9a2d] border-4 border-[#0f380f] rounded-2xl shadow-2xl p-2.5 sm:p-3 relative flex flex-col gap-2 overflow-hidden" data-purpose="mobile-gameboy-device">
+<!-- Top Reference Accent Banner (Shows Reference Header) -->
+<div class="w-full overflow-hidden rounded-t border-2 border-[var(--gb-darkest)] bg-[#306230] max-h-12 flex items-center justify-center opacity-90 shadow-inner" data-purpose="reference-banner">
+<img alt="Reference Picross Stone UI" class="w-full h-auto object-cover scale-105 filter contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADCCSYlfkrPMkkR6Lw5koa6VqytaJCEjVO6aac6lK_GwQKpXsap_ALi7rTlrcScHJ9nYxjUeR1hQPILRAMMJt3fW5hi9sBNCrULWZkCiXmvsTFPvh3_WDqDHmrci98WZutclsSqZd_jSGYq_k3DrFjeXnulPrFLf4ok_GH-oP2WlQWefgFG0IOmigZ3_cl3wuSJ12ZnbRN2r1qM9FO-AExJIjvtl9PJP96PogkMiUK2H097oqKZFAodA"/>
+</div>
+<!-- BEGIN: Dashboard Section -->
+<header class="stone-frame rounded-md p-2 flex items-center justify-between gap-1 border-2 border-[var(--gb-darkest)] bg-[#8bac0f]" data-purpose="top-dashboard">
+<!-- Archaeologist Portrait & Timer Unit -->
+<div class="flex items-center gap-1.5 bg-[#9bbc0f] p-1.5 rounded border-2 border-[var(--gb-darkest)] shadow-inner">
+<!-- Pixel Archaeologist Sprite Frame -->
+<div class="w-10 h-10 bg-[#8bac0f] border border-[var(--gb-darkest)] rounded flex items-center justify-center p-0.5" title="Mario Archaeologist">
+<svg class="w-8 h-8 fill-[var(--gb-darkest)]" shape-rendering="crispEdges" viewbox="0 0 24 24">
+<!-- Pith helmet -->
+<rect height="2" width="10" x="7" y="2"></rect>
+<rect height="2" width="14" x="5" y="4"></rect>
+<rect height="2" width="18" x="3" y="6"></rect>
+<!-- Face & Nose -->
+<rect height="4" width="12" x="6" y="8"></rect>
+<rect height="3" width="4" x="14" y="9"></rect>
+<!-- Moustache & Eyes -->
+<rect height="2" width="2" x="11" y="9"></rect>
+<rect height="2" width="10" x="9" y="12"></rect>
+<!-- Dungarees & Body -->
+<rect height="4" width="12" x="6" y="14"></rect>
+<rect height="3" width="5" x="5" y="18"></rect>
+<rect height="3" width="5" x="14" y="18"></rect>
+</svg>
+</div>
+<!-- 30:00 Digital Segment Timer Frame -->
+<div class="px-2 py-1 bg-[#0f380f] rounded border border-[var(--gb-dark)] flex flex-col items-center">
+<span class="text-[7px] text-[#8bac0f] tracking-tighter uppercase font-mono">Time</span>
+<span class="text-[#9bbc0f] font-mono font-bold tracking-wider text-sm leading-none" id="picross-timer">30:00</span>
+</div>
+</div>
+<!-- Preview Nonogram & Menu Button Area -->
+<div class="flex items-center gap-1.5">
+<!-- 1-Bit Pixel Thumbnail Preview Screen -->
+<div class="stone-inset p-1 rounded border border-[var(--gb-darkest)] flex flex-col items-center">
+<div class="w-8 h-8 bg-[#9bbc0f] border border-[var(--gb-darkest)] grid grid-cols-5 grid-rows-5 p-0.5 gap-[1px]" title="Mini Puzzle Radar">
+<!-- Mini preview pixels forming archaeological relic shape -->
+<div class="bg-transparent"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-transparent"></div>
+<div class="bg-[var(--gb-darkest)]"></div><div class="bg-transparent"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-transparent"></div><div class="bg-[var(--gb-darkest)]"></div>
+<div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div>
+<div class="bg-transparent"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-transparent"></div>
+<div class="bg-transparent"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-transparent"></div><div class="bg-[var(--gb-darkest)]"></div><div class="bg-transparent"></div>
+</div>
+</div>
+<!-- Pause / Options Button -->
+<button aria-label="Pause and Options" class="carved-block px-2 py-2 rounded text-[8px] flex flex-col items-center justify-center font-bold text-[var(--gb-darkest)] active:translate-y-0.5">
+<span>PAUSE</span>
+<span class="text-[6px] tracking-tight mt-0.5 text-[var(--gb-dark)]">MENU</span>
+</button>
+</div>
+</header>
+<!-- END: Dashboard Section -->
+<!-- BEGIN: Game Board (Nonogram Grid & Clues) -->
+<section class="pixel-lcd rounded-lg p-1.5 border-4 border-[var(--gb-darkest)] flex flex-col justify-center items-center shadow-inner relative" data-purpose="nonogram-board">
+<!-- Top Touch Mode Indicator Badge -->
+<div class="w-full flex justify-between items-center px-1 mb-1 text-[7px] text-[var(--gb-dark)]">
+<span class="font-bold tracking-tight">LEVEL 1-A [RELIC]</span>
+<div class="flex items-center gap-1 bg-[#8bac0f] px-1.5 py-0.5 rounded border border-[var(--gb-darkest)]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#0f380f] inline-block animate-ping"></span>
+<span class="text-[6px] text-[#0f380f]">TOUCH &amp; D-PAD ENABLED</span>
+</div>
+</div>
+<!-- Puzzle Matrix Container -->
+<div class="relative bg-[var(--gb-lightest)] border-2 border-[var(--gb-darkest)] inline-block select-none" id="puzzle-wrapper">
+<!-- Column Clues Header (Horizontal alignment with 10 puzzle columns) -->
+<div class="flex ml-9 sm:ml-10 border-b-2 border-[var(--gb-darkest)]">
+<!-- Col 0 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-odd border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>2</span><span>1</span>
+</div>
+<!-- Col 1 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-even border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>2</span><span>2</span>
+</div>
+<!-- Col 2 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-odd border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>3</span><span>1</span>
+</div>
+<!-- Col 3 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-even border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>4</span><span>2</span>
+</div>
+<!-- Col 4 Clue (5-th col delimiter) -->
+<div class="w-6 sm:w-7 h-12 stripe-odd border-r-2 border-[var(--gb-darkest)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight font-bold">
+<span>1</span><span>1</span><span>1</span>
+</div>
+<!-- Col 5 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-even border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>1</span><span>2</span><span>1</span>
+</div>
+<!-- Col 6 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-odd border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>4</span><span>1</span>
+</div>
+<!-- Col 7 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-even border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>5</span><span>1</span>
+</div>
+<!-- Col 8 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-odd border-r border-[var(--gb-dark)] flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>5</span><span>1</span>
+</div>
+<!-- Col 9 Clue -->
+<div class="w-6 sm:w-7 h-12 stripe-even flex flex-col justify-end items-center pb-0.5 text-[7px] leading-tight">
+<span>6</span><span>1</span>
+</div>
+</div>
+<!-- Rows Container: Row Clues + 10x10 Matrix -->
+<div class="flex">
+<!-- Row Clues (Left Bar) -->
+<div class="w-9 sm:w-10 flex flex-col border-r-2 border-[var(--gb-darkest)]">
+<div class="h-6 sm:h-7 stripe-odd border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">2</div>
+<div class="h-6 sm:h-7 stripe-even border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">2</div>
+<div class="h-6 sm:h-7 stripe-odd border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">3</div>
+<div class="h-6 sm:h-7 stripe-even border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">1 2</div>
+<div class="h-6 sm:h-7 stripe-odd border-b-2 border-[var(--gb-darkest)] flex items-center justify-end pr-1 text-[7px] font-bold">1 7</div>
+<div class="h-6 sm:h-7 stripe-even border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">2 1</div>
+<div class="h-6 sm:h-7 stripe-odd border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">1 3</div>
+<div class="h-6 sm:h-7 stripe-even border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">1 2</div>
+<div class="h-6 sm:h-7 stripe-odd border-b border-[var(--gb-dark)] flex items-center justify-end pr-1 text-[7px]">1</div>
+<div class="h-6 sm:h-7 stripe-even flex items-center justify-end pr-1 text-[7px]">5</div>
+</div>
+<!-- 10x10 Nonogram Grid -->
+<div aria-label="10 by 10 Picross Tile Board" class="grid grid-cols-10 grid-rows-10" id="picross-grid" role="grid">
+<!-- Row 1 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 2 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 3 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 4 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 5 (Horizontal 5-divider) -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-b-2 border-b-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<!-- Row 6 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 7 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 8 (With active Reticle Cursor) -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile border-r-2 border-r-[var(--gb-darkest)] reticle-cursor flex items-center justify-center" id="active-cursor-tile"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 9 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 excavated-tile flex items-center justify-center"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<!-- Row 10 -->
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block border-r-2 border-r-[var(--gb-darkest)] flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-[9px] font-bold">✕</div>
+<div class="w-6 sm:w-7 h-6 sm:h-7 carved-block flex items-center justify-center text-xs"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Game Board -->
+<!-- BEGIN: Handheld Controller Section -->
+<footer class="stone-frame rounded-xl p-3 border-2 border-[var(--gb-darkest)] flex items-center justify-between mt-1 relative" data-purpose="gameboy-controls">
+<!-- Left: Cross D-Pad -->
+<div class="relative w-28 h-28 flex items-center justify-center" data-purpose="dpad-controller">
+<!-- Center D-pad hub -->
+<div class="w-9 h-9 bg-[var(--gb-dark)] absolute rounded-sm border border-[var(--gb-darkest)] flex items-center justify-center">
+<div class="w-3.5 h-3.5 rounded-full bg-[var(--gb-darkest)] opacity-50 shadow-inner"></div>
+</div>
+<!-- UP Direction Button -->
+<button aria-label="Up" class="dpad-btn absolute top-0 w-9 h-10 rounded-t-md flex items-center justify-center active:translate-y-0.5" id="btn-up">
+<svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] mb-2" viewbox="0 0 24 24"><polygon points="12,4 4,18 20,18"></polygon></svg>
+</button>
+<!-- DOWN Direction Button -->
+<button aria-label="Down" class="dpad-btn absolute bottom-0 w-9 h-10 rounded-b-md flex items-center justify-center active:translate-y-0.5" id="btn-down">
+<svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] mt-2" viewbox="0 0 24 24"><polygon points="12,20 4,6 20,6"></polygon></svg>
+</button>
+<!-- LEFT Direction Button -->
+<button aria-label="Left" class="dpad-btn absolute left-0 h-9 w-10 rounded-l-md flex items-center justify-center active:translate-x-0.5" id="btn-left">
+<svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] mr-2" viewbox="0 0 24 24"><polygon points="4,12 18,4 18,20"></polygon></svg>
+</button>
+<!-- RIGHT Direction Button -->
+<button aria-label="Right" class="dpad-btn absolute right-0 h-9 w-10 rounded-r-md flex items-center justify-center active:translate-x-0.5" id="btn-right">
+<svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] ml-2" viewbox="0 0 24 24"><polygon points="20,12 6,4 6,20"></polygon></svg>
+</button>
+</div>
+<!-- Center Tool Quick-Toggle & Stylus Icon -->
+<div class="flex flex-col items-center gap-1.5" data-purpose="auxiliary-tools">
+<!-- Chisel Tool Marker -->
+<div class="bg-[var(--gb-darkest)] text-[var(--gb-light)] px-1.5 py-0.5 rounded text-[6px] tracking-tight text-center font-bold">
+          TOOL MODE
+        </div>
+<!-- Toggle Button Stylus / Touch -->
+<button class="carved-block px-2 py-1.5 rounded-full flex items-center gap-1 text-[7px] font-bold text-[var(--gb-darkest)]" id="toggle-input-mode" title="Toggle Direct Tap Excavate">
+<svg class="w-3.5 h-3.5 fill-[var(--gb-darkest)]" viewbox="0 0 24 24">
+<path d="M12 2C8 2 6 5 6 9v6c0 3.3 2.7 6 6 6s6-2.7 6-6V9c0-4-2-7-6-7zm0 17c-2.2 0-4-1.8-4-4V9c0-2.5 1.2-5 4-5s4 2.5 4 5v6c0 2.2-1.8 4-4 4z"></path>
+</svg>
+<span>TAP</span>
+</button>
+</div>
+<!-- Right: Action Buttons (A & B) -->
+<div class="flex items-center gap-3 pr-1" data-purpose="action-buttons">
+<!-- Button A (Excavate / Chisel) -->
+<div class="flex flex-col items-center gap-1">
+<button aria-label="Button A: Dig Cell" class="retro-round-btn w-13 h-13 sm:w-14 sm:h-14 rounded-full flex flex-col items-center justify-center p-2.5" id="btn-action-a">
+<!-- Chisel / Pickaxe Pixel Graphic -->
+<svg class="w-5 h-5 fill-[var(--gb-lightest)] -rotate-45" shape-rendering="crispEdges" viewbox="0 0 24 24">
+<rect height="6" width="4" x="10" y="2"></rect>
+<rect height="12" width="2" x="11" y="8"></rect>
+<polygon points="12,24 8,18 16,18"></polygon>
+</svg>
+</button>
+<span class="text-[9px] font-bold text-[var(--gb-darkest)]">A</span>
+</div>
+<!-- Button B (Mark X Cross) -->
+<div class="flex flex-col items-center gap-1 mt-6">
+<button aria-label="Button B: Mark Cross" class="retro-round-btn w-13 h-13 sm:w-14 sm:h-14 rounded-full flex flex-col items-center justify-center p-2.5" id="btn-action-b">
+<!-- Bold X Pixel Marker Graphic -->
+<span class="text-[var(--gb-lightest)] font-bold text-lg leading-none">✕</span>
+</button>
+<span class="text-[9px] font-bold text-[var(--gb-darkest)]">B</span>
+</div>
+</div>
+</footer>
+<!-- END: Handheld Controller Section -->
+</main>
+<!-- END: Game Boy Handheld Housing Outer Container -->
+<!-- BEGIN: Game Interactive Scripts -->
+<script data-purpose="cursor-and-audio-interaction">
+    // Grid interactivity for mobile taps & controls
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('picross-grid');
+      const cells = grid.querySelectorAll('div');
+      let currentIndex = 74; // Current focus cell (Row 8, Col 5)
+
+      function updateCursor(newIndex) {
+        if (newIndex >= 0 && newIndex < cells.length) {
+          cells[currentIndex].classList.remove('reticle-cursor');
+          currentIndex = newIndex;
+          cells[currentIndex].classList.add('reticle-cursor');
+        }
+      }
+
+      // Allow direct mobile touch on any grid tile
+      cells.forEach((cell, index) => {
+        cell.addEventListener('pointerdown', () => {
+          updateCursor(index);
+          // If already dark, turn to stone, else excavate
+          if (cell.classList.contains('excavated-tile')) {
+            cell.classList.remove('excavated-tile');
+            cell.innerText = '✕';
+          } else if (cell.innerText === '✕') {
+            cell.innerText = '';
+          } else {
+            cell.classList.add('excavated-tile');
+          }
+        });
+      });
+
+      // Directional Pad Navigation
+      document.getElementById('btn-up').addEventListener('click', () => updateCursor(currentIndex - 10));
+      document.getElementById('btn-down').addEventListener('click', () => updateCursor(currentIndex + 10));
+      document.getElementById('btn-left').addEventListener('click', () => {
+        if (currentIndex % 10 !== 0) updateCursor(currentIndex - 1);
+      });
+      document.getElementById('btn-right').addEventListener('click', () => {
+        if (currentIndex % 10 !== 9) updateCursor(currentIndex + 1);
+      });
+
+      // Action A: Dig / Excavate
+      document.getElementById('btn-action-a').addEventListener('click', () => {
+        const cur = cells[currentIndex];
+        cur.innerText = '';
+        cur.classList.toggle('excavated-tile');
+      });
+
+      // Action B: Mark with X
+      document.getElementById('btn-action-b').addEventListener('click', () => {
+        const cur = cells[currentIndex];
+        cur.classList.remove('excavated-tile');
+        cur.innerText = cur.innerText === '✕' ? '' : '✕';
+      });
+
+      // Simple running timer simulation
+      let totalSeconds = 1800; // 30 mins
+      const timerElement = document.getElementById('picross-timer');
+      setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          const m = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+          const s = String(totalSeconds % 60).padStart(2, '0');
+          timerElement.innerText = `${m}:${s}`;
+        }
+      }, 1000);
+    });
+  </script>
+<!-- END: Game Interactive Scripts -->
+</body></html>

@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#061206">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Alien Picross: Area 51 Edition by Goran Ageton - Game Boy DMG</title>
+  
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <!-- Google Fonts: 8-bit Pixel Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Application Retro Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gb: {
+              black: '#081808',
+              darkest: '#0f380f',
+              dark: '#306230',
+              mid: '#688c0a',
+              light: '#8bac0f',
+              lightest: '#9bbc0f',
+              bright: '#9bbc0f',
+              glow: '#b2d41a'
+            }
+          },
+          fontFamily: {
+            pixel: ['"Press Start 2P"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#050e05] text-[#0f380f] font-pixel flex flex-col items-center justify-start min-h-screen">
+
+  <!-- ========================================================
+       DISCRETE FLOATING DEV NAV TOGGLE
+       (Hidden/minimized by default on mobile, tap to show)
+       ======================================================== -->
+  <button id="dev-nav-toggle-pill" class="fixed top-2 right-2 z-50 bg-[#0f380f]/85 hover:bg-[#0f380f] text-[#8bac0f] hover:text-[#9bbc0f] text-[7.5px] font-pixel px-2 py-1.5 rounded-full border border-[#306230] shadow-[0_2px_6px_rgba(0,0,0,0.8)] backdrop-blur cursor-pointer select-none flex items-center gap-1 transition-all opacity-80 hover:opacity-100" title="Dölj / Visa Dev-meny">
+    <span>⚙</span>
+    <span class="text-[7px]">NAV</span>
+  </button>
+
+  <!-- ========================================================
+       TOP QUICK NAVIGATION / TESTING BAR
+       (Hidden by default on mobile for authentic handheld feel)
+       ======================================================== -->
+  <nav class="hidden w-full view-nav-bar items-center justify-between px-3 py-1.5 z-40 text-[8px] sticky top-0 transition-all duration-200" id="top-nav-bar">
+    <div class="flex items-center gap-1.5">
+      <span class="inline-block w-2 h-2 rounded-full bg-[#cc2222] shadow-[0_0_5px_#f53333]"></span>
+      <span class="text-[#8bac0f] font-bold tracking-wider hidden sm:inline">AREA 51 • UFO SCANNER</span>
+    </div>
+
+    <!-- Navigation Pills -->
+    <div class="flex items-center gap-1 overflow-x-auto py-0.5" id="nav-tabs-container">
+      <button class="nav-tab-btn active" data-target="main-menu" title="Huvudmeny">1. MENY</button>
+      <button class="nav-tab-btn" data-target="level-select" title="Nivåväljare">2. NIVÅER</button>
+      <button class="nav-tab-btn" data-target="game-board" title="Spelplan 10x10">3. SPELPLAN</button>
+      <button class="nav-tab-btn" data-target="gameboy-view" title="Game Boy-vy 15x15">4. GAME BOY</button>
+    </div>
+
+    <!-- Control utilities -->
+    <div class="flex items-center gap-2">
+      <button id="music-toggle-btn" class="text-xs hover:scale-110 active:scale-95 transition-transform" title="Musik På/Av">🎵</button>
+      <button id="sound-toggle-btn" class="text-xs hover:scale-110 active:scale-95 transition-transform" title="Ljudeffekter På/Av">🔊</button>
+      <button id="toggle-nav-visibility-btn" class="text-[7px] text-[#688c0a] hover:text-[#9bbc0f] uppercase" title="Dölj Flikar">▲</button>
+    </div>
+  </nav>
+
+  <!-- ========================================================
+       MAIN APP CONTAINER FOR SCREENS (Fullscreen on Mobile)
+       ======================================================== -->
+  <div class="flex-1 w-full min-h-screen flex flex-col items-center justify-start p-0 m-0">
+
+    <!-- ========================================================
+         SCREEN 1: HUVUDMENY (Alien Picross Area 51 Main Menu)
+         ======================================================== -->
+    <div id="screen-main-menu" class="game-screen-wrapper active-screen w-full min-h-screen flex-1">
+      <main class="w-full min-h-screen max-w-lg mx-auto bg-[#0c240c] rounded-none sm:rounded-2xl p-2 sm:p-3 border-0 sm:border-4 border-[#061206] shadow-none sm:shadow-2xl flex flex-col justify-between relative overflow-hidden select-none">
+        
+        <!-- Main Game Boy LCD Screen Area -->
+        <div class="lcd-screen flex-1 rounded-lg border-4 border-[#081808] flex flex-col justify-between relative overflow-hidden p-2.5">
+          
+          <!-- Background Textures: Starry Galaxy & LCD Matrix -->
+          <div class="absolute inset-0 galaxy-stars-bg pointer-events-none z-0"></div>
+          <div class="absolute inset-0 lcd-matrix pointer-events-none z-0"></div>
+
+          <!-- Futuristic UFO Tractor Beam Left Column Pylon -->
+          <aside aria-label="Left Tractor Beam Pylon" class="absolute left-0 top-0 bottom-0 w-8 sm:w-9 z-10 flex flex-col border-r-4 border-[var(--gb-darkest)] bg-[var(--gb-light)] shadow-[2px_0_0_var(--gb-dark)]">
+            <div class="h-8 border-b-4 border-[var(--gb-darkest)] bg-[var(--gb-bright)] flex items-center justify-center p-1">
+              <div class="w-full h-full border-2 border-[var(--gb-darkest)] bg-[var(--gb-light)] flex flex-col justify-between items-center p-[2px]">
+                <div class="w-full h-[2px] bg-[var(--gb-bright)]"></div>
+                <span class="text-[7px] text-[var(--gb-darkest)] leading-none">🛸</span>
+                <div class="w-full h-[2px] bg-[var(--gb-dark)]"></div>
+              </div>
+            </div>
+            <div class="flex-1 flex flex-col justify-between py-1">
+              <div class="h-7 flex items-center justify-center"><span class="text-[8px] text-[var(--gb-darkest)] font-bold">✦</span></div>
+              <div class="h-8 flex items-center justify-center"><div class="w-3.5 h-3.5 border-2 border-[var(--gb-darkest)] bg-[var(--gb-dark)] flex items-center justify-center text-[6px] text-[var(--gb-bright)]">⚡</div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-dark)] font-bold">★</span></div>
+              <div class="h-8 flex items-center justify-center relative"><div class="w-4 h-1.5 bg-[var(--gb-darkest)] shadow-[0_0_2px_var(--gb-glow)]"></div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-darkest)]">📡</span></div>
+              <div class="h-8 flex items-center justify-center"><div class="w-3 h-3 border-2 border-[var(--gb-darkest)] rotate-45 bg-[var(--gb-bright)]"></div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-dark)] font-bold">✦</span></div>
+              <div class="h-8 flex items-center justify-center relative"><div class="w-3.5 h-1.5 bg-[var(--gb-darkest)]"></div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-darkest)]">👾</span></div>
+              <div class="h-8 flex items-center justify-center"><div class="w-3 h-3 border-2 border-[var(--gb-darkest)] bg-[var(--gb-dark)]"></div></div>
+            </div>
+            <div class="h-8 border-t-4 border-[var(--gb-darkest)] bg-[var(--gb-bright)] flex items-center justify-center p-1">
+              <div class="w-full h-full border-2 border-[var(--gb-darkest)] bg-[var(--gb-dark)] flex items-center justify-center">
+                <span class="text-[6px] text-[var(--gb-bright)] font-mono">▲</span>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Futuristic UFO Tractor Beam Right Column Pylon -->
+          <aside aria-label="Right Tractor Beam Pylon" class="absolute right-0 top-0 bottom-0 w-8 sm:w-9 z-10 flex flex-col border-l-4 border-[var(--gb-darkest)] bg-[var(--gb-light)] shadow-[-2px_0_0_var(--gb-dark)]">
+            <div class="h-8 border-b-4 border-[var(--gb-darkest)] bg-[var(--gb-bright)] flex items-center justify-center p-1">
+              <div class="w-full h-full border-2 border-[var(--gb-darkest)] bg-[var(--gb-light)] flex flex-col justify-between items-center p-[2px]">
+                <div class="w-full h-[2px] bg-[var(--gb-bright)]"></div>
+                <span class="text-[7px] text-[var(--gb-darkest)] leading-none">🛸</span>
+                <div class="w-full h-[2px] bg-[var(--gb-dark)]"></div>
+              </div>
+            </div>
+            <div class="flex-1 flex flex-col justify-between py-1">
+              <div class="h-7 flex items-center justify-center"><span class="text-[8px] text-[var(--gb-darkest)] font-bold">✦</span></div>
+              <div class="h-8 flex items-center justify-center"><div class="w-3.5 h-3.5 border-2 border-[var(--gb-darkest)] bg-[var(--gb-dark)] flex items-center justify-center text-[6px] text-[var(--gb-bright)]">⚡</div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-dark)] font-bold">★</span></div>
+              <div class="h-8 flex items-center justify-center relative"><div class="w-4 h-1.5 bg-[var(--gb-darkest)] shadow-[0_0_2px_var(--gb-glow)]"></div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-darkest)]">📡</span></div>
+              <div class="h-8 flex items-center justify-center"><div class="w-3 h-3 border-2 border-[var(--gb-darkest)] rotate-45 bg-[var(--gb-bright)]"></div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-dark)] font-bold">✦</span></div>
+              <div class="h-8 flex items-center justify-center relative"><div class="w-3.5 h-1.5 bg-[var(--gb-darkest)]"></div></div>
+              <div class="h-7 flex items-center justify-center"><span class="text-[7px] text-[var(--gb-darkest)]">👾</span></div>
+              <div class="h-8 flex items-center justify-center"><div class="w-3 h-3 border-2 border-[var(--gb-darkest)] bg-[var(--gb-dark)]"></div></div>
+            </div>
+            <div class="h-8 border-t-4 border-[var(--gb-darkest)] bg-[var(--gb-bright)] flex items-center justify-center p-1">
+              <div class="w-full h-full border-2 border-[var(--gb-darkest)] bg-[var(--gb-dark)] flex items-center justify-center">
+                <span class="text-[6px] text-[var(--gb-bright)] font-mono">▲</span>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Center Inner Sanctum -->
+          <div class="relative z-20 mx-8 sm:mx-9 flex flex-col justify-between h-full pt-1 pb-1">
+            
+            <!-- TOP SECTION: Carved Ancient Stone Title Header Banner -->
+            <section aria-label="Game Title Banner" class="flex flex-col items-center">
+              <div class="w-full flex items-center justify-center mb-1">
+                <div class="h-2 w-8 border-b-2 border-r-2 border-[var(--gb-darkest)] bg-[var(--gb-mid)]"></div>
+                <div class="px-2 py-[2px] bg-[var(--gb-darkest)] text-[var(--gb-bright)] text-[7px] tracking-widest uppercase border-2 border-[var(--gb-mid)]">
+                  ★ 1947 ROSWELL LABS ★
+                </div>
+                <div class="h-2 w-8 border-b-2 border-l-2 border-[var(--gb-darkest)] bg-[var(--gb-mid)]"></div>
+              </div>
+
+              <!-- Heavy Carved Stone Tablet Banner -->
+              <div class="w-full stone-bezel-outer bg-[var(--gb-light)] p-2.5 text-center relative">
+                <span class="absolute top-1 left-1 w-1.5 h-1.5 bg-[var(--gb-darkest)] shadow-[1px_1px_0_var(--gb-bright)]"></span>
+                <span class="absolute top-1 right-1 w-1.5 h-1.5 bg-[var(--gb-darkest)] shadow-[1px_1px_0_var(--gb-bright)]"></span>
+                <span class="absolute bottom-1 left-1 w-1.5 h-1.5 bg-[var(--gb-darkest)] shadow-[1px_1px_0_var(--gb-bright)]"></span>
+                <span class="absolute bottom-1 right-1 w-1.5 h-1.5 bg-[var(--gb-darkest)] shadow-[1px_1px_0_var(--gb-bright)]"></span>
+
+                <div class="text-[7px] text-[var(--gb-dark)] font-bold tracking-[0.25em] uppercase mb-1">
+                  - GALACTIC SPECIMEN SCAN -
+                </div>
+
+                <div class="relative inline-block my-1">
+                  <h1 class="text-[17px] sm:text-[19px] leading-tight text-[var(--gb-darkest)] tracking-tight font-black uppercase drop-shadow-[2px_2px_0_var(--gb-bright)]">
+                    ALIEN<br/>
+                    <span class="text-[18px] sm:text-[20px] text-[var(--gb-darkest)] tracking-normal border-b-4 border-[var(--gb-darkest)] pb-0.5 inline-block">
+                      PICROSS
+                    </span>
+                  </h1>
+                  <div class="text-[7.5px] sm:text-[8.5px] font-bold text-[var(--gb-darkest)] tracking-widest uppercase mt-1">
+                    BY GORAN AGETON
+                  </div>
+                </div>
+
+                <div class="mt-1.5 pt-1 border-t-2 border-[var(--gb-dark)] flex items-center justify-center gap-3 text-[8px] text-[var(--gb-darkest)]">
+                  <span>◄ 🛸 ►</span>
+                  <span class="text-[7px] font-bold tracking-wider">AREA 51 EDITION</span>
+                  <span>◄ 🛸 ►</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- MID SECTION: Interactive Center Menu Tablet Buttons -->
+            <section aria-label="Main Menu Options" class="my-auto py-2 flex flex-col items-center w-full px-1">
+              <div class="w-full flex flex-col gap-3 relative">
+
+                <!-- BUTTON 1: HOW TO ABDUCT -->
+                <div class="relative w-full flex items-center">
+                  <div class="w-6 sm:w-7 flex-shrink-0 flex items-center justify-center"></div>
+                  <button type="button" id="menu-btn-how-to" class="stone-tablet-btn flex-1 py-2.5 px-2 text-center text-[10px] sm:text-[11px] font-bold text-[var(--gb-darkest)] tracking-wider uppercase">
+                    HUR MAN SPELAR
+                  </button>
+                </div>
+
+                <!-- BUTTON 2: GALACTIC PICROSS (HIGHLIGHTED WITH RAYGUN / BEAM CURSOR) -->
+                <div class="relative w-full flex items-center">
+                  <!-- Active Pixel Raygun Cursor on Left Edge -->
+                  <div class="w-6 sm:w-7 flex-shrink-0 flex items-center justify-center pr-1">
+                    <svg class="cursor-chisel-anim w-6 h-6 drop-shadow-[1px_1px_0_var(--gb-darkest)]" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <polygon points="12,8 9,5 9,11" fill="var(--gb-darkest)" />
+                      <rect x="7" y="6" width="3" height="4" fill="var(--gb-darkest)" />
+                      <rect x="8" y="7" width="2" height="2" fill="var(--gb-bright)" />
+                      <rect x="5" y="5" width="2" height="6" fill="var(--gb-dark)" />
+                      <rect x="1" y="6" width="4" height="4" fill="var(--gb-darkest)" />
+                      <rect x="2" y="7" width="2" height="2" fill="var(--gb-light)" />
+                      <rect x="0" y="6" width="1" height="4" fill="var(--gb-dark)" />
+                    </svg>
+                  </div>
+
+                  <!-- Highlighted Stone Tablet Button -->
+                  <button type="button" id="menu-btn-picross" class="stone-tablet-btn active-tab flex-1 py-3 px-2 text-center text-[10px] sm:text-[11px] font-bold text-[var(--gb-darkest)] tracking-wider uppercase border-[var(--gb-darkest)] relative">
+                    <span class="absolute left-1.5 top-1.5 text-[8px] text-[var(--gb-dark)]">◤</span>
+                    <span class="absolute right-1.5 top-1.5 text-[8px] text-[var(--gb-dark)]">◥</span>
+                    <span class="absolute left-1.5 bottom-1.5 text-[8px] text-[var(--gb-dark)]">◣</span>
+                    <span class="absolute right-1.5 bottom-1.5 text-[8px] text-[var(--gb-dark)]">◢</span>
+                    <span class="inline-block border-b-2 border-[var(--gb-darkest)] pb-[1px]">
+                      GALAKTISK PICROSS
+                    </span>
+                  </button>
+                </div>
+
+                <!-- BUTTON 3: GAME BOY VIEW 15x15 -->
+                <div class="relative w-full flex items-center">
+                  <div class="w-6 sm:w-7 flex-shrink-0 flex items-center justify-center"></div>
+                  <button type="button" id="menu-btn-gameboy" class="stone-tablet-btn flex-1 py-2 px-2 text-center text-[8px] sm:text-[9px] font-bold text-[var(--gb-darkest)] tracking-wider uppercase opacity-90">
+                    MODERSKEPP 15x15
+                  </button>
+                </div>
+
+                <!-- BUTTON 4: SETTINGS (SPRÅK, LJUD, SVÅRIGHET) -->
+                <div class="relative w-full flex items-center mt-0.5">
+                  <div class="w-6 sm:w-7 flex-shrink-0 flex items-center justify-center"></div>
+                  <button type="button" id="menu-btn-settings" class="stone-tablet-btn flex-1 py-2 px-2.5 text-center text-[8px] sm:text-[9px] font-bold text-[var(--gb-darkest)] tracking-wider uppercase cursor-pointer flex items-center justify-between" title="Spelinställningar: Språk, Ljud, Svårighetsgrad">
+                    <span class="flex items-center gap-1.5">
+                      <span>⚙️</span>
+                      <span id="menu-settings-text">INSTÄLLNINGAR</span>
+                    </span>
+                    <span id="menu-settings-badge" class="text-[6.5px] bg-[var(--gb-darkest)] text-[var(--gb-bright)] px-1.5 py-0.5 rounded font-mono font-bold">🟢 30M • 🇸🇪</span>
+                  </button>
+                </div>
+
+                <!-- BUTTON 5: EXIT GAME -->
+                <div class="relative w-full flex items-center mt-0.5">
+                  <div class="w-6 sm:w-7 flex-shrink-0 flex items-center justify-center"></div>
+                  <button type="button" id="menu-btn-exit" class="stone-tablet-btn flex-1 py-1.5 px-2 text-center text-[8px] sm:text-[9px] font-bold text-[#300000] border border-[#300000]/60 tracking-wider uppercase opacity-95 cursor-pointer" title="Stäng och avsluta spelet">
+                    ✕ AVSLUTA SPEL (EXIT)
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- Pixel Alien Mascot Silhouette Alcove -->
+              <div class="mt-3 px-3 py-1.5 bg-[var(--gb-darkest)] border-2 border-[var(--gb-mid)] text-[var(--gb-bright)] flex items-center justify-between w-full max-w-[240px] text-[7px] tracking-widest">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-4 h-4 bg-[var(--gb-light)] flex flex-col justify-center items-center p-[1px] border border-[var(--gb-dark)]">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" shape-rendering="crispEdges">
+                      <rect x="2" y="1" width="2" height="2" fill="#0f380f" />
+                      <rect x="12" y="1" width="2" height="2" fill="#0f380f" />
+                      <rect x="3" y="3" width="1" height="1" fill="#0f380f" />
+                      <rect x="12" y="3" width="1" height="1" fill="#0f380f" />
+                      <rect x="4" y="4" width="8" height="2" fill="#0f380f" />
+                      <rect x="3" y="6" width="10" height="5" fill="#0f380f" />
+                      <rect x="4" y="7" width="2" height="3" fill="#9bbc0f" />
+                      <rect x="10" y="7" width="2" height="3" fill="#9bbc0f" />
+                      <rect x="7" y="10" width="2" height="1" fill="#9bbc0f" />
+                    </svg>
+                  </div>
+                  <span>RADAR LEVEL 1-A READY</span>
+                </div>
+                <span class="animate-pulse">●</span>
+              </div>
+            </section>
+
+            <!-- BOTTOM SECTION: Embedded Stone Floor Border & Controller Navigation Prompt -->
+            <footer aria-label="Menu Navigation Footer" class="w-full flex flex-col items-center">
+              <div class="w-full bg-[var(--gb-mid)] border-t-2 border-[var(--gb-dark)] h-2 mb-[1px]"></div>
+              
+              <div class="w-full bg-[var(--gb-light)] border-4 border-[var(--gb-darkest)] p-2 shadow-[inset_0_2px_0_var(--gb-bright)] flex items-center justify-between">
+                <!-- Left Action: A Button Enter -->
+                <button type="button" id="main-menu-footer-select" class="flex items-center gap-1 text-[7px] sm:text-[8px] font-bold text-[var(--gb-darkest)] hover:opacity-80 active:translate-y-0.5">
+                  <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[var(--gb-darkest)] text-[var(--gb-bright)] text-[7px] border border-[var(--gb-light)]">
+                    A
+                  </span>
+                  <span class="tracking-wider">BEAM TARGET</span>
+                </button>
+
+                <!-- Center Decorative Glyph Divider -->
+                <span class="text-[7px] text-[var(--gb-dark)]">❖</span>
+
+                <!-- Required User Text Prompt: B + CANCEL -->
+                <div class="flex items-center gap-1 text-[7px] sm:text-[8px] font-bold text-[var(--gb-darkest)]">
+                  <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[var(--gb-darkest)] text-[var(--gb-bright)] text-[7px] border border-[var(--gb-light)]">
+                    B
+                  </span>
+                  <span class="tracking-wider">+ CANCEL</span>
+                </div>
+              </div>
+
+              <!-- Bottom Stone Floor Edge Trim with Masonry Seams -->
+              <div class="w-full grid grid-cols-4 gap-1 mt-1 px-1">
+                <div class="h-1.5 bg-[var(--gb-darkest)]"></div>
+                <div class="h-1.5 bg-[var(--gb-dark)]"></div>
+                <div class="h-1.5 bg-[var(--gb-darkest)]"></div>
+                <div class="h-1.5 bg-[var(--gb-dark)]"></div>
+              </div>
+            </footer>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- ========================================================
+         SCREEN 2: NIVÅVÄLJARE (Archaeology Picross Level Select)
+         ======================================================== -->
+    <div id="screen-level-select" class="game-screen-wrapper w-full min-h-screen flex-1">
+      <div class="relative w-full min-h-screen max-w-lg mx-auto bg-[#2d312e] rounded-none sm:rounded-[36px] p-2 sm:p-3 shadow-none sm:shadow-2xl flex flex-col justify-between border-0 sm:border-4 border-[#1f2220] overflow-hidden select-none">
+        
+        <!-- Main Game Boy LCD Screen -->
+        <main class="relative flex-1 bg-gb-lightest rounded-lg border-4 border-gb-darkest p-2 flex flex-col justify-between overflow-hidden shadow-inner lcd-grid-pattern">
+          <div class="absolute inset-0 pointer-events-none scanlines z-20"></div>
+
+          <!-- Header Section -->
+          <header class="relative z-10 w-full mb-1">
+            <div class="flex items-center justify-center gap-2 py-1 text-center font-extrabold text-[12px] sm:text-[13px] tracking-tight border-b-2 border-gb-darkest">
+              <span class="text-[10px] leading-none">●</span>
+              <h1 class="tracking-wide">SELECT TARGET</h1>
+              <span class="text-[10px] leading-none">●</span>
+            </div>
+
+            <!-- Difficulty Category Tabs for Stats & Gameplay -->
+            <div class="flex items-center justify-between gap-1 mt-1" id="level-diff-tabs">
+              <button type="button" class="diff-tab-btn active flex-1 py-0.5 text-[6.5px] sm:text-[7.5px] font-bold uppercase text-center border border-gb-darkest bg-gb-darkest text-gb-lightest cursor-pointer" data-diff-tab="easy" id="tab-btn-easy">
+                🟢 LÄTT (30M)
+              </button>
+              <button type="button" class="diff-tab-btn flex-1 py-0.5 text-[6.5px] sm:text-[7.5px] font-bold uppercase text-center border border-gb-darkest bg-gb-light/40 text-gb-darkest cursor-pointer" data-diff-tab="medium" id="tab-btn-medium">
+                🟡 MEDEL (20M)
+              </button>
+              <button type="button" class="diff-tab-btn flex-1 py-0.5 text-[6.5px] sm:text-[7.5px] font-bold uppercase text-center border border-gb-darkest bg-gb-light/40 text-gb-darkest cursor-pointer" data-diff-tab="hard" id="tab-btn-hard">
+                🔴 SVÅR (15M)
+              </button>
+              <button type="button" class="diff-tab-btn px-1.5 py-0.5 text-[6.5px] sm:text-[7.5px] font-bold uppercase text-center border border-gb-darkest bg-gb-light/40 text-gb-darkest cursor-pointer" data-diff-tab="all" id="tab-btn-all" title="Visa sammanlagt">
+                ALLA
+              </button>
+            </div>
+
+            <!-- Problem Statistics Box -->
+            <section class="mt-0.5 border-2 border-gb-darkest bg-gb-lightest cursor-pointer hover:bg-gb-light/20 transition-colors shadow-sm" id="stats-dashboard-box" title="Klicka för att se Top 5 bästa tider">
+              <div class="grid grid-cols-3 divide-x-2 divide-gb-darkest text-center">
+                <div class="p-1 flex flex-col justify-center">
+                  <span class="text-[7.5px] tracking-wider uppercase" id="stats-first-label">FÖRSTA</span>
+                  <span class="text-[10px] font-bold mt-0.5 tracking-widest font-mono" id="stats-first">--:--</span>
+                </div>
+                <div class="p-1 flex flex-col justify-center bg-gb-light/30">
+                  <span class="text-[7.5px] tracking-wider uppercase" id="stats-times-label">GÅNGER</span>
+                  <span class="text-[10px] font-bold mt-0.5 font-mono" id="stats-times">0</span>
+                </div>
+                <div class="p-1 flex flex-col justify-center">
+                  <span class="text-[7.5px] tracking-wider uppercase" id="stats-best-label">BÄST</span>
+                  <span class="text-[10px] font-bold mt-0.5 tracking-widest font-mono" id="stats-best">--:--</span>
+                </div>
+              </div>
+              <!-- Bottom Row of Stats Box: Category & Top 5 Button -->
+              <div class="border-t border-gb-darkest/60 bg-gb-mid/20 px-1.5 py-0.5 flex items-center justify-between text-[6.5px] sm:text-[7px]">
+                <span class="font-bold tracking-tight text-gb-darkest" id="stats-cat-indicator">KATEGORI: 🟢 LÄTT (30 MIN)</span>
+                <span class="text-[7px] font-black text-gb-darkest underline flex items-center gap-0.5" id="stats-top5-action-btn">
+                  <span>🏆 TOP 5 TIDER ▸</span>
+                </span>
+              </div>
+            </section>
+          </header>
+
+          <!-- Level Matrix 64-Grid Section -->
+          <section class="relative z-10 flex-1 flex flex-col justify-start my-1 px-0.5" id="level-select-matrix">
+            <!-- Column Headers (A through H) -->
+            <div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center text-[10px] font-bold pb-1 border-b border-dashed border-gb-dark/60">
+              <div class="text-[8px] text-left pl-0.5">LV</div>
+              <div>A</div><div>B</div><div>C</div><div>D</div><div>E</div><div>F</div><div>G</div><div>H</div>
+            </div>
+
+            <!-- 8x8 Grid Rows Container (Populated dynamically with all 64 levels) -->
+            <div id="level-matrix-grid" class="flex flex-col justify-between flex-1 pt-1 gap-[2.5px]">
+              <!-- Dynamically rendered by app.js -->
+            </div>
+          </section>
+
+          <!-- Area 51 Desert Scenery & Roswell Course Stamp -->
+          <section class="relative z-10 w-full mt-2 pt-1 border-t-2 border-gb-darkest flex items-end justify-between">
+            <!-- Left Side: Area 51 Desert, UFO Tractor Beam & Abducted Cow Silhouette -->
+            <div class="flex-1 flex items-end pb-0.5 overflow-hidden">
+              <svg class="w-full h-12 pixel-sharp" fill="none" preserveAspectRatio="xMinYMax meet" viewBox="0 0 200 48">
+                <!-- Ground -->
+                <rect fill="#0f380f" height="4" width="200" x="0" y="44"></rect>
+                <!-- Desert Saguaro Cactus Left -->
+                <rect fill="#0f380f" height="20" width="4" x="8" y="24"></rect>
+                <rect fill="#0f380f" height="10" width="3" x="3" y="28"></rect>
+                <rect fill="#0f380f" height="3" width="5" x="3" y="35"></rect>
+                <rect fill="#0f380f" height="10" width="3" x="14" y="26"></rect>
+                <rect fill="#0f380f" height="3" width="5" x="12" y="33"></rect>
+                <!-- Small Desert Rocks -->
+                <rect fill="#306230" height="3" width="6" x="22" y="41"></rect>
+                <rect fill="#306230" height="2" width="4" x="32" y="42"></rect>
+                <!-- Satellite Dish / Radar Base -->
+                <rect fill="#0f380f" height="12" width="3" x="46" y="32"></rect>
+                <polygon fill="#306230" stroke="#0f380f" stroke-width="1.5" points="38,24 54,20 57,28 41,32"></polygon>
+                <!-- Flying Saucer (UFO) in mid-air -->
+                <ellipse cx="102" cy="11" rx="20" ry="5" fill="#306230" stroke="#0f380f" stroke-width="2"></ellipse>
+                <ellipse cx="102" cy="9" rx="10" ry="4" fill="#8bac0f" stroke="#0f380f" stroke-width="1.5"></ellipse>
+                <circle cx="94" cy="11" r="1.5" fill="#9bbc0f"></circle>
+                <circle cx="102" cy="12" r="1.5" fill="#9bbc0f"></circle>
+                <circle cx="110" cy="11" r="1.5" fill="#9bbc0f"></circle>
+                <!-- Tractor Beam Cone -->
+                <polygon fill="#8bac0f" fill-opacity="0.35" stroke="#306230" stroke-dasharray="2 2" stroke-width="1" points="96,16 108,16 122,44 82,44"></polygon>
+                <!-- Abducted Cow Floating in Beam -->
+                <!-- Cow Body -->
+                <rect fill="#0f380f" height="5" width="8" x="98" y="27"></rect>
+                <!-- Cow Head -->
+                <rect fill="#0f380f" height="4" width="4" x="95" y="26"></rect>
+                <!-- Cow Horns -->
+                <rect fill="#8bac0f" height="2" width="1" x="94" y="25"></rect>
+                <rect fill="#8bac0f" height="2" width="1" x="97" y="25"></rect>
+                <!-- Cow Spots -->
+                <rect fill="#9bbc0f" height="2" width="2" x="100" y="28"></rect>
+                <!-- Cow Legs -->
+                <rect fill="#0f380f" height="4" width="1" x="99" y="32"></rect>
+                <rect fill="#0f380f" height="4" width="1" x="101" y="32"></rect>
+                <rect fill="#0f380f" height="4" width="1" x="104" y="32"></rect>
+                <!-- Right Side: Secret Hangar Bunker -->
+                <polygon fill="#306230" stroke="#0f380f" stroke-width="2" points="135,44 142,32 175,32 182,44"></polygon>
+                <rect fill="#0f380f" height="8" width="14" x="151" y="36"></rect>
+                <line x1="158" y1="36" x2="158" y2="44" stroke="#8bac0f" stroke-width="1"></line>
+              </svg>
+            </div>
+
+            <!-- Right Side: Decorative "ROSWELL AREA 51" Emblem Stamp -->
+            <div class="w-[124px] border-2 border-gb-darkest bg-gb-lightest p-1 flex items-center gap-1.5 shadow-sm">
+              <div class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-gb-light/40 border border-gb-darkest">
+                <!-- Cute Alien Head Icon -->
+                <svg class="pixel-sharp" fill="none" height="18" viewBox="0 0 16 16" width="18" shape-rendering="crispEdges">
+                  <rect x="2" y="1" width="2" height="2" fill="#0f380f" />
+                  <rect x="12" y="1" width="2" height="2" fill="#0f380f" />
+                  <rect x="3" y="3" width="1" height="1" fill="#0f380f" />
+                  <rect x="12" y="3" width="1" height="1" fill="#0f380f" />
+                  <rect x="4" y="4" width="8" height="2" fill="#0f380f" />
+                  <rect x="3" y="6" width="10" height="6" fill="#0f380f" />
+                  <rect x="4" y="7" width="2" height="3" fill="#9bbc0f" />
+                  <rect x="10" y="7" width="2" height="3" fill="#9bbc0f" />
+                  <rect x="7" y="10" width="2" height="1" fill="#9bbc0f" />
+                </svg>
+              </div>
+              <div class="flex flex-col leading-tight">
+                <span class="text-[8px] font-extrabold tracking-tighter">AREA 51</span>
+                <span class="text-[7.5px] font-bold tracking-widest text-gb-dark">COURSE</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Bottommost Action Prompt Footer -->
+          <footer class="relative z-10 w-full mt-1 pt-1 border-t-2 border-dashed border-gb-dark/80 flex items-center justify-between text-[9px] px-1 font-bold">
+            <button type="button" id="level-select-action-btn" class="text-[8px] opacity-90 hover:opacity-100 flex items-center gap-1 cursor-pointer">
+              <span>A • BEAM TARGET</span>
+            </button>
+            <button type="button" id="level-select-exit-btn" class="flex items-center gap-1 bg-gb-darkest text-gb-lightest px-2 py-0.5 rounded-sm hover:bg-gb-dark cursor-pointer active:translate-y-0.5">
+              <span>B</span>
+              <span class="text-[7px]">◆</span>
+              <span>EXIT</span>
+            </button>
+            <span class="text-[8px] opacity-75">START • OPT</span>
+          </footer>
+        </main>
+
+        <!-- Handheld Bottom Brand Stamp -->
+        <div class="w-full flex items-center justify-between px-3 py-1 text-zinc-500 text-[10px]">
+          <div class="italic font-bold tracking-widest text-zinc-400">
+            Nintendo <span class="not-italic text-[7.5px] border border-zinc-600 px-0.5 rounded font-mono">GAME BOY</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="w-7 h-2 bg-zinc-800 rounded-full rotate-[-25deg] shadow-inner"></span>
+            <span class="w-7 h-2 bg-zinc-800 rounded-full rotate-[-25deg] shadow-inner"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SCREEN 3: SPELPLAN (UFO Abduction Scanner 10x10 Edition)
+         ======================================================== -->
+    <div id="screen-game-board" class="game-screen-wrapper w-full min-h-screen flex-1 relative">
+      <!-- Floating Penalty Toast Notification -->
+      <div id="penalty-toast" class="hidden absolute top-12 left-1/2 -translate-x-1/2 z-50 bg-[#cc2222] text-white border-2 border-[#300000] px-3 py-1.5 font-pixel text-[9px] shadow-2xl tracking-wider uppercase pointer-events-none rounded-sm">
+        ZAP! EARTHLING DETECTED -2:00!
+      </div>
+      <main id="game-board-container" class="w-full min-h-screen max-w-lg mx-auto bg-[#7a9a2d] border-0 sm:border-4 border-[#0f380f] rounded-none sm:rounded-2xl shadow-none sm:shadow-2xl p-1.5 sm:p-3 relative flex flex-col justify-between gap-1 overflow-hidden select-none">
+        
+        <!-- Top Reference Accent Banner -->
+        <div class="w-full overflow-hidden rounded-t border-2 border-[var(--gb-darkest)] bg-[#306230] max-h-12 flex items-center justify-center opacity-90 shadow-inner">
+          <div class="w-full py-1.5 px-3 bg-[#0f380f] text-[#8bac0f] flex items-center justify-between text-[8px] font-bold">
+            <span>🛸 UFO ABDUCTION SCANNER</span>
+            <span class="text-[#9bbc0f] animate-pulse">● REC</span>
+          </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <header class="stone-frame rounded-md p-2 flex items-center justify-between gap-1 border-2 border-[var(--gb-darkest)] bg-[#8bac0f]">
+          <!-- Cute Reactive Pixel Alien Portrait & Timer Unit -->
+          <div class="flex items-center gap-1.5 bg-[#9bbc0f] p-1.5 rounded border-2 border-[var(--gb-darkest)] shadow-inner">
+            <div id="alien-mascot-box" class="w-10 h-10 bg-[#8bac0f] border border-[var(--gb-darkest)] rounded flex items-center justify-center p-0.5 relative overflow-hidden transition-all duration-150" title="Alien Commander Zog">
+              <div id="alien-mascot-face" class="w-8 h-8 flex items-center justify-center">
+                <!-- Populated dynamically with reactive emotions in app.js -->
+                <svg class="w-8 h-8" shape-rendering="crispEdges" viewBox="0 0 24 24" fill="none">
+                  <rect x="4" y="2" width="2" height="2" fill="#0f380f" />
+                  <rect x="18" y="2" width="2" height="2" fill="#0f380f" />
+                  <rect x="5" y="4" width="2" height="2" fill="#306230" />
+                  <rect x="17" y="4" width="2" height="2" fill="#306230" />
+                  <rect x="7" y="5" width="10" height="2" fill="#0f380f" />
+                  <rect x="5" y="7" width="14" height="2" fill="#0f380f" />
+                  <rect x="4" y="9" width="16" height="5" fill="#306230" />
+                  <rect x="6" y="9" width="3" height="4" fill="#0f380f" />
+                  <rect x="15" y="9" width="3" height="4" fill="#0f380f" />
+                  <rect x="7" y="10" width="1" height="1" fill="#9bbc0f" />
+                  <rect x="16" y="10" width="1" height="1" fill="#9bbc0f" />
+                  <rect x="6" y="14" width="12" height="3" fill="#306230" />
+                  <rect x="11" y="15" width="2" height="1" fill="#0f380f" />
+                  <rect x="8" y="17" width="8" height="2" fill="#0f380f" />
+                  <rect x="9" y="19" width="6" height="3" fill="#306230" />
+                  <rect x="5" y="18" width="2" height="3" fill="#0f380f" />
+                  <rect x="17" y="18" width="2" height="3" fill="#0f380f" />
+                </svg>
+              </div>
+            </div>
+            <!-- Timer Frame -->
+            <div class="px-2 py-1 bg-[#0f380f] rounded border border-[var(--gb-dark)] flex flex-col items-center">
+              <span class="text-[7px] text-[#8bac0f] tracking-tighter uppercase font-mono">Beam Time</span>
+              <span class="text-[#9bbc0f] font-mono font-bold tracking-wider text-sm leading-none" id="picross-timer-10">30:00</span>
+            </div>
+          </div>
+
+          <!-- Right Controls Section: Audio, Pause and Large Beam Mode Toggle -->
+          <div class="flex flex-col items-end gap-1">
+            <div class="flex items-center gap-1.5">
+              <!-- Audio Quick Controls for In-Screen Play -->
+              <button type="button" id="board-music-btn" class="carved-block w-6 h-6 rounded text-[8px] flex items-center justify-center font-bold text-[var(--gb-darkest)] active:scale-95 cursor-pointer" title="Musik På/Av">
+                <span id="board-music-icon">🎵</span>
+              </button>
+              <button type="button" id="board-sound-btn" class="carved-block w-6 h-6 rounded text-[8px] flex items-center justify-center font-bold text-[var(--gb-darkest)] active:scale-95 cursor-pointer" title="Ljud På/Av">
+                <span id="board-sound-icon">🔊</span>
+              </button>
+
+              <!-- Pause Button -->
+              <button type="button" id="board-pause-btn" class="carved-block px-3 py-1.5 rounded text-[8px] flex items-center justify-center font-bold text-[var(--gb-darkest)] active:translate-y-0.5 cursor-pointer shadow-sm">
+                <span>PAUSE</span>
+              </button>
+            </div>
+
+            <!-- Large Beam Mode Switcher under Pause Button -->
+            <button type="button" id="toggle-input-mode" class="stone-tablet-btn w-full py-1.5 px-2 rounded flex items-center justify-center gap-1.5 text-[8px] sm:text-[8.5px] font-black text-[var(--gb-darkest)] cursor-pointer shadow active:scale-95 border-2 border-[var(--gb-darkest)] bg-[#9bbc0f]" title="Växla mellan Laser och Sköld">
+              <span id="beam-mode-icon" class="text-[10px] leading-none">⚡</span>
+              <span id="beam-mode-label" class="tracking-wider">LÄGE: LASER</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Game Board (Nonogram Grid & Clues) -->
+        <section class="pixel-lcd rounded-lg p-1.5 border-4 border-[var(--gb-darkest)] flex flex-col justify-center items-center shadow-inner relative">
+          <!-- Top Touch Mode Indicator Badge -->
+          <div class="w-full flex justify-between items-center px-1 mb-1 text-[7px] text-[var(--gb-dark)]">
+            <span class="font-bold tracking-tight" id="current-level-badge">UFO SCAN [LEVEL 1-A: FLYING SAUCER]</span>
+            <div class="flex items-center gap-1 bg-[#8bac0f] px-1.5 py-0.5 rounded border border-[var(--gb-darkest)]">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#0f380f] inline-block animate-ping"></span>
+              <span class="text-[6px] text-[#0f380f]" id="tool-mode-text">LASER ⚡</span>
+            </div>
+          </div>
+
+          <!-- Puzzle Matrix Container -->
+          <div class="relative bg-[var(--gb-lightest)] border-[3px] sm:border-4 border-[var(--gb-darkest)] inline-block select-none shadow-md rounded-sm" id="puzzle-wrapper">
+            <!-- Column Clues Header (Horizontal alignment with 10 puzzle columns) -->
+            <div class="flex ml-[74px] sm:ml-[84px] border-b-[3px] border-[var(--gb-darkest)] bg-[#8bac0f]" id="col-clues-container">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Rows Container: Row Clues + 10x10 Matrix -->
+            <div class="flex">
+              <!-- Row Clues (Left Bar) -->
+              <div class="w-[74px] sm:w-[84px] flex flex-col border-r-[3px] border-[var(--gb-darkest)] bg-[#8bac0f]" id="row-clues-container">
+                <!-- Dynamically populated -->
+              </div>
+
+              <!-- 10x10 Nonogram Grid -->
+              <div class="grid grid-cols-10 grid-rows-10" id="picross-grid-10" role="grid">
+                <!-- Dynamically populated with 100 tiles -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Handheld Controller Section -->
+        <footer class="stone-frame rounded-xl p-3 border-2 border-[var(--gb-darkest)] flex items-center justify-between mt-1 relative">
+          <!-- Left: Cross D-Pad -->
+          <div class="relative w-28 h-28 flex items-center justify-center">
+            <div class="w-9 h-9 bg-[var(--gb-dark)] absolute rounded-sm border border-[var(--gb-darkest)] flex items-center justify-center">
+              <div class="w-3.5 h-3.5 rounded-full bg-[var(--gb-darkest)] opacity-50 shadow-inner"></div>
+            </div>
+            <button aria-label="Up" class="dpad-btn absolute top-0 w-9 h-10 rounded-t-md flex items-center justify-center active:translate-y-0.5" id="btn-up">
+              <svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] mb-2" viewBox="0 0 24 24"><polygon points="12,4 4,18 20,18"></polygon></svg>
+            </button>
+            <button aria-label="Down" class="dpad-btn absolute bottom-0 w-9 h-10 rounded-b-md flex items-center justify-center active:translate-y-0.5" id="btn-down">
+              <svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] mt-2" viewBox="0 0 24 24"><polygon points="12,20 4,6 20,6"></polygon></svg>
+            </button>
+            <button aria-label="Left" class="dpad-btn absolute left-0 h-9 w-10 rounded-l-md flex items-center justify-center active:translate-x-0.5" id="btn-left">
+              <svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] mr-2" viewBox="0 0 24 24"><polygon points="4,12 18,4 18,20"></polygon></svg>
+            </button>
+            <button aria-label="Right" class="dpad-btn absolute right-0 h-9 w-10 rounded-r-md flex items-center justify-center active:translate-x-0.5" id="btn-right">
+              <svg class="w-3.5 h-3.5 fill-[var(--gb-lightest)] ml-2" viewBox="0 0 24 24"><polygon points="20,12 6,4 6,20"></polygon></svg>
+            </button>
+          </div>
+
+          <!-- Right: Action Buttons (A & B) -->
+          <div class="flex items-center gap-3 pr-1">
+            <!-- Button A (Zap / Laser) -->
+            <div class="flex flex-col items-center gap-1">
+              <button aria-label="Button A: Zap Laser" class="retro-round-btn w-13 h-13 sm:w-14 sm:h-14 rounded-full flex flex-col items-center justify-center p-2.5" id="btn-action-a">
+                <svg class="w-6 h-6 fill-[var(--gb-lightest)]" viewBox="0 0 24 24" shape-rendering="crispEdges">
+                  <polygon points="13,2 4,14 11,14 11,22 20,10 13,10"></polygon>
+                </svg>
+              </button>
+              <span class="text-[8px] font-bold text-[var(--gb-darkest)]">A (ZAP)</span>
+              <span class="text-[6.5px] font-bold text-[var(--gb-dark)] -mt-1 tracking-tight">LASER</span>
+            </div>
+
+            <!-- Button B (Shield / X) -->
+            <div class="flex flex-col items-center gap-1 mt-5">
+              <button aria-label="Button B: Shield Forcefield" class="retro-round-btn w-13 h-13 sm:w-14 sm:h-14 rounded-full flex flex-col items-center justify-center p-2.5" id="btn-action-b">
+                <svg class="w-5 h-5 fill-[var(--gb-lightest)]" viewBox="0 0 24 24">
+                  <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm0 3.5c2.3 0 4.1 1.8 4.1 4.1 0 1.2-.5 2.3-1.3 3.1l-2.8-2.8V6.5h-1.5v3.4l-2.8 2.8c-.8-.8-1.3-1.9-1.3-3.1 0-2.3 1.8-4.1 4.1-4.1z"></path>
+                </svg>
+              </button>
+              <span class="text-[8px] font-bold text-[var(--gb-darkest)]">B (SHIELD)</span>
+              <span class="text-[6.5px] font-bold text-[var(--gb-dark)] -mt-1 tracking-tight">SHIELD</span>
+            </div>
+          </div>
+        </footer>
+
+      </main>
+    </div>
+
+    <!-- ========================================================
+         SCREEN 4: GAME BOY-VY (Retro 8-Bit Handheld DMG 15x15)
+         ======================================================== -->
+    <div id="screen-gameboy-view" class="game-screen-wrapper w-full min-h-screen flex-1">
+      <main class="w-full min-h-screen max-w-lg mx-auto bg-[#d3d2ce] rounded-none sm:rounded-3xl p-3 sm:p-4 pt-3 pb-6 flex flex-col justify-between items-center relative overflow-hidden select-none border-0 sm:border-2 border-[#b8b7b2]">
+        
+        <!-- Top subtle curved vent indents -->
+        <div class="w-full flex justify-between px-6 mb-2 opacity-40">
+          <div class="h-1 w-12 bg-zinc-600 rounded-full"></div>
+          <div class="h-1 w-12 bg-zinc-600 rounded-full"></div>
+        </div>
+
+        <!-- Screen Bezel -->
+        <div class="w-full bg-[#757788] rounded-t-xl rounded-b-3xl p-2.5 sm:p-3 shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),0_2px_4px_rgba(255,255,255,0.4)] relative">
+          <!-- Subtle Battery LED Indicator -->
+          <div class="flex items-center justify-start mb-1 px-1">
+            <div class="w-2.5 h-2.5 rounded-full bg-red-600 shadow-[0_0_6px_#ff0000] border border-red-950 animate-pulse"></div>
+          </div>
+
+          <!-- LCD Screen Display -->
+          <section class="lcd-screen w-full aspect-[1/1] border-[3px] border-[#202028] rounded p-1.5 flex flex-col justify-between overflow-hidden relative">
+            <!-- Header Row -->
+            <header class="flex items-start justify-between border-b-2 border-[#0f380f] pb-1 mb-0.5">
+              <div class="flex items-center space-x-1.5">
+                <!-- Cute Alien Portrait -->
+                <div class="w-8 h-8 bg-[#8bac0f] border border-[#0f380f] relative overflow-hidden shrink-0 shadow-[1px_1px_0_#0f380f] flex items-center justify-center">
+                  <svg class="w-7 h-7" viewBox="0 0 16 16" fill="none" shape-rendering="crispEdges">
+                    <rect x="2" y="1" width="2" height="2" fill="#0f380f" />
+                    <rect x="12" y="1" width="2" height="2" fill="#0f380f" />
+                    <rect x="3" y="3" width="1" height="1" fill="#0f380f" />
+                    <rect x="12" y="3" width="1" height="1" fill="#0f380f" />
+                    <rect x="4" y="4" width="8" height="2" fill="#0f380f" />
+                    <rect x="3" y="6" width="10" height="6" fill="#0f380f" />
+                    <rect x="4" y="7" width="2" height="3" fill="#9bbc0f" />
+                    <rect x="10" y="7" width="2" height="3" fill="#9bbc0f" />
+                    <rect x="7" y="10" width="2" height="1" fill="#9bbc0f" />
+                  </svg>
+                </div>
+                <!-- Timer Plaque -->
+                <div class="border border-[#0f380f] bg-[#8bac0f] px-1 py-0.5 shadow-[1px_1px_0_#0f380f]">
+                  <div class="text-[6px] tracking-tight text-[#306230] leading-none mb-0.5">BEAM</div>
+                  <div class="text-[9px] tracking-tighter font-extrabold text-[#0f380f] leading-none" id="gb-timer-display">29:42</div>
+                </div>
+              </div>
+
+              <!-- Stage Indicator -->
+              <div class="text-right flex flex-col items-end">
+                <div class="flex items-center space-x-1 mb-0.5">
+                  <span class="text-[7px] bg-[#0f380f] text-[#9bbc0f] px-1 py-0.5 rounded-[1px] font-bold">GB-1</span>
+                </div>
+                <div class="text-[6px] text-[#0f380f] font-bold">15x15 MOTHERSHIP</div>
+              </div>
+            </header>
+
+            <!-- 15x15 Picross Board Area -->
+            <div class="flex-1 flex flex-col justify-center items-center">
+              <div class="w-full max-w-[240px] aspect-square border-2 border-[#0f380f] bg-[#8bac0f]/30" id="gameboy-grid-15">
+                <div class="grid grid-cols-15 w-full h-full" style="grid-template-columns: repeat(15, minmax(0, 1fr)); grid-template-rows: repeat(15, minmax(0, 1fr));">
+                  <!-- Generated 225 cells with authentic partial solve -->
+                  <script>
+                    (function(){
+                      const container = document.currentScript.parentElement;
+                      for(let i=0; i<225; i++) {
+                        const cell = document.createElement('div');
+                        const r = Math.floor(i / 15);
+                        const c = i % 15;
+                        cell.className = 'cell-border border-r border-b border-[#0f380f]/20 flex items-center justify-center font-bold text-[6px] cursor-pointer select-none';
+                        if (c % 5 === 4) cell.classList.add('border-r-2', 'border-r-[#0f380f]');
+                        if (r % 5 === 4) cell.classList.add('border-b-2', 'border-b-[#0f380f]');
+                        if ((r >= 3 && r <= 11 && c >= 3 && c <= 11) && ((r+c)%3 !== 0)) {
+                          cell.classList.add('bg-[#0f380f]');
+                        } else if ((r+c)%4 === 0) {
+                          cell.innerText = '✕';
+                        }
+                        container.appendChild(cell);
+                      }
+                    })();
+                  </script>
+                </div>
+              </div>
+            </div>
+
+            <!-- In-game Lower Status -->
+            <footer class="mt-0.5 pt-0.5 border-t border-[#0f380f]/40 flex justify-between items-center text-[6px] tracking-tight text-[#0f380f]">
+              <div class="flex items-center space-x-2">
+                <span>A: ZAP</span>
+                <span>B: SHIELD ✕</span>
+              </div>
+              <div class="font-bold">START: PAUSE</div>
+            </footer>
+          </section>
+        </div>
+
+        <!-- Brand Header & In-Screen Sound Controls -->
+        <div class="w-full flex items-center justify-between px-3 mt-3 mb-1">
+          <div class="text-[10px] font-black tracking-widest text-[#2e3160] italic">
+            ALIEN<span class="text-[#882233]">-CROSS</span> 51
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="gb-music-btn" class="px-1.5 py-0.5 bg-[#bfbeb8] text-[#2e3160] rounded border border-[#8a8984] text-[8px] font-bold active:scale-95 cursor-pointer shadow-sm" title="Game Boy Musik">
+              <span id="gb-music-icon">🎵</span>
+            </button>
+            <button type="button" id="gb-sound-btn" class="px-1.5 py-0.5 bg-[#bfbeb8] text-[#2e3160] rounded border border-[#8a8984] text-[8px] font-bold active:scale-95 cursor-pointer shadow-sm" title="Game Boy SFX">
+              <span id="gb-sound-icon">🔊</span>
+            </button>
+            <div class="text-[6px] text-zinc-500 font-bold tracking-tighter">
+              DMG-01
+            </div>
+          </div>
+        </div>
+
+        <!-- Handheld Controls Panel -->
+        <section class="w-full flex justify-between items-center px-2 mt-2 relative">
+          <!-- Directional D-Pad -->
+          <div class="relative w-24 h-24 flex items-center justify-center">
+            <div class="absolute w-24 h-24 rounded-full bg-[#bfbeb8] shadow-[inset_0_3px_6px_rgba(0,0,0,0.35)]"></div>
+            <div class="relative w-20 h-20">
+              <button aria-label="Up" id="gb-btn-up" class="d-pad-btn absolute top-0 left-7 w-7 h-8 bg-[#1c1c1f] rounded-t-sm flex items-start justify-center pt-1 text-zinc-500 text-[8px]">▲</button>
+              <button aria-label="Down" id="gb-btn-down" class="d-pad-btn absolute bottom-0 left-7 w-7 h-8 bg-[#1c1c1f] rounded-b-sm flex items-end justify-center pb-1 text-zinc-500 text-[8px]">▼</button>
+              <button aria-label="Left" id="gb-btn-left" class="d-pad-btn absolute top-7 left-0 w-8 h-7 bg-[#1c1c1f] rounded-l-sm flex items-center justify-start pl-1 text-zinc-500 text-[8px]">◀</button>
+              <button aria-label="Right" id="gb-btn-right" class="d-pad-btn absolute top-7 right-0 w-8 h-7 bg-[#1c1c1f] rounded-r-sm flex items-center justify-end pr-1 text-zinc-500 text-[8px]">▶</button>
+              <div class="absolute top-7 left-7 w-7 h-7 bg-[#1c1c1f] flex items-center justify-center"><div class="w-3 h-3 rounded-full bg-[#151517] shadow-inner"></div></div>
+            </div>
+          </div>
+
+          <!-- Action Buttons A & B (Slanted) -->
+          <div class="relative w-28 h-20 flex items-center justify-center">
+            <div class="absolute w-28 h-14 bg-[#bfbeb8] rounded-full rotate-[-25deg] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+            <div class="relative flex space-x-3 rotate-[-25deg] items-center">
+              <div class="flex flex-col items-center">
+                <button aria-label="Button B" id="gb-btn-b" class="action-btn w-9 h-9 rounded-full bg-[#8c183b] flex items-center justify-center text-white text-[9px] font-bold active:scale-95"></button>
+                <span class="text-[7px] font-black text-[#2e3160] mt-1 italic">B</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <button aria-label="Button A" id="gb-btn-a" class="action-btn w-9 h-9 rounded-full bg-[#8c183b] flex items-center justify-center text-white text-[9px] font-bold active:scale-95"></button>
+                <span class="text-[7px] font-black text-[#2e3160] mt-1 italic">A</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SELECT & START Buttons -->
+        <div class="w-full flex justify-center items-center space-x-6 mt-3 mb-1">
+          <div class="flex flex-col items-center">
+            <button aria-label="Select" id="gb-btn-select" class="pill-btn w-10 h-3 bg-[#6e6e76] rounded-full border border-black/40"></button>
+            <span class="text-[6px] font-black tracking-widest text-[#2e3160] mt-1">SELECT</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <button aria-label="Start" id="gb-btn-start" class="pill-btn w-10 h-3 bg-[#6e6e76] rounded-full border border-black/40"></button>
+            <span class="text-[6px] font-black tracking-widest text-[#2e3160] mt-1">START</span>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- ========================================================
+       RETRO MODAL: HOW TO PLAY (Area 51 Intel & Alien Tips)
+       ======================================================== -->
+  <div id="how-to-modal" class="hidden fixed inset-0 z-50 retro-modal-backdrop flex items-center justify-center p-3 select-none">
+    <div class="w-full max-w-[360px] stone-bezel-outer bg-[var(--gb-light)] p-3 text-[var(--gb-darkest)] flex flex-col gap-2 relative">
+      <div class="flex items-center justify-between border-b-2 border-[var(--gb-darkest)] pb-1">
+        <span class="text-[9px] font-bold">★ AREA 51 SCANNER INTEL ★</span>
+        <button type="button" class="text-[10px] font-bold px-1 hover:text-[var(--gb-bright)] cursor-pointer" data-close-modal="how-to-modal">✕</button>
+      </div>
+      <div class="text-[7.5px] leading-relaxed flex flex-col gap-2 py-1 max-h-[60vh] overflow-y-auto">
+        <p><strong>1. DEKODA PICROSS-SIGNALER:</strong><br/>Siffrorna vid raderna och kolumnerna anger hur många energipunkter traktortrålen ska scanna in sammanhängande.</p>
+        <p><strong>2. FLERA TAL:</strong><br/>Exempelvis "2 1" betyder ett block med 2 aktiva rutor följt av minst en tom ruta innan nästa block med 1 ruta.</p>
+        <p><strong>3. VAPENSYSTEM & SKÖLDFÖRSVAR:</strong><br/>• <strong>A / ZAP (LASER):</strong> Avfyra laserpulsen för att gräva ut och aktivera rutan (mörkgrön).<br/>• <strong>B / SHIELD (X):</strong> Res en skyddssköld med ett ✕ över tomma koordinater du vet inte ska skjutas.</p>
+        <p><strong>4. STRAFFTID VID FELSKJUTNING:</strong><br/>Skjuter du fel med lasern larmas jordborna! Du bestraffas med -2:00 min, -4:00 min och därefter -8:00 min per misstag!</p>
+        <p><strong>5. GALAKTISKT UPPDRAG:</strong><br/>Fånga in alla 64 rymdföremål, utomjordingar och hemliga farkoster för moderskeppet!</p>
+      </div>
+      <button type="button" class="stone-tablet-btn py-2 text-center text-[8px] font-bold uppercase mt-1 cursor-pointer" data-close-modal="how-to-modal">
+        MOTTAGET (A)
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       RETRO MODAL: PAUSE / OPTIONS MENU
+       ======================================================== -->
+  <div id="pause-modal" class="hidden fixed inset-0 z-50 retro-modal-backdrop flex items-center justify-center p-3 select-none">
+    <div class="w-full max-w-[300px] stone-bezel-outer bg-[var(--gb-light)] p-3 text-[var(--gb-darkest)] flex flex-col gap-2.5">
+      <div class="text-center text-[10px] font-bold border-b-2 border-[var(--gb-darkest)] pb-1">
+        - PAUSE -
+      </div>
+      <div class="flex flex-col gap-2">
+        <button type="button" id="pause-btn-resume" class="stone-tablet-btn py-2 text-center text-[8px] font-bold cursor-pointer">
+          FORTSÄTT (RESUME)
+        </button>
+
+        <!-- In-Screen Sound Toggles in Pause Menu -->
+        <div class="grid grid-cols-2 gap-2 my-0.5">
+          <button type="button" id="pause-music-btn" class="stone-tablet-btn py-1.5 px-2 text-center text-[7.5px] font-bold flex items-center justify-center gap-1 cursor-pointer">
+            <span id="pause-music-icon">🎵</span>
+            <span id="pause-music-label">MUSIK: PÅ</span>
+          </button>
+          <button type="button" id="pause-sound-btn" class="stone-tablet-btn py-1.5 px-2 text-center text-[7.5px] font-bold flex items-center justify-center gap-1 cursor-pointer">
+            <span id="pause-sound-icon">🔊</span>
+            <span id="pause-sound-label">LJUD: PÅ</span>
+          </button>
+        </div>
+
+        <button type="button" id="pause-btn-restart" class="stone-tablet-btn py-2 text-center text-[8px] font-bold cursor-pointer">
+          STARTA OM MÅL
+        </button>
+        <button type="button" id="pause-btn-lang" class="stone-tablet-btn py-2 text-center text-[8px] font-bold cursor-pointer flex items-center justify-center gap-1.5" title="Byt språk / Switch language">
+          <span id="pause-lang-icon">🇸🇪</span>
+          <span id="pause-lang-label">SPRÅK: SVENSKA</span>
+        </button>
+        <button type="button" id="pause-btn-level-select" class="stone-tablet-btn py-2 text-center text-[8px] font-bold cursor-pointer">
+          MÅLVÄLJARE (NIVÅER)
+        </button>
+        <button type="button" id="pause-btn-main-menu" class="stone-tablet-btn py-2 text-center text-[8px] font-bold cursor-pointer">
+          HUVUDMENY
+        </button>
+        <button type="button" id="pause-btn-exit" class="stone-tablet-btn py-2 text-center text-[8px] font-bold text-[#300000] border border-[#300000]/70 uppercase cursor-pointer" title="Avsluta och stäng appen">
+          ✕ AVSLUTA SPEL (EXIT)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       RETRO MODAL: VICTORY ABDUCTION BANNER
+       ======================================================== -->
+  <div id="victory-modal" class="hidden fixed inset-0 z-50 retro-modal-backdrop flex items-center justify-center p-3 select-none">
+    <div class="w-full max-w-[340px] stone-bezel-outer bg-[var(--gb-bright)] p-4 text-[var(--gb-darkest)] flex flex-col items-center gap-2 text-center">
+      <div class="text-[12px] font-black tracking-wider animate-bounce">
+        ★ SPECIMEN ABDUCTED! ★
+      </div>
+      <div class="text-[8px] font-bold text-[var(--gb-dark)] tracking-wider">
+        TARGET IDENTIFIED IN TRACTOR BEAM:
+      </div>
+      <div class="px-3 py-1 bg-[var(--gb-darkest)] text-[var(--gb-bright)] border-2 border-[var(--gb-mid)] text-[10px] font-bold" id="victory-relic-name">
+        FLYING SAUCER
+      </div>
+
+      <!-- ALIEN RESEARCH LOG NOTE -->
+      <div class="w-full bg-[var(--gb-light)] border-2 border-[var(--gb-darkest)] p-2 text-left mt-0.5 shadow-inner">
+        <div class="text-[6.5px] font-bold text-[var(--gb-dark)] tracking-wider flex items-center gap-1 mb-1">
+          <span>🛸</span>
+          <span>MOTHERSHIP RESEARCH LOG:</span>
+        </div>
+        <div class="text-[7.5px] font-mono text-[var(--gb-darkest)] leading-tight italic" id="victory-research-note">
+          "EARTH LEADER IDENTIFIED. PRODUCES WHITE LIQUID."
+        </div>
+      </div>
+
+      <div class="text-[7px] mt-0.5 text-[var(--gb-dark)]">
+        Exemplaret är infångat i moderskeppet. DNA-koden är knäckt!
+      </div>
+      <div class="flex gap-2 w-full mt-2">
+        <button type="button" id="victory-btn-next" class="stone-tablet-btn flex-1 py-2 text-[8px] font-bold cursor-pointer">
+          NÄSTA MÅL ►
+        </button>
+        <button type="button" id="victory-btn-levels" class="stone-tablet-btn flex-1 py-2 text-[8px] font-bold cursor-pointer">
+          MÅLLISTA
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       RETRO MODAL: GAME OVER (TIME UP)
+       ======================================================== -->
+  <div id="game-over-modal" class="hidden fixed inset-0 z-50 retro-modal-backdrop flex items-center justify-center p-3 select-none">
+    <div class="w-full max-w-[320px] stone-bezel-outer bg-[#180808] p-4 text-[#ff9999] flex flex-col items-center gap-2 text-center border-4 border-[#cc2222]">
+      <div class="text-[13px] font-black tracking-wider animate-pulse text-[#ff3333]">
+        ☠ BEAM FAILURE! ☠
+      </div>
+      <div class="text-[8px] font-bold text-[#ffaaaa] tracking-wider">
+        EARTHLINGS ESCAPED
+      </div>
+      <div class="text-[7.5px] mt-1 text-zinc-300">
+        Tiden tog slut och traktortrålen överhettades. Målet undkom till Area 51!
+      </div>
+      <div class="flex gap-2 w-full mt-2">
+        <button type="button" id="game-over-btn-restart" class="stone-tablet-btn flex-1 py-2 text-[8px] font-bold cursor-pointer text-[#0f380f]">
+          SKJUT IGEN
+        </button>
+        <button type="button" id="game-over-btn-levels" class="stone-tablet-btn flex-1 py-2 text-[8px] font-bold cursor-pointer text-[#0f380f]">
+          MÅLLISTA
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       RETRO MODAL: HINT PROMPT (ACTIVATE MIND PROBE HINT? YES / NO)
+       ======================================================== -->
+  <div id="hint-prompt-modal" class="hidden fixed inset-0 z-50 retro-modal-backdrop flex items-center justify-center p-3 select-none">
+    <div class="w-full max-w-[320px] stone-bezel-outer bg-[var(--gb-light)] p-4 text-[var(--gb-darkest)] flex flex-col items-center gap-2 text-center">
+      <div class="text-[10px] font-black tracking-wider border-b-2 border-[var(--gb-darkest)] pb-1 w-full">
+        ★ MOTHERSHIP INTEL ★
+      </div>
+      <div class="text-[9px] font-bold my-2 text-[var(--gb-darkest)]">
+        ACTIVATE MIND PROBE HINT?
+      </div>
+      <div class="text-[7.5px] text-[var(--gb-dark)] leading-relaxed mb-1">
+        Vill du aktivera moderskeppets tankesond för att scanna och avslöja en slumpmässig rad och kolumn gratis?
+      </div>
+      <div class="flex gap-2 w-full mt-2">
+        <button type="button" id="hint-btn-yes" class="stone-tablet-btn active-tab flex-1 py-2 text-[8px] font-bold cursor-pointer">
+          ► YES (PROBE)
+        </button>
+        <button type="button" id="hint-btn-no" class="stone-tablet-btn flex-1 py-2 text-[8px] font-bold cursor-pointer">
+          NO (ABORT)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       RETRO MODAL: SETTINGS (Språk, Ljud, Svårighetsgrad)
+       ======================================================== -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 retro-modal-backdrop flex items-center justify-center p-3 select-none">
+    <div class="w-full max-w-[350px] stone-bezel-outer bg-[var(--gb-light)] p-3.5 text-[var(--gb-darkest)] flex flex-col gap-2.5 border-4 border-[var(--gb-darkest)] shadow-2xl relative">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b-2 border-[var(--gb-darkest)] pb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px]">⚙️</span>
+          <span class="text-[9px] font-extrabold tracking-wider" id="settings-modal-title">★ SPELINSTÄLLNINGAR ★</span>
+        </div>
+        <button type="button" class="text-[10px] font-bold px-1.5 hover:text-[var(--gb-bright)] cursor-pointer" data-close-modal="settings-modal">✕</button>
+      </div>
+
+      <!-- 1. SVÅRIGHETSGRAD / DIFFICULTY -->
+      <div class="flex flex-col gap-1 bg-[#8bac0f]/30 p-2 rounded border border-[var(--gb-darkest)]">
+        <div class="flex items-center justify-between">
+          <span class="text-[7.5px] sm:text-[8px] font-extrabold uppercase" id="settings-diff-title">🎯 SVÅRIGHETSGRAD (STRÅLTID):</span>
+          <span id="settings-diff-current-badge" class="text-[7px] font-bold bg-[var(--gb-darkest)] text-[var(--gb-bright)] px-1.5 py-0.5 rounded font-mono">30 MIN</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 mt-1">
+          <button type="button" class="diff-select-btn stone-tablet-btn py-2 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer" data-diff="easy" id="diff-btn-easy">
+            🟢 LÄTT<br/><span class="text-[6.5px] opacity-80 font-mono">30 MIN</span>
+          </button>
+          <button type="button" class="diff-select-btn stone-tablet-btn py-2 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer" data-diff="medium" id="diff-btn-medium">
+            🟡 MEDEL<br/><span class="text-[6.5px] opacity-80 font-mono">20 MIN</span>
+          </button>
+          <button type="button" class="diff-select-btn stone-tablet-btn py-2 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer" data-diff="hard" id="diff-btn-hard">
+            🔴 SVÅR<br/><span class="text-[6.5px] opacity-80 font-mono">15 MIN</span>
+          </button>
+        </div>
+        <p id="settings-diff-desc" class="text-[6.5px] sm:text-[7px] text-[var(--gb-darkest)] leading-tight mt-1 opacity-90 text-center font-mono">
+          🟢 LÄTT: 30 MINUTER STRÅLTID (AVSLAPPNAD)
+        </p>
+      </div>
+
+      <!-- 2. SPRÅK / LANGUAGE -->
+      <div class="flex flex-col gap-1 bg-[#8bac0f]/30 p-2 rounded border border-[var(--gb-darkest)]">
+        <span class="text-[7.5px] sm:text-[8px] font-extrabold uppercase" id="settings-lang-title">🌐 SPRÅK / LANGUAGE:</span>
+        <div class="grid grid-cols-2 gap-2 mt-1">
+          <button type="button" class="lang-select-btn stone-tablet-btn py-1.5 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer flex items-center justify-center gap-1.5" data-lang="sv" id="lang-btn-sv">
+            <span>🇸🇪</span> <span>SVENSKA</span>
+          </button>
+          <button type="button" class="lang-select-btn stone-tablet-btn py-1.5 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer flex items-center justify-center gap-1.5" data-lang="en" id="lang-btn-en">
+            <span>🇬🇧</span> <span>ENGLISH</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. LJUD & MUSIK / AUDIO -->
+      <div class="flex flex-col gap-1 bg-[#8bac0f]/30 p-2 rounded border border-[var(--gb-darkest)]">
+        <span class="text-[7.5px] sm:text-[8px] font-extrabold uppercase" id="settings-audio-title">🔊 LJUD & MUSIK:</span>
+        <div class="grid grid-cols-2 gap-2 mt-1">
+          <button type="button" class="stone-tablet-btn py-1.5 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer flex items-center justify-center gap-1" id="settings-btn-music">
+            <span id="settings-music-icon">🎵</span>
+            <span id="settings-music-text">MUSIK: PÅ</span>
+          </button>
+          <button type="button" class="stone-tablet-btn py-1.5 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer flex items-center justify-center gap-1" id="settings-btn-sfx">
+            <span id="settings-sfx-icon">🔊</span>
+            <span id="settings-sfx-text">LJUD: PÅ</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Close / Confirm Button -->
+      <button type="button" class="stone-tablet-btn py-2 text-center text-[8px] sm:text-[9px] font-bold uppercase mt-1 cursor-pointer border-2 border-[var(--gb-darkest)]" data-close-modal="settings-modal" id="settings-confirm-btn">
+        SPARA OCH TILLBAKA (A)
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       RETRO MODAL: TOP 5 BÄSTA TIDER PER KATEGORI
+       ======================================================== -->
+  <div id="top5-records-modal" class="hidden fixed inset-0 z-50 retro-modal-backdrop flex items-center justify-center p-3 select-none">
+    <div class="w-full max-w-[360px] stone-bezel-outer bg-[var(--gb-light)] p-3 text-[var(--gb-darkest)] flex flex-col gap-2 relative border-4 border-[var(--gb-darkest)] shadow-2xl">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b-2 border-[var(--gb-darkest)] pb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px]">🏆</span>
+          <span class="text-[8.5px] font-bold tracking-tight" id="top5-modal-title">TOP 5 REKORD: 1-A FLYGANDE TEFAT</span>
+        </div>
+        <button type="button" class="text-[10px] font-bold px-1.5 hover:text-[var(--gb-bright)] cursor-pointer" data-close-modal="top5-records-modal">✕</button>
+      </div>
+
+      <!-- Body: 3 Distinct Categories (LÄTT, MEDEL, SVÅR) -->
+      <div class="text-[7.5px] flex flex-col gap-2 max-h-[65vh] overflow-y-auto pr-0.5 py-1">
+        
+        <!-- Category 1: LÄTT (30 MIN) -->
+        <div class="border border-[var(--gb-darkest)] bg-[#8bac0f]/30 p-1.5 rounded flex flex-col gap-1">
+          <div class="flex items-center justify-between font-extrabold text-[8px] border-b border-[var(--gb-darkest)] pb-0.5">
+            <span class="flex items-center gap-1 text-[#0f380f]" id="top5-easy-title">
+              <span>🟢</span> <span>LÄTT (30 MIN STRÅLTID)</span>
+            </span>
+            <span class="text-[6.5px] opacity-80 font-mono" id="top5-easy-times">SPELAT: 0</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1 text-center font-mono font-bold text-[7.5px] pt-1" id="top5-list-easy">
+            <!-- Dynamically populated 1 to 5 -->
+          </div>
+        </div>
+
+        <!-- Category 2: MEDEL (20 MIN) -->
+        <div class="border border-[var(--gb-darkest)] bg-[#8bac0f]/30 p-1.5 rounded flex flex-col gap-1">
+          <div class="flex items-center justify-between font-extrabold text-[8px] border-b border-[var(--gb-darkest)] pb-0.5">
+            <span class="flex items-center gap-1 text-[#0f380f]" id="top5-medium-title">
+              <span>🟡</span> <span>MEDEL (20 MIN STRÅLTID)</span>
+            </span>
+            <span class="text-[6.5px] opacity-80 font-mono" id="top5-medium-times">SPELAT: 0</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1 text-center font-mono font-bold text-[7.5px] pt-1" id="top5-list-medium">
+            <!-- Dynamically populated 1 to 5 -->
+          </div>
+        </div>
+
+        <!-- Category 3: SVÅR (15 MIN) -->
+        <div class="border border-[var(--gb-darkest)] bg-[#8bac0f]/30 p-1.5 rounded flex flex-col gap-1">
+          <div class="flex items-center justify-between font-extrabold text-[8px] border-b border-[var(--gb-darkest)] pb-0.5">
+            <span class="flex items-center gap-1 text-[#0f380f]" id="top5-hard-title">
+              <span>🔴</span> <span>SVÅR (15 MIN STRÅLTID)</span>
+            </span>
+            <span class="text-[6.5px] opacity-80 font-mono" id="top5-hard-times">SPELAT: 0</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1 text-center font-mono font-bold text-[7.5px] pt-1" id="top5-list-hard">
+            <!-- Dynamically populated 1 to 5 -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Close Button -->
+      <button type="button" class="stone-tablet-btn py-1.5 text-center text-[8px] font-bold uppercase mt-1 cursor-pointer" data-close-modal="top5-records-modal" id="top5-close-btn">
+        TILLBAKA (B)
+      </button>
+    </div>
+  </div>
+
+  <!-- Puzzles Database, Translations & Application Logic -->
+  <script src="translations.js"></script>
+  <script src="puzzles.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

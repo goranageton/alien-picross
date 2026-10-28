@@ -1,0 +1,29 @@
+{
+  "name": "retro-picross-archaeologist",
+  "version": "1.0.0",
+  "description": "Retro Picross Archaeologist UI - Game Boy Edition web application, ready for Capacitor",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "serve": "npx serve .",
+    "build": "node -e \"const fs = require('fs'); if (!fs.existsSync('www')) fs.mkdirSync('www'); ['index.html','styles.css','app.js','puzzles.js','translations.js','manifest.json','icon.svg','icon-192.png','icon-512.png'].forEach(f => { if (fs.existsSync(f)) fs.copyFileSync(f, 'www/' + f); }); console.log('Built www successfully');\"",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:open": "npx cap open android",
+    "build:apk": "npm run cap:sync && powershell -Command \"$env:JAVA_HOME = (Join-Path (Get-Location) 'tools/jdk-21.0.12.1+1'); cd android; .\\gradlew.bat assembleDebug; Copy-Item app/build/outputs/apk/debug/app-debug.apk ../Alien-Picross-debug.apk -Force; Write-Host 'APK generated at: Alien-Picross-debug.apk'\""
+  },
+  "keywords": [
+    "picross",
+    "gameboy",
+    "retro",
+    "nonogram",
+    "capacitor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  }
+}

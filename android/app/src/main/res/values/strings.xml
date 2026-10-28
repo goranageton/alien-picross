@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Alien Picross</string>
+    <string name="title_activity_main">Alien Picross</string>
+    <string name="package_name">com.area51.alienpicross</string>
+    <string name="custom_url_scheme">com.area51.alienpicross</string>
+</resources>

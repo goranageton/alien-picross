@@ -1,0 +1,8 @@
+{
+  "appId": "com.area51.alienpicross",
+  "appName": "Alien Picross",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Archaeology Picross - Select A Problem</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: 8-bit Pixel Font -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet"/>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gb: {
+              darkest: '#0f380f', // Tone 1: Darkest ink/pixels
+              dark: '#306230',    // Tone 2: Mid-shadow / accent borders
+              light: '#8bac0f',   // Tone 3: Mid-highlight / active LCD background
+              lightest: '#9bbc0f' // Tone 4: Pure luminous LCD backlight
+            }
+          },
+          fontFamily: {
+            pixel: ['"Press Start 2P"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+<!-- BEGIN: Custom Retro Styles -->
+<style data-purpose="lcd-effects">
+    /* Subtle dot-matrix LCD sub-pixel overlay */
+    .lcd-grid-pattern {
+      background-image: 
+        linear-gradient(rgba(15, 56, 15, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 56, 15, 0.07) 1px, transparent 1px);
+      background-size: 3px 3px;
+    }
+    
+    /* Horizontal scanlines simulation */
+    .scanlines {
+      background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(15, 56, 15, 0.08) 50%,
+        rgba(15, 56, 15, 0.08)
+      );
+      background-size: 100% 4px;
+    }
+
+    /* Pixelated double outline helpers */
+    .gb-double-border {
+      border: 3px solid #0f380f;
+      outline: 2px solid #8bac0f;
+      box-shadow: 0 0 0 2px #0f380f;
+    }
+    
+    .pixel-sharp {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Retro cursor subtle blink */
+    @keyframes retro-blink {
+      0%, 100% { opacity: 1; transform: translate(0, 0); }
+      50% { opacity: 0.85; transform: translate(-2px, 0); }
+    }
+    .cursor-anim {
+      animation: retro-blink 0.75s steps(2, start) infinite;
+    }
+  </style>
+<!-- END: Custom Retro Styles -->
+</head>
+<body class="bg-zinc-950 min-h-screen flex items-center justify-center p-0 sm:p-4 font-pixel select-none text-gb-darkest">
+<!-- BEGIN: Mobile Device Frame Wrap -->
+<!-- Designed strictly in portrait smartphone aspect ratio (390px x 844px) -->
+<div class="relative w-full max-w-[390px] h-[844px] bg-[#2d312e] rounded-[36px] p-3 shadow-2xl flex flex-col justify-between border-4 border-[#1f2220] overflow-hidden" data-purpose="handheld-viewport">
+<!-- Outer Plastic Bezel Header -->
+<div class="w-full flex items-center justify-between px-4 pt-2 pb-1 text-[9px] tracking-wider text-zinc-500 font-bold uppercase" data-purpose="bezel-top">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-red-600/80 inline-block shadow-inner"></span>
+<span class="text-[7.5px] text-zinc-400">BATTERY</span>
+</div>
+<div class="tracking-[0.2em] text-[8px] text-zinc-400">DOT MATRIX WITH STEREO SOUND</div>
+<div class="text-[7.5px] text-zinc-500">4-SHADE LCD</div>
+</div>
+<!-- BEGIN: Main Game Boy LCD Screen -->
+<main class="relative flex-1 bg-gb-lightest rounded-lg border-4 border-gb-darkest p-2 flex flex-col justify-between overflow-hidden shadow-inner lcd-grid-pattern" data-purpose="gameboy-screen">
+<!-- Scanlines overlay element -->
+<div class="absolute inset-0 pointer-events-none scanlines z-20"></div>
+<!-- BEGIN: Header Section -->
+<header class="relative z-10 w-full mb-1" data-purpose="screen-header">
+<!-- Title Banner -->
+<div class="flex items-center justify-center gap-2 py-1 text-center font-extrabold text-[12px] sm:text-[13px] tracking-tight border-b-2 border-gb-darkest">
+<span class="text-[10px] leading-none">●</span>
+<h1 class="tracking-wide">SELECT A PROBLEM</h1>
+<span class="text-[10px] leading-none">●</span>
+</div>
+<!-- Problem Statistics Box -->
+<!-- 3 distinct columns: FIRST, TIMES, BEST -->
+<section class="mt-1 border-2 border-gb-darkest bg-gb-lightest" data-purpose="stats-dashboard">
+<div class="grid grid-cols-3 divide-x-2 divide-gb-darkest text-center">
+<!-- Left Column: First Clear Time -->
+<div class="p-1 flex flex-col justify-center">
+<span class="text-[8px] tracking-wider uppercase">FIRST</span>
+<span class="text-[10px] font-bold mt-0.5 tracking-widest">--:--</span>
+</div>
+<!-- Middle Column: Attempt Count -->
+<div class="p-1 flex flex-col justify-center bg-gb-light/30">
+<span class="text-[8px] tracking-wider uppercase">TIMES</span>
+<span class="text-[11px] font-bold mt-0.5">4</span>
+</div>
+<!-- Right Column: Best Record Time -->
+<div class="p-1 flex flex-col justify-center">
+<span class="text-[8px] tracking-wider uppercase">BEST</span>
+<span class="text-[10px] font-bold mt-0.5 tracking-widest">--:--</span>
+</div>
+</div>
+</section>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: Level Matrix 64-Grid Section -->
+<section class="relative z-10 flex-1 flex flex-col justify-start my-1 px-0.5" data-purpose="level-select-matrix">
+<!-- Column Headers (A through H) -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center text-[10px] font-bold pb-1 border-b border-dashed border-gb-dark/60" data-purpose="matrix-columns">
+<div class="text-[8px] text-left pl-0.5">LV</div>
+<div>A</div>
+<div>B</div>
+<div>C</div>
+<div>D</div>
+<div>E</div>
+<div>F</div>
+<div>G</div>
+<div>H</div>
+</div>
+<!-- 8x8 Grid Rows Container -->
+<div class="flex flex-col justify-between flex-1 pt-1 gap-[2.5px]" data-purpose="matrix-rows">
+<!-- ROW 1 (With Active Cursor on 1-A) -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<!-- Row Label -->
+<div class="text-[9px] font-bold text-left pl-1">1</div>
+<!-- Slot 1-A: Active/Targeted with Hand/Chisel Cursor -->
+<div class="relative flex items-center justify-center">
+<!-- Pixel Hand/Finger Cursor SVG pointing right-down into 1A -->
+<div class="absolute -left-3.5 -top-2.5 z-30 cursor-anim pointer-events-none">
+<svg class="pixel-sharp" fill="none" height="18" viewbox="0 0 16 16" width="18">
+<!-- Pixel Chisel/Glove Cursor Silhouette -->
+<path d="M2 1H7V3H9V5H11V7H13V9H15V13H13V15H9V13H7V11H5V9H3V7H1V3H2V1Z" fill="#0f380f"></path>
+<path d="M3 3H6V5H8V7H10V9H12V11H13V12H10V10H8V8H6V6H4V4H3V3Z" fill="#9bbc0f"></path>
+</svg>
+</div>
+<!-- Slot Stamp -->
+<div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-dark flex items-center justify-center text-[8px] text-gb-lightest shadow-inner">
+<span class="w-1.5 h-1.5 bg-gb-lightest"></span>
+</div>
+</div>
+<!-- Slots 1-B through 1-H -->
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+<!-- ROW 2 -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<div class="text-[9px] font-bold text-left pl-1">2</div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+<!-- ROW 3 -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<div class="text-[9px] font-bold text-left pl-1">3</div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+<!-- ROW 4 -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<div class="text-[9px] font-bold text-left pl-1">4</div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+<!-- ROW 5 -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<div class="text-[9px] font-bold text-left pl-1">5</div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+<!-- ROW 6 -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<div class="text-[9px] font-bold text-left pl-1">6</div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+<!-- ROW 7 -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<div class="text-[9px] font-bold text-left pl-1">7</div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+<!-- ROW 8 -->
+<div class="grid grid-cols-[26px_repeat(8,1fr)] items-center text-center">
+<div class="text-[9px] font-bold text-left pl-1">8</div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+<div class="flex justify-center"><div class="w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest bg-gb-lightest flex items-center justify-center"></div></div>
+</div>
+</div>
+</section>
+<!-- END: Level Matrix 64-Grid Section -->
+<!-- BEGIN: Archaeological Bottom Scenery & Course Stamp -->
+<section class="relative z-10 w-full mt-2 pt-1 border-t-2 border-gb-darkest flex items-end justify-between" data-purpose="archaeology-landscape">
+<!-- Left Side: Mesoamerican Stepped Pyramid & Jungle Ruins Pixel Silhouette -->
+<div class="flex-1 flex items-end pb-0.5 overflow-hidden">
+<svg class="w-full h-12 pixel-sharp" fill="none" preserveaspectratio="xMinYMax meet" viewbox="0 0 200 48">
+<!-- Ground baseline -->
+<rect fill="#0f380f" height="4" width="200" x="0" y="44"></rect>
+<!-- Left Jungle Trees -->
+<!-- Tree 1 -->
+<rect fill="#0f380f" height="12" width="4" x="6" y="32"></rect>
+<rect fill="#306230" height="8" width="12" x="2" y="24"></rect>
+<rect fill="#0f380f" height="2" width="8" x="4" y="22"></rect>
+<rect fill="#8bac0f" height="4" width="2" x="4" y="26"></rect>
+<!-- Tree 2 -->
+<rect fill="#0f380f" height="14" width="3" x="18" y="30"></rect>
+<rect fill="#0f380f" height="10" width="13" x="13" y="20"></rect>
+<rect fill="#306230" height="6" width="9" x="15" y="22"></rect>
+<!-- Tree 3 -->
+<rect fill="#0f380f" height="10" width="3" x="28" y="34"></rect>
+<rect fill="#306230" height="6" width="9" x="25" y="28"></rect>
+<!-- Stepped Pyramid Structure (Ziggurat) -->
+<!-- Base step -->
+<polygon fill="#306230" points="38,44 48,36 102,36 112,44" stroke="#0f380f" stroke-width="2"></polygon>
+<!-- Step 2 -->
+<polygon fill="#306230" points="49,36 56,28 94,28 101,36" stroke="#0f380f" stroke-width="2"></polygon>
+<!-- Step 3 -->
+<polygon fill="#306230" points="57,28 64,20 86,20 93,28" stroke="#0f380f" stroke-width="2"></polygon>
+<!-- Temple top sanctuary -->
+<rect fill="#306230" height="8" stroke="#0f380f" stroke-width="2" width="14" x="68" y="12"></rect>
+<!-- Center doorway -->
+<rect fill="#0f380f" height="5" width="4" x="73" y="15"></rect>
+<!-- Central Grand Staircase -->
+<polygon fill="#0f380f" points="70,44 72,20 78,20 80,44"></polygon>
+<!-- Stair risers lines -->
+<line stroke="#8bac0f" stroke-width="1" x1="71" x2="79" y1="40" y2="40"></line>
+<line stroke="#8bac0f" stroke-width="1" x1="72" x2="78" y1="34" y2="34"></line>
+<line stroke="#8bac0f" stroke-width="1" x1="73" x2="77" y1="28" y2="28"></line>
+<!-- Right Palm/Ruins -->
+<rect fill="#0f380f" height="14" width="3" x="114" y="30"></rect>
+<circle cx="115" cy="24" fill="#306230" r="6" stroke="#0f380f" stroke-width="2"></circle>
+<rect fill="#306230" height="8" stroke="#0f380f" stroke-width="2" width="8" x="124" y="36"></rect>
+<rect fill="#0f380f" height="6" width="6" x="134" y="38"></rect>
+</svg>
+</div>
+<!-- Right Side: Decorative "KINOKO COURSE" Emblem Stamp -->
+<div class="w-[124px] border-2 border-gb-darkest bg-gb-lightest p-1 flex items-center gap-1.5 shadow-sm" data-purpose="course-badge">
+<!-- Pixel Mushroom Emblem -->
+<div class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-gb-light/40 border border-gb-darkest">
+<svg class="pixel-sharp" fill="none" height="18" viewbox="0 0 16 16" width="18">
+<!-- Mushroom Cap Outline -->
+<path d="M4 1H12V3H14V8H15V9H1V8H2V3H4V1Z" fill="#0f380f"></path>
+<!-- Mushroom Cap Fill Inner -->
+<path d="M5 2H11V4H13V7H3V4H5V2Z" fill="#8bac0f"></path>
+<!-- Mushroom White Spots -->
+<rect fill="#9bbc0f" height="3" width="2" x="4" y="3"></rect>
+<rect fill="#9bbc0f" height="3" width="2" x="10" y="3"></rect>
+<rect fill="#9bbc0f" height="2" width="2" x="7" y="2"></rect>
+<!-- Stem -->
+<path d="M5 9H11V14H10V15H6V14H5V9Z" fill="#0f380f"></path>
+<rect fill="#9bbc0f" height="4" width="4" x="6" y="10"></rect>
+</svg>
+</div>
+<!-- Course Name Pixel Lettering -->
+<div class="flex flex-col leading-tight">
+<span class="text-[8px] font-extrabold tracking-tighter">KINOKO</span>
+<span class="text-[7.5px] font-bold tracking-widest text-gb-dark">COURSE</span>
+</div>
+</div>
+</section>
+<!-- END: Archaeological Bottom Scenery & Course Stamp -->
+<!-- BEGIN: Bottommost Action Prompt Footer -->
+<footer class="relative z-10 w-full mt-1 pt-1 border-t-2 border-dashed border-gb-dark/80 flex items-center justify-between text-[9px] px-1 font-bold" data-purpose="control-exit-footer">
+<!-- Optional sub-control helper -->
+<span class="text-[8px] opacity-75">A • SELECT</span>
+<!-- Authentic B EXIT Prompt -->
+<div class="flex items-center gap-1 bg-gb-darkest text-gb-lightest px-2 py-0.5 rounded-sm">
+<span>B</span>
+<span class="text-[7px]">◆</span>
+<span>EXIT</span>
+</div>
+<span class="text-[8px] opacity-75">START • OPT</span>
+</footer>
+<!-- END: Bottommost Action Prompt Footer -->
+</main>
+<!-- END: Main Game Boy LCD Screen -->
+<!-- Handheld Bottom Brand Stamp -->
+<div class="w-full flex items-center justify-between px-3 py-1 text-zinc-500 text-[10px]" data-purpose="device-lower-bezel">
+<div class="italic font-bold tracking-widest text-zinc-400">Nintendo <span class="not-italic text-[7.5px] border border-zinc-600 px-0.5 rounded font-mono">GAME BOY</span></div>
+<div class="flex gap-2">
+<span class="w-7 h-2 bg-zinc-800 rounded-full rotate-[-25deg] shadow-inner"></span>
+<span class="w-7 h-2 bg-zinc-800 rounded-full rotate-[-25deg] shadow-inner"></span>
+</div>
+</div>
+</div>
+<!-- END: Mobile Device Frame Wrap -->
+</body></html>
