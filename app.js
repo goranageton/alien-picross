@@ -630,6 +630,16 @@ function updateDifficultyUI() {
     modalBadge.innerText = `${DIFFICULTY_CONFIG[diff].minutes} MIN`;
   }
 
+  // Level select header active difficulty pill
+  const lvlActiveDiff = document.getElementById('level-select-active-diff');
+  if (lvlActiveDiff) {
+    const diffEmoji = diff === 'easy' ? '🟢' : diff === 'medium' ? '🟡' : '🔴';
+    const diffName = diff === 'easy' ? (isSv ? 'LÄTT (30M)' : 'EASY (30M)') :
+                     diff === 'medium' ? (isSv ? 'MEDEL (20M)' : 'MED (20M)') :
+                     (isSv ? 'SVÅR (15M)' : 'HARD (15M)');
+    lvlActiveDiff.innerText = `${diffEmoji} ${diffName}`;
+  }
+
   const descEl = document.getElementById('settings-diff-desc');
   if (descEl) {
     if (diff === 'easy') descEl.innerText = t.diffEasyDesc || '🟢 LÄTT: 30 MINUTER STRÅLTID (AVSLAPPNAD)';
@@ -710,31 +720,32 @@ function updateLanguageUI() {
   if (setConfirmBtn) setConfirmBtn.innerText = t.settingsSaveBtn || 'SPARA OCH TILLBAKA (A)';
 
   // Level Select Screen
-  const selTargetHeader = document.querySelector('#screen-level-select h1');
+  const selTargetHeader = document.getElementById('level-select-header-title') || document.querySelector('#screen-level-select h1');
   if (selTargetHeader) selTargetHeader.innerText = t.selectTarget;
 
-  const tabEasy = document.getElementById('tab-btn-easy');
-  if (tabEasy) tabEasy.innerText = t.tabEasy || '🟢 LÄTT (30M)';
-  const tabMed = document.getElementById('tab-btn-medium');
-  if (tabMed) tabMed.innerText = t.tabMedium || '🟡 MEDEL (20M)';
-  const tabHard = document.getElementById('tab-btn-hard');
-  if (tabHard) tabHard.innerText = t.tabHard || '🔴 SVÅR (15M)';
-  const tabAll = document.getElementById('tab-btn-all');
-  if (tabAll) tabAll.innerText = t.tabAll || 'ALLA';
-
-  const statsFirstLabel = document.getElementById('stats-first-label');
-  if (statsFirstLabel) statsFirstLabel.innerText = t.firstTime;
-  const statsTimesLabel = document.getElementById('stats-times-label');
-  if (statsTimesLabel) statsTimesLabel.innerText = t.timesPlayed;
-  const statsBestLabel = document.getElementById('stats-best-label');
-  if (statsBestLabel) statsBestLabel.innerText = t.bestTime;
-  const statsTop5Btn = document.getElementById('stats-top5-action-btn');
-  if (statsTop5Btn) statsTop5Btn.innerHTML = `<span>${t.top5Btn || '🏆 TOP 5 TIDER ▸'}</span>`;
+  const lvlGridHint = document.getElementById('level-select-grid-hint');
+  if (lvlGridHint) lvlGridHint.innerText = t.levelSelectGridHint || 'TRYCK PÅ EN NIVÅ (1-A TILL 8-H)';
 
   const lvlBackBtn = document.getElementById('level-select-exit-btn');
   if (lvlBackBtn) lvlBackBtn.innerText = t.levelSelectBack;
   const lvlActionBtn = document.getElementById('level-select-action-btn');
   if (lvlActionBtn) lvlActionBtn.innerText = t.levelSelectStart;
+
+  // Level Mission Briefing Modal
+  const briefingStartText = document.getElementById('briefing-start-text');
+  if (briefingStartText) briefingStartText.innerText = t.briefingStartBtn || 'STARTA MISSION (A)';
+  const briefingCancelText = document.getElementById('briefing-cancel-text');
+  if (briefingCancelText) briefingCancelText.innerText = t.briefingBackBtn || 'TILLBAKA (B)';
+  const briefingTop5Btn = document.getElementById('briefing-top5-btn');
+  if (briefingTop5Btn) briefingTop5Btn.innerText = t.briefingViewTop5 || 'VISA TOP 5 ▸';
+  const briefingBestTitle = document.getElementById('briefing-best-times-title');
+  if (briefingBestTitle) briefingBestTitle.innerText = t.briefingBestTimesTitle || '🏆 BÄSTA TIDER PER STRÅLTID:';
+  const briefingDiffTitle = document.getElementById('briefing-diff-select-title');
+  if (briefingDiffTitle) briefingDiffTitle.innerText = t.briefingDiffSelectTitle || '🎯 VÄLJ STRÅLTID FÖR UPPDRAGET:';
+  const briefingLoreHeader = document.getElementById('briefing-lore-header');
+  if (briefingLoreHeader) briefingLoreHeader.innerText = t.briefingIntelHeader || '📡 AREA 51 SPANINGSRAPPORT • TOP SECRET:';
+  const briefingTotalLabel = document.getElementById('briefing-total-played-label');
+  if (briefingTotalLabel) briefingTotalLabel.innerText = t.briefingTotalPlayed || 'SPELAD TOTALT:';
 
   // Top 5 Modal
   const top5Close = document.getElementById('top5-close-btn');
@@ -1127,28 +1138,136 @@ function initLevelSelect() {
 
   const selectBtn = document.getElementById('level-select-action-btn');
   if (selectBtn) {
-    selectBtn.addEventListener('click', () => promptHintAndStartLevel(State.selectedLevelId));
+    selectBtn.addEventListener('click', () => {
+      sound.playBlip();
+      openLevelBriefing(State.selectedLevelId);
+    });
   }
 
-  // Difficulty filter tabs on level select
-  const diffTabs = document.querySelectorAll('#level-diff-tabs .diff-tab-btn');
-  diffTabs.forEach(btn => {
-    btn.addEventListener('click', () => {
+  // Mission briefing modal buttons
+  const startMissionBtn = document.getElementById('briefing-start-btn');
+  if (startMissionBtn) {
+    startMissionBtn.addEventListener('click', () => {
       sound.playBlip();
-      State.statsDifficultyTab = btn.dataset.diffTab;
-      saveGameData();
-      updateStatsDashboard(State.selectedLevelId);
+      closeModal('level-briefing-modal');
+      promptHintAndStartLevel(State.selectedLevelId);
     });
-  });
+  }
 
-  // Click on stats box or top 5 button opens top 5 modal
-  const statsBox = document.getElementById('stats-dashboard-box');
-  if (statsBox) {
-    statsBox.addEventListener('click', () => {
+  const top5BriefingBtn = document.getElementById('briefing-top5-btn');
+  if (top5BriefingBtn) {
+    top5BriefingBtn.addEventListener('click', () => {
       sound.playBlip();
       renderTop5Modal(State.selectedLevelId);
     });
   }
+
+  const briefingDiffBtns = document.querySelectorAll('#briefing-diff-buttons .diff-select-btn');
+  briefingDiffBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      sound.playBlip();
+      setDifficulty(btn.dataset.diff);
+    });
+  });
+}
+
+function openLevelBriefing(levelId) {
+  State.selectedLevelId = levelId;
+  const puzzle = getPuzzle10(levelId);
+  const stat = State.stats[levelId] || {
+    cleared: false, first: '--:--', best: '--:--', times: 0,
+    byDiff: {
+      easy: { first: '--:--', best: '--:--', times: 0, top5: [] },
+      medium: { first: '--:--', best: '--:--', times: 0, top5: [] },
+      hard: { first: '--:--', best: '--:--', times: 0, top5: [] }
+    }
+  };
+  const t = getTranslations();
+  const isSv = State.lang === 'sv';
+
+  // Sector & Level Title
+  const sectorEl = document.getElementById('briefing-sector-code');
+  if (sectorEl) {
+    sectorEl.innerText = `${t.briefingSector || 'SEKTOR'} ${levelId}`;
+  }
+  const nameEl = document.getElementById('briefing-level-name');
+  if (nameEl) {
+    nameEl.innerText = puzzle.name;
+  }
+
+  // Sci-Fi Lore & Humorous Observation
+  const loreHeaderEl = document.getElementById('briefing-lore-header');
+  if (loreHeaderEl) {
+    loreHeaderEl.innerText = t.briefingIntelHeader || '📡 AREA 51 SPANINGSRAPPORT • TOP SECRET:';
+  }
+  const loreTextEl = document.getElementById('briefing-lore-text');
+  if (loreTextEl) {
+    loreTextEl.innerText = `"${puzzle.researchNote || (isSv ? 'KLASSIFICERAD DATA I MODERSKEPPETS ARKIV.' : 'CLASSIFIED DATA IN MOTHERSHIP ARCHIVES.')}"`;
+  }
+
+  // Total Times Played
+  const totalPlayedLabel = document.getElementById('briefing-total-played-label');
+  if (totalPlayedLabel) {
+    totalPlayedLabel.innerText = t.briefingTotalPlayed || 'SPELAD TOTALT:';
+  }
+  const totalTimesEl = document.getElementById('briefing-total-times');
+  if (totalTimesEl) {
+    const timesUnit = t.briefingTimesUnit || (isSv ? 'GÅNGER' : 'TIMES');
+    totalTimesEl.innerText = `${stat.times || 0} ${timesUnit}`;
+  }
+
+  // Best Times per Difficulty
+  const bestTimesTitle = document.getElementById('briefing-best-times-title');
+  if (bestTimesTitle) {
+    bestTimesTitle.innerText = t.briefingBestTimesTitle || '🏆 BÄSTA TIDER PER STRÅLTID:';
+  }
+  const top5Btn = document.getElementById('briefing-top5-btn');
+  if (top5Btn) {
+    top5Btn.innerText = t.briefingViewTop5 || 'VISA TOP 5 ▸';
+  }
+
+  const timesShort = t.briefingTimesPlayedShort || (isSv ? 'ggr' : 'times');
+  const bestLabel = t.briefingBestLabel || 'BÄST:';
+
+  const bestEasy = document.getElementById('briefing-best-easy');
+  const timesEasy = document.getElementById('briefing-times-easy');
+  const labelEasy = document.getElementById('briefing-easy-label');
+  if (labelEasy) labelEasy.innerText = bestLabel;
+  if (bestEasy) bestEasy.innerText = stat.byDiff?.easy?.best || '--:--';
+  if (timesEasy) timesEasy.innerText = `${stat.byDiff?.easy?.times || 0} ${timesShort}`;
+
+  const bestMedium = document.getElementById('briefing-best-medium');
+  const timesMedium = document.getElementById('briefing-times-medium');
+  const labelMedium = document.getElementById('briefing-medium-label');
+  if (labelMedium) labelMedium.innerText = bestLabel;
+  if (bestMedium) bestMedium.innerText = stat.byDiff?.medium?.best || '--:--';
+  if (timesMedium) timesMedium.innerText = `${stat.byDiff?.medium?.times || 0} ${timesShort}`;
+
+  const bestHard = document.getElementById('briefing-best-hard');
+  const timesHard = document.getElementById('briefing-times-hard');
+  const labelHard = document.getElementById('briefing-hard-label');
+  if (labelHard) labelHard.innerText = bestLabel;
+  if (bestHard) bestHard.innerText = stat.byDiff?.hard?.best || '--:--';
+  if (timesHard) timesHard.innerText = `${stat.byDiff?.hard?.times || 0} ${timesShort}`;
+
+  // Difficulty selection title & buttons inside briefing
+  const diffSelectTitle = document.getElementById('briefing-diff-select-title');
+  if (diffSelectTitle) {
+    diffSelectTitle.innerText = t.briefingDiffSelectTitle || '🎯 VÄLJ STRÅLTID FÖR UPPDRAGET:';
+  }
+  updateDifficultyUI();
+
+  // Action button texts
+  const startBtnText = document.getElementById('briefing-start-text');
+  if (startBtnText) {
+    startBtnText.innerText = t.briefingStartBtn || 'STARTA MISSION (A)';
+  }
+  const cancelBtnText = document.getElementById('briefing-cancel-text');
+  if (cancelBtnText) {
+    cancelBtnText.innerText = t.briefingBackBtn || 'TILLBAKA (B)';
+  }
+
+  openModal('level-briefing-modal');
 }
 
 function renderLevelMatrix() {
@@ -1201,7 +1320,8 @@ function renderLevelMatrix() {
       btn.addEventListener('mouseenter', () => updateLevelHover(btn, id));
       btn.addEventListener('click', () => {
         State.selectedLevelId = id;
-        promptHintAndStartLevel(id);
+        sound.playBlip();
+        openLevelBriefing(id);
       });
 
       cellWrap.appendChild(btn);
@@ -2211,6 +2331,8 @@ function openModal(modalId) {
       updateAudioButtonsUI();
       updateDifficultyUI();
       updateLanguageUI();
+    } else if (modalId === 'level-briefing-modal') {
+      updateDifficultyUI();
     }
   }
 }

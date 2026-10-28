@@ -17,7 +17,7 @@ window.UI_TRANSLATIONS = {
     "timesPlayed": "GÅNGER",
     "area51Course": "AREA 51 KURS",
     "levelSelectBack": "TILLBAKA (B)",
-    "levelSelectStart": "STARTA (A)",
+    "levelSelectStart": "VÄLJ MÅL (A)",
     "scannerTitle": "🛸 UFO BORTFÖRINGSSCANNER",
     "beamTime": "STRÅLTID",
     "pauseBtn": "PAUS",
@@ -90,7 +90,19 @@ window.UI_TRANSLATIONS = {
     "tabAll": "ALLA",
     "tabEasy": "🟢 LÄTT (30M)",
     "tabMedium": "🟡 MEDEL (20M)",
-    "tabHard": "🔴 SVÅR (15M)"
+    "tabHard": "🔴 SVÅR (15M)",
+    "levelSelectGridHint": "TRYCK PÅ EN NIVÅ (1-A TILL 8-H)",
+    "briefingSector": "SEKTOR",
+    "briefingIntelHeader": "📡 AREA 51 SPANINGSRAPPORT • TOP SECRET:",
+    "briefingTotalPlayed": "SPELAD TOTALT:",
+    "briefingTimesUnit": "GÅNGER",
+    "briefingBestTimesTitle": "🏆 BÄSTA TIDER PER STRÅLTID:",
+    "briefingViewTop5": "VISA TOP 5 ▸",
+    "briefingBestLabel": "BÄST:",
+    "briefingTimesPlayedShort": "ggr",
+    "briefingStartBtn": "STARTA MISSION (A)",
+    "briefingBackBtn": "TILLBAKA (B)",
+    "briefingDiffSelectTitle": "🎯 VÄLJ STRÅLTID FÖR UPPDRAGET:"
   },
   "en": {
     "roswellLabs": "1947 ROSWELL LABS",
@@ -109,7 +121,7 @@ window.UI_TRANSLATIONS = {
     "timesPlayed": "TIMES",
     "area51Course": "AREA 51 COURSE",
     "levelSelectBack": "BACK (B)",
-    "levelSelectStart": "START (A)",
+    "levelSelectStart": "SELECT TARGET (A)",
     "scannerTitle": "🛸 UFO ABDUCTION SCANNER",
     "beamTime": "BEAM TIME",
     "pauseBtn": "PAUSE",
@@ -182,7 +194,19 @@ window.UI_TRANSLATIONS = {
     "tabAll": "ALL",
     "tabEasy": "🟢 EASY (30M)",
     "tabMedium": "🟡 MEDIUM (20M)",
-    "tabHard": "🔴 HARD (15M)"
+    "tabHard": "🔴 HARD (15M)",
+    "levelSelectGridHint": "CHOOSE A TARGET (1-A TO 8-H)",
+    "briefingSector": "SECTOR",
+    "briefingIntelHeader": "📡 AREA 51 INTEL REPORT • TOP SECRET:",
+    "briefingTotalPlayed": "TOTAL PLAYED:",
+    "briefingTimesUnit": "TIMES",
+    "briefingBestTimesTitle": "🏆 BEST TIMES PER BEAM TIME:",
+    "briefingViewTop5": "VIEW TOP 5 ▸",
+    "briefingBestLabel": "BEST:",
+    "briefingTimesPlayedShort": "times",
+    "briefingStartBtn": "START MISSION (A)",
+    "briefingBackBtn": "BACK (B)",
+    "briefingDiffSelectTitle": "🎯 CHOOSE BEAM TIME FOR MISSION:"
   }
 };
 window.SWEDISH_PUZZLE_NAMES = {
