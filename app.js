@@ -274,13 +274,23 @@ class RetroAudioEngine {
       this.startMusic(track);
     }
     saveSettings();
+    updateAudioButtonsUI();
     return !this.bgmMuted;
+  }
+
+  toggleMusic() {
+    return this.toggleBGM();
   }
 
   toggleSFX() {
     this.sfxMuted = !this.sfxMuted;
     saveSettings();
+    updateAudioButtonsUI();
     return !this.sfxMuted;
+  }
+
+  toggleSfx() {
+    return this.toggleSFX();
   }
 
   // Extraterrestrial Theremin / Space Tone with Vibrato LFO
@@ -924,10 +934,32 @@ function updateAudioButtonsUI() {
   const setMusicText = document.getElementById('settings-music-text');
   const setSfxIcon = document.getElementById('settings-sfx-icon');
   const setSfxText = document.getElementById('settings-sfx-text');
+  const setMusicBtn = document.getElementById('settings-btn-music');
+  const setSfxBtn = document.getElementById('settings-btn-sfx');
+
   if (setMusicIcon) setMusicIcon.innerText = isBgmMuted ? '🔇' : '🎵';
-  if (setMusicText) setMusicText.innerText = isBgmMuted ? (isSv ? 'MUSIK: AV' : 'MUSIC: OFF') : (isSv ? 'MUSIK: PÅ' : 'MUSIC: ON');
+  if (setMusicText) {
+    setMusicText.innerText = isBgmMuted ? (isSv ? 'MUSIK: AV' : 'MUSIC: OFF') : (isSv ? 'MUSIK: PÅ' : 'MUSIC: ON');
+  }
+  if (setMusicBtn) {
+    if (isBgmMuted) {
+      setMusicBtn.classList.add('audio-muted-btn');
+    } else {
+      setMusicBtn.classList.remove('audio-muted-btn');
+    }
+  }
+
   if (setSfxIcon) setSfxIcon.innerText = isSfxMuted ? '🔕' : '🔊';
-  if (setSfxText) setSfxText.innerText = isSfxMuted ? (isSv ? 'LJUD: AV' : 'SOUND: OFF') : (isSv ? 'LJUD: PÅ' : 'SOUND: ON');
+  if (setSfxText) {
+    setSfxText.innerText = isSfxMuted ? (isSv ? 'LJUD: AV' : 'SOUND: OFF') : (isSv ? 'LJUD: PÅ' : 'SOUND: ON');
+  }
+  if (setSfxBtn) {
+    if (isSfxMuted) {
+      setSfxBtn.classList.add('audio-muted-btn');
+    } else {
+      setSfxBtn.classList.remove('audio-muted-btn');
+    }
+  }
 }
 
 // Calculate row & column clues from a 2D binary grid
@@ -2173,7 +2205,14 @@ function startBoard15Timer() {
 
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    modal.classList.remove('hidden');
+    if (modalId === 'settings-modal') {
+      updateAudioButtonsUI();
+      updateDifficultyUI();
+      updateLanguageUI();
+    }
+  }
 }
 
 function closeModal(modalId) {

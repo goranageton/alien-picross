@@ -547,3 +547,11 @@ body {
   border-color: var(--gb-bright) !important;
   box-shadow: inset 2px 2px 0 var(--gb-mid), 0 0 4px var(--gb-glow);
 }
+
+.audio-muted-btn {
+  background-color: var(--gb-dark) !important;
+  color: var(--gb-light) !important;
+  opacity: 0.8;
+  border-color: var(--gb-darkest) !important;
+  box-shadow: inset 2px 2px 0 var(--gb-darkest) !important;
+}
