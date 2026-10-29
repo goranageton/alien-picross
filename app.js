@@ -820,9 +820,11 @@ function updateLanguageUI() {
   const vicLogHeader = document.querySelector('#victory-modal #victory-research-note')?.parentElement?.querySelector('div span:last-child');
   if (vicLogHeader) vicLogHeader.innerText = t.mothershipLog;
   const vicNext = document.getElementById('victory-btn-next');
-  if (vicNext) vicNext.innerText = t.nextSpecimenBtn;
+  if (vicNext) vicNext.innerHTML = `<span>🚀</span> <span>${t.nextSpecimenBtn}</span>`;
   const vicLvls = document.getElementById('victory-btn-levels');
-  if (vicLvls) vicLvls.innerText = t.victoryTargetsBtn;
+  if (vicLvls) vicLvls.innerHTML = `<span>📋</span> <span>${t.victoryTargetsBtn}</span>`;
+  const vicBadge = document.getElementById('victory-pixel-badge');
+  if (vicBadge) vicBadge.innerText = t.victoryPixelBadge || '10x10 PIXELKONST DEKODAD';
 
   // Game Over Modal
   const goTitle = document.querySelector('#game-over-modal .text-\\[12px\\]');
@@ -1777,6 +1779,14 @@ function initBoard10() {
       openModal('pause-modal');
     });
   }
+
+  // Global drag release listeners
+  window.addEventListener('pointerup', handleCellDragEnd);
+  window.addEventListener('touchend', handleCellDragEnd);
+  window.addEventListener('pointercancel', handleCellDragEnd);
+
+  // Initialize background critters
+  initCritterSystem();
 }
 
 function loadLevelIntoBoard10(levelKey) {
@@ -1785,6 +1795,10 @@ function loadLevelIntoBoard10(levelKey) {
   State.board10.isCompleted = false;
   State.board10.timerSeconds = getStartingSeconds(State.difficulty);
   State.board10.mistakes = 0;
+
+  // Reset clean solved board showcase mode if set from previous puzzle
+  const boardEl = document.getElementById('game-board-container');
+  if (boardEl) boardEl.classList.remove('board-solved-showcase');
 
   const timerEl = document.getElementById('picross-timer-10');
   if (timerEl) {
@@ -1806,6 +1820,17 @@ function loadLevelIntoBoard10(levelKey) {
   updateClueCompletion();
   updateToolModeUI();
   triggerAlienEmotion('normal', 0);
+
+  // Reset critters to walking state
+  if (activeCritters.length === 0) {
+    initCritterSystem();
+  } else {
+    activeCritters.forEach(c => {
+      c.state = 'walk';
+      c.el.classList.remove('critter-abduct', 'critter-panic');
+      c.el.classList.add('critter-walk');
+    });
+  }
 }
 
 function renderClues10(rowClues, colClues) {
@@ -1868,6 +1893,336 @@ function renderClues10(rowClues, colClues) {
   }
 }
 
+// ========================================================
+// RETRO MINI-CRITTERS (Aliens, Cows & Humans in Margins)
+// ========================================================
+
+const CRITTER_ALIEN_SVG = `
+<svg class="pixel-sharp" viewBox="0 0 16 16" width="18" height="18">
+  <rect x="3" y="1" width="2" height="2" fill="#0f380f" />
+  <rect x="11" y="1" width="2" height="2" fill="#0f380f" />
+  <rect x="4" y="3" width="1" height="2" fill="#0f380f" />
+  <rect x="11" y="3" width="1" height="2" fill="#0f380f" />
+  <rect x="3" y="5" width="10" height="6" fill="#8bac0f" />
+  <rect x="2" y="6" width="12" height="4" fill="#8bac0f" />
+  <rect x="4" y="6" width="3" height="3" fill="#0f380f" />
+  <rect x="9" y="6" width="3" height="3" fill="#0f380f" />
+  <rect x="5" y="7" width="1" height="1" fill="#9bbc0f" />
+  <rect x="10" y="7" width="1" height="1" fill="#9bbc0f" />
+  <rect x="7" y="10" width="2" height="1" fill="#0f380f" />
+  <rect x="5" y="11" width="6" height="3" fill="#306230" />
+  <rect x="4" y="14" width="2" height="2" fill="#0f380f" />
+  <rect x="10" y="14" width="2" height="2" fill="#0f380f" />
+</svg>`;
+
+const CRITTER_COW_SVG = `
+<svg class="pixel-sharp" viewBox="0 0 20 14" width="22" height="16">
+  <rect x="14" y="1" width="1" height="2" fill="#9bbc0f" />
+  <rect x="18" y="1" width="1" height="2" fill="#9bbc0f" />
+  <rect x="13" y="3" width="6" height="5" fill="#8bac0f" />
+  <rect x="14" y="4" width="1" height="1" fill="#0f380f" />
+  <rect x="17" y="4" width="1" height="1" fill="#0f380f" />
+  <rect x="17" y="5" width="3" height="3" fill="#9bbc0f" />
+  <rect x="19" y="6" width="1" height="1" fill="#0f380f" />
+  <rect x="3" y="4" width="11" height="6" fill="#8bac0f" />
+  <rect x="5" y="5" width="3" height="2" fill="#0f380f" />
+  <rect x="9" y="7" width="4" height="2" fill="#0f380f" />
+  <rect x="6" y="7" width="2" height="2" fill="#0f380f" />
+  <rect x="6" y="10" width="3" height="1" fill="#9bbc0f" />
+  <rect x="1" y="5" width="2" height="1" fill="#0f380f" />
+  <rect x="1" y="6" width="1" height="2" fill="#0f380f" />
+  <rect x="4" y="10" width="2" height="4" fill="#0f380f" />
+  <rect x="11" y="10" width="2" height="4" fill="#0f380f" />
+</svg>`;
+
+const CRITTER_HUMAN_SVG = `
+<svg class="pixel-sharp" viewBox="0 0 16 18" width="18" height="20">
+  <rect x="3" y="1" width="10" height="2" fill="#0f380f" />
+  <rect x="1" y="3" width="14" height="2" fill="#306230" />
+  <rect x="4" y="5" width="8" height="5" fill="#9bbc0f" />
+  <rect x="5" y="6" width="2" height="2" fill="#0f380f" />
+  <rect x="9" y="6" width="2" height="2" fill="#0f380f" />
+  <rect x="7" y="8" width="2" height="1" fill="#0f380f" />
+  <rect x="4" y="10" width="8" height="5" fill="#0f380f" />
+  <rect x="6" y="10" width="4" height="2" fill="#8bac0f" />
+  <rect x="2" y="11" width="2" height="3" fill="#9bbc0f" />
+  <rect x="12" y="11" width="2" height="3" fill="#9bbc0f" />
+  <rect x="4" y="15" width="3" height="3" fill="#306230" />
+  <rect x="9" y="15" width="3" height="3" fill="#306230" />
+</svg>`;
+
+let activeCritters = [];
+let critterTimer = null;
+
+function initCritterSystem() {
+  const topZone = document.getElementById('critter-zone-top');
+  const botZone = document.getElementById('critter-zone-bottom');
+  if (!topZone || !botZone) return;
+
+  topZone.innerHTML = '';
+  botZone.innerHTML = '';
+  activeCritters = [];
+
+  const critterConfigs = [
+    { zone: topZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 18, dir: 1, speed: 0.22 },
+    { zone: topZone, type: 'cow', svg: CRITTER_COW_SVG, x: 50, dir: -1, speed: 0.16 },
+    { zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 82, dir: -1, speed: 0.25 },
+    { zone: botZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 15, dir: 1, speed: 0.24 },
+    { zone: botZone, type: 'cow', svg: CRITTER_COW_SVG, x: 48, dir: 1, speed: 0.17 },
+    { zone: botZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 78, dir: -1, speed: 0.26 }
+  ];
+
+  critterConfigs.forEach(cfg => {
+    const wrap = document.createElement('div');
+    wrap.className = 'critter-sprite critter-walk';
+    wrap.style.left = `${cfg.x}%`;
+    wrap.style.transform = cfg.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+    wrap.innerHTML = cfg.svg;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'critter-bubble hidden';
+    wrap.appendChild(bubble);
+
+    cfg.zone.appendChild(wrap);
+
+    activeCritters.push({
+      el: wrap,
+      bubbleEl: bubble,
+      type: cfg.type,
+      x: cfg.x,
+      dir: cfg.dir,
+      speed: cfg.speed,
+      state: 'walk',
+      idleTicks: 0,
+      nextActionTicks: 50 + Math.floor(Math.random() * 70)
+    });
+  });
+
+  if (critterTimer) clearInterval(critterTimer);
+  critterTimer = setInterval(updateCrittersTick, 60);
+}
+
+function updateCrittersTick() {
+  if (State.currentScreen !== 'game-board') return;
+
+  activeCritters.forEach(c => {
+    c.nextActionTicks--;
+
+    if (c.state === 'walk') {
+      c.x += c.dir * c.speed;
+
+      // Bounce at boundary
+      if (c.x <= 4) {
+        c.x = 4;
+        c.dir = 1;
+        c.el.style.transform = 'scaleX(1)';
+      } else if (c.x >= 92) {
+        c.x = 92;
+        c.dir = -1;
+        c.el.style.transform = 'scaleX(-1)';
+      }
+
+      c.el.style.left = `${c.x}%`;
+
+      if (c.nextActionTicks <= 0) {
+        c.state = 'idle';
+        c.idleTicks = 20 + Math.floor(Math.random() * 30);
+        c.el.classList.remove('critter-walk');
+
+        if (Math.random() < 0.6) {
+          const emotes = c.type === 'alien' ? ['👽', '⚡', '🛸', 'HI'] :
+                         c.type === 'cow' ? ['MOO', '🌿', '💤', '🐮'] :
+                         ['🌾', '☕', '👀', '?!'];
+          showCritterBubble(c, emotes[Math.floor(Math.random() * emotes.length)], 1400);
+        }
+      }
+    } else if (c.state === 'idle') {
+      c.idleTicks--;
+      if (c.idleTicks <= 0) {
+        c.state = 'walk';
+        c.el.classList.add('critter-walk');
+        c.nextActionTicks = 70 + Math.floor(Math.random() * 90);
+        if (Math.random() < 0.35) {
+          c.dir = -c.dir;
+          c.el.style.transform = c.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+        }
+      }
+    } else if (c.state === 'panic') {
+      c.x += c.dir * (c.speed * 2.4);
+      if (c.x <= 4) {
+        c.x = 4;
+        c.dir = 1;
+        c.el.style.transform = 'scaleX(1)';
+      } else if (c.x >= 92) {
+        c.x = 92;
+        c.dir = -1;
+        c.el.style.transform = 'scaleX(-1)';
+      }
+      c.el.style.left = `${c.x}%`;
+
+      if (c.nextActionTicks <= 0) {
+        c.state = 'walk';
+        c.el.classList.remove('critter-panic');
+        c.el.classList.add('critter-walk');
+        c.nextActionTicks = 60;
+      }
+    }
+  });
+}
+
+function showCritterBubble(c, text, duration = 1200) {
+  if (!c.bubbleEl) return;
+  c.bubbleEl.innerText = text;
+  c.bubbleEl.classList.remove('hidden');
+  setTimeout(() => {
+    if (c.bubbleEl) c.bubbleEl.classList.add('hidden');
+  }, duration);
+}
+
+function triggerCritterPanic() {
+  activeCritters.forEach(c => {
+    if (c.type === 'human' || c.type === 'cow') {
+      c.state = 'panic';
+      c.nextActionTicks = 45;
+      c.el.classList.remove('critter-walk');
+      c.el.classList.add('critter-panic');
+      showCritterBubble(c, c.type === 'cow' ? 'MOO!!' : 'ZAP?!', 2000);
+    } else if (c.type === 'alien') {
+      showCritterBubble(c, '⚡ HEHE', 1800);
+    }
+  });
+}
+
+function triggerCritterVictory() {
+  activeCritters.forEach(c => {
+    if (c.type === 'cow') {
+      c.state = 'abduct';
+      c.el.classList.remove('critter-walk', 'critter-panic');
+      c.el.classList.add('critter-abduct');
+      showCritterBubble(c, '🛸 MOOO!', 4000);
+    } else if (c.type === 'alien') {
+      c.state = 'idle';
+      showCritterBubble(c, '★ YAY! ★', 4000);
+    } else if (c.type === 'human') {
+      showCritterBubble(c, '😮 WOW!', 4000);
+    }
+  });
+}
+
+// ========================================================
+// VICTORY PIXEL ART DISPLAY
+// ========================================================
+
+function renderVictoryPixelArt(grid) {
+  const canvas = document.getElementById('victory-pixel-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const size = 120;
+  canvas.width = size;
+  canvas.height = size;
+  const cellSize = size / 10;
+
+  // Background light Game Boy LCD green
+  ctx.fillStyle = '#8bac0f';
+  ctx.fillRect(0, 0, size, size);
+
+  for (let r = 0; r < 10; r++) {
+    for (let c = 0; c < 10; c++) {
+      if (grid[r][c] === 1) {
+        // Darkest retro pixel
+        ctx.fillStyle = '#0f380f';
+        ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+        // Subtle pixel bevel
+        ctx.fillStyle = '#306230';
+        ctx.fillRect(c * cellSize, r * cellSize, cellSize, 1);
+        ctx.fillRect(c * cellSize, r * cellSize, 1, cellSize);
+      } else {
+        // Empty pixel
+        ctx.fillStyle = '#9bbc0f';
+        ctx.fillRect(c * cellSize + 1, r * cellSize + 1, cellSize - 2, cellSize - 2);
+      }
+    }
+  }
+
+  // Border frame
+  ctx.strokeStyle = '#0f380f';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(1, 1, size - 2, size - 2);
+}
+
+// ========================================================
+// DRAG-TO-DRAW (MULTI-CELL FILL) & 10x10 GRID INTERACTION
+// ========================================================
+
+let isBoardDragging = false;
+let currentDragMode = 'chisel'; // 'chisel', 'mark-x', 'erase'
+let visitedDragCells = new Set();
+
+function handleCellDragStart(e, idx) {
+  if (State.board10.isCompleted) return;
+  e.preventDefault();
+  isBoardDragging = true;
+  visitedDragCells.clear();
+  visitedDragCells.add(idx);
+  updateCursor10(idx);
+
+  const r = Math.floor(idx / 10);
+  const c = idx % 10;
+  const currentVal = State.board10.userGrid[r][c];
+  const activeTool = State.board10.toolMode;
+
+  if (activeTool === 'chisel') {
+    currentDragMode = (currentVal === 1) ? 'erase' : 'chisel';
+  } else {
+    currentDragMode = (currentVal === 2) ? 'erase' : 'mark-x';
+  }
+
+  const hadPenalty = applyCellDragAction(idx, currentDragMode);
+  if (hadPenalty) {
+    isBoardDragging = false;
+    visitedDragCells.clear();
+  }
+}
+
+function handleCellDragEnter(idx) {
+  if (!isBoardDragging || State.board10.isCompleted) return;
+  if (idx < 0 || idx >= 100) return;
+  if (visitedDragCells.has(idx)) return;
+
+  visitedDragCells.add(idx);
+  updateCursor10(idx);
+  const hadPenalty = applyCellDragAction(idx, currentDragMode);
+  if (hadPenalty) {
+    isBoardDragging = false;
+    visitedDragCells.clear();
+  }
+}
+
+function handleGridTouchMove(e) {
+  if (!isBoardDragging || State.board10.isCompleted) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  if (!touch) return;
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (target && target.classList.contains('carved-block')) {
+    const idx = parseInt(target.dataset.index, 10);
+    if (!isNaN(idx)) {
+      handleCellDragEnter(idx);
+    }
+  }
+}
+
+function handleCellDragEnd() {
+  if (isBoardDragging) {
+    isBoardDragging = false;
+    visitedDragCells.clear();
+    updateClueCompletion();
+    checkSolution10();
+  }
+}
+
 function renderGrid10() {
   const gridEl = document.getElementById('picross-grid-10');
   if (!gridEl) return;
@@ -1887,15 +2242,16 @@ function renderGrid10() {
         cell.classList.add('reticle-cursor');
       }
 
-      cell.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        updateCursor10(idx);
-        applyCellAction(idx, State.board10.toolMode);
-      });
+      // Drag and touch interactions
+      cell.addEventListener('pointerdown', (e) => handleCellDragStart(e, idx));
+      cell.addEventListener('pointerenter', (e) => handleCellDragEnter(idx));
 
       gridEl.appendChild(cell);
     }
   }
+
+  gridEl.removeEventListener('touchmove', handleGridTouchMove);
+  gridEl.addEventListener('touchmove', handleGridTouchMove, { passive: false });
 }
 
 function updateCursor10(newIdx) {
@@ -1967,20 +2323,20 @@ function updateClueCompletion() {
   }
 }
 
-function applyCellAction(index, actionType) {
+function applyCellDragAction(index, actionType) {
   const r = Math.floor(index / 10);
   const c = index % 10;
   const gridEl = document.getElementById('picross-grid-10');
-  if (!gridEl) return;
+  if (!gridEl) return false;
   const cells = gridEl.querySelectorAll('.carved-block');
   const cell = cells[index];
-  if (!cell || State.board10.isCompleted) return;
+  if (!cell || State.board10.isCompleted) return false;
 
   const puzzle = getPuzzle10(State.board10.puzzleKey);
   const isCorrectSolution = puzzle && puzzle.grid[r][c] === 1;
   const currentVal = State.board10.userGrid[r][c];
 
-  if (actionType === 'chisel') {
+  if (actionType === 'erase') {
     if (currentVal === 1) {
       State.board10.userGrid[r][c] = 0;
       cell.classList.remove('excavated-tile');
@@ -1988,93 +2344,128 @@ function applyCellAction(index, actionType) {
       sound.playChisel();
       hapticPulse('zap');
     } else if (currentVal === 2) {
-      sound.playBlip(); // marked with X protection
-      hapticPulse('shield');
-    } else {
-      if (isCorrectSolution) {
-        State.board10.userGrid[r][c] = 1;
-        cell.classList.add('excavated-tile');
-        cell.classList.remove('marked-x-tile');
-        cell.innerText = '';
-        sound.playChisel();
-        hapticPulse('zap');
-        triggerAlienEmotion('happy', 850);
-      } else {
-        // PENALTY MECHANIC
-        State.board10.mistakes++;
-        const penaltySecs = State.board10.mistakes === 1 ? 120 : (State.board10.mistakes === 2 ? 240 : 480);
-        const penaltyLabel = State.board10.mistakes === 1 ? '-2:00' : (State.board10.mistakes === 2 ? '-4:00' : '-8:00');
-
-        sound.playAlienBuzzer();
-        hapticPulse('penalty');
-        triggerAlienEmotion('panic', 1400);
-
-        const boardEl = document.getElementById('game-board-container');
-        if (boardEl) {
-          boardEl.classList.remove('shake-screen');
-          void boardEl.offsetWidth;
-          boardEl.classList.add('shake-screen');
-          setTimeout(() => boardEl.classList.remove('shake-screen'), 480);
-        }
-
-        State.board10.timerSeconds = Math.max(0, State.board10.timerSeconds - penaltySecs);
-        const timerEl = document.getElementById('picross-timer-10');
-        if (timerEl) {
-          timerEl.innerText = formatTime(State.board10.timerSeconds);
-          timerEl.classList.remove('timer-penalty-flash');
-          void timerEl.offsetWidth;
-          timerEl.classList.add('timer-penalty-flash');
-          setTimeout(() => timerEl.classList.remove('timer-penalty-flash'), 900);
-        }
-
-        const toast = document.getElementById('penalty-toast');
-        if (toast) {
-          const funnyPenaltyMessages = [
-            'ZAP! ANGRY FARMER DETECTED',
-            'SHIELD MALFUNCTION',
-            'ERROR! FOIL HAT DEFLECTED',
-            'COW ESCAPED TRACTOR BEAM',
-            'AREA 51 RADAR LOCK',
-            'TRACTOR BEAM OVERHEATED',
-            'WEATHER BALLOON HIT',
-            'PROBE MALFUNCTION',
-            'FBI AGENT SPOTTED'
-          ];
-          const randomMsg = funnyPenaltyMessages[Math.floor(Math.random() * funnyPenaltyMessages.length)];
-          toast.innerText = `${randomMsg} ${penaltyLabel}!`;
-          toast.classList.remove('hidden', 'penalty-notification');
-          void toast.offsetWidth;
-          toast.classList.add('penalty-notification');
-          setTimeout(() => toast.classList.add('hidden'), 1500);
-        }
-
-        State.board10.userGrid[r][c] = 2;
-        cell.classList.remove('excavated-tile');
-        cell.classList.add('marked-x-tile');
-        cell.innerText = '✕';
-
-        if (State.board10.timerSeconds <= 0) {
-          openModal('game-over-modal');
-        }
-      }
-    }
-  } else if (actionType === 'mark-x') {
-    if (currentVal === 2) {
       State.board10.userGrid[r][c] = 0;
       cell.classList.remove('marked-x-tile');
       cell.innerText = '';
       sound.playMarkX();
       hapticPulse('shield');
-    } else if (currentVal === 0) {
+    }
+    return false;
+  }
+
+  if (actionType === 'chisel') {
+    if (currentVal === 1) {
+      return false; // Already marked
+    }
+    if (currentVal === 2) {
+      sound.playBlip();
+      hapticPulse('shield');
+      return false; // Shielded
+    }
+
+    if (isCorrectSolution) {
+      State.board10.userGrid[r][c] = 1;
+      cell.classList.add('excavated-tile');
+      cell.classList.remove('marked-x-tile');
+      cell.innerText = '';
+      sound.playChisel();
+      hapticPulse('zap');
+      triggerAlienEmotion('happy', 850);
+      return false;
+    } else {
+      // PENALTY MECHANIC
+      State.board10.mistakes++;
+      const penaltySecs = State.board10.mistakes === 1 ? 120 : (State.board10.mistakes === 2 ? 240 : 480);
+      const penaltyLabel = State.board10.mistakes === 1 ? '-2:00' : (State.board10.mistakes === 2 ? '-4:00' : '-8:00');
+
+      sound.playAlienBuzzer();
+      hapticPulse('penalty');
+      triggerAlienEmotion('panic', 1400);
+      triggerCritterPanic();
+
+      const boardEl = document.getElementById('game-board-container');
+      if (boardEl) {
+        boardEl.classList.remove('shake-screen');
+        void boardEl.offsetWidth;
+        boardEl.classList.add('shake-screen');
+        setTimeout(() => boardEl.classList.remove('shake-screen'), 480);
+      }
+
+      State.board10.timerSeconds = Math.max(0, State.board10.timerSeconds - penaltySecs);
+      const timerEl = document.getElementById('picross-timer-10');
+      if (timerEl) {
+        timerEl.innerText = formatTime(State.board10.timerSeconds);
+        timerEl.classList.remove('timer-penalty-flash');
+        void timerEl.offsetWidth;
+        timerEl.classList.add('timer-penalty-flash');
+        setTimeout(() => timerEl.classList.remove('timer-penalty-flash'), 900);
+      }
+
+      const toast = document.getElementById('penalty-toast');
+      if (toast) {
+        const funnyPenaltyMessages = [
+          'ZAP! ANGRY FARMER DETECTED',
+          'SHIELD MALFUNCTION',
+          'ERROR! FOIL HAT DEFLECTED',
+          'COW ESCAPED TRACTOR BEAM',
+          'AREA 51 RADAR LOCK',
+          'TRACTOR BEAM OVERHEATED',
+          'WEATHER BALLOON HIT',
+          'PROBE MALFUNCTION',
+          'FBI AGENT SPOTTED'
+        ];
+        const randomMsg = funnyPenaltyMessages[Math.floor(Math.random() * funnyPenaltyMessages.length)];
+        toast.innerText = `${randomMsg} ${penaltyLabel}!`;
+        toast.classList.remove('hidden', 'penalty-notification');
+        void toast.offsetWidth;
+        toast.classList.add('penalty-notification');
+        setTimeout(() => toast.classList.add('hidden'), 1500);
+      }
+
+      State.board10.userGrid[r][c] = 2;
+      cell.classList.remove('excavated-tile');
+      cell.classList.add('marked-x-tile');
+      cell.innerText = '✕';
+
+      if (State.board10.timerSeconds <= 0) {
+        openModal('game-over-modal');
+      }
+
+      return true; // Penalty occurred!
+    }
+  }
+
+  if (actionType === 'mark-x') {
+    if (currentVal === 1) {
+      return false; // Cannot X excavated tile
+    }
+    if (currentVal === 2) {
+      return false; // Already X
+    }
+    if (currentVal === 0) {
       State.board10.userGrid[r][c] = 2;
       cell.classList.remove('excavated-tile');
       cell.classList.add('marked-x-tile');
       cell.innerText = '✕';
       sound.playMarkX();
       hapticPulse('shield');
+      return false;
     }
   }
 
+  return false;
+}
+
+function applyCellAction(index, actionType) {
+  const r = Math.floor(index / 10);
+  const c = index % 10;
+  const currentVal = State.board10.userGrid[r][c];
+
+  let mode = actionType;
+  if (actionType === 'chisel' && currentVal === 1) mode = 'erase';
+  else if (actionType === 'mark-x' && currentVal === 2) mode = 'erase';
+
+  applyCellDragAction(index, mode);
   updateClueCompletion();
   checkSolution10();
 }
@@ -2104,6 +2495,16 @@ function checkSolution10() {
     State.board10.isCompleted = true;
     sound.playFanfare();
     hapticPulse('victory');
+
+    // Clean revealed picture mode on the game board
+    const boardEl = document.getElementById('game-board-container');
+    if (boardEl) boardEl.classList.add('board-solved-showcase');
+
+    // Render 10x10 pixel art onto victory canvas
+    renderVictoryPixelArt(puzzle.grid);
+
+    // Trigger celebration in critters (cow abduction, alien hearts)
+    triggerCritterVictory();
 
     const lvl = State.board10.puzzleKey;
     if (!State.stats[lvl]) {
