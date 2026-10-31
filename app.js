@@ -270,7 +270,7 @@ class RetroAudioEngine {
     if (this.bgmMuted) {
       this.stopMusic();
     } else {
-      const track = (State.currentScreen === 'game-board' || State.currentScreen === 'gameboy-view') ? 'game' : 'menu';
+      const track = (State.currentScreen === 'game-board') ? 'game' : 'menu';
       this.startMusic(track);
     }
     saveSettings();
@@ -501,16 +501,6 @@ const State = {
     isCompleted: false,
     mistakes: 0,
     toolMode: 'chisel' // 'chisel' or 'mark-x'
-  },
-  // 15x15 board state
-  board15: {
-    puzzleKey: 'GB-1',
-    cursorRow: 7,
-    cursorCol: 7,
-    userGrid: [],
-    timerSeconds: 1782,
-    timerInterval: null,
-    toolMode: 'chisel'
   }
 };
 
@@ -686,9 +676,6 @@ function updateLanguageUI() {
 
   const menuPicross = document.querySelector('#menu-btn-picross span.inline-block');
   if (menuPicross) menuPicross.innerText = t.galacticPicross;
-
-  const menuGameboy = document.getElementById('menu-btn-gameboy');
-  if (menuGameboy) menuGameboy.innerText = t.mothership15;
 
   const menuSettingsText = document.getElementById('menu-settings-text');
   if (menuSettingsText) menuSettingsText.innerText = t.menuSettingsBtn || 'INSTÄLLNINGAR';
@@ -1042,7 +1029,7 @@ function navigateTo(screenId) {
   });
 
   // Manage Background Music per screen
-  if (screenId === 'game-board' || screenId === 'gameboy-view') {
+  if (screenId === 'game-board') {
     sound.startMusic('game');
   } else {
     sound.startMusic('menu');
@@ -1054,8 +1041,6 @@ function navigateTo(screenId) {
   } else if (screenId === 'game-board') {
     startBoard10Timer();
     renderMiniRadar();
-  } else if (screenId === 'gameboy-view') {
-    startBoard15Timer();
   }
 }
 
@@ -1066,11 +1051,9 @@ function navigateTo(screenId) {
 function initMainMenu() {
   const btnPicross = document.getElementById('menu-btn-picross');
   const btnHowTo = document.getElementById('menu-btn-how-to');
-  const btnGameboy = document.getElementById('menu-btn-gameboy');
   const btnSettings = document.getElementById('menu-btn-settings');
 
   if (btnPicross) btnPicross.addEventListener('click', () => navigateTo('level-select'));
-  if (btnGameboy) btnGameboy.addEventListener('click', () => navigateTo('gameboy-view'));
   if (btnSettings) {
     btnSettings.addEventListener('click', () => {
       sound.playBlip();
@@ -1822,15 +1805,7 @@ function loadLevelIntoBoard10(levelKey) {
   triggerAlienEmotion('normal', 0);
 
   // Reset critters to walking state
-  if (activeCritters.length === 0) {
-    initCritterSystem();
-  } else {
-    activeCritters.forEach(c => {
-      c.state = 'walk';
-      c.el.classList.remove('critter-abduct', 'critter-panic');
-      c.el.classList.add('critter-walk');
-    });
-  }
+  initCritterSystem();
 }
 
 function renderClues10(rowClues, colClues) {
@@ -1951,8 +1926,41 @@ const CRITTER_HUMAN_SVG = `
   <rect x="9" y="15" width="3" height="3" fill="#306230" />
 </svg>`;
 
+const CRITTER_UFO_SVG = `
+<svg class="pixel-sharp" viewBox="0 0 24 16" width="26" height="18">
+  <rect x="9" y="1" width="6" height="2" fill="#8bac0f" />
+  <rect x="7" y="3" width="10" height="3" fill="#9bbc0f" />
+  <rect x="10" y="3" width="4" height="2" fill="#0f380f" />
+  <rect x="3" y="6" width="18" height="3" fill="#306230" />
+  <rect x="1" y="8" width="22" height="3" fill="#0f380f" />
+  <rect x="4" y="9" width="2" height="1" fill="#9bbc0f" />
+  <rect x="8" y="9" width="2" height="1" fill="#9bbc0f" />
+  <rect x="14" y="9" width="2" height="1" fill="#9bbc0f" />
+  <rect x="18" y="9" width="2" height="1" fill="#9bbc0f" />
+  <rect x="9" y="11" width="6" height="2" fill="#306230" />
+  <rect x="10" y="13" width="4" height="1" fill="#8bac0f" />
+</svg>`;
+
+const CRITTER_UFO_SCOUT_SVG = `
+<svg class="pixel-sharp" viewBox="0 0 20 12" width="22" height="14">
+  <rect x="9" y="0" width="2" height="2" fill="#0f380f" />
+  <rect x="7" y="2" width="6" height="2" fill="#9bbc0f" />
+  <rect x="8" y="3" width="4" height="2" fill="#0f380f" />
+  <rect x="2" y="4" width="16" height="3" fill="#306230" />
+  <rect x="0" y="7" width="20" height="2" fill="#0f380f" />
+  <rect x="3" y="7" width="2" height="1" fill="#9bbc0f" />
+  <rect x="9" y="7" width="2" height="1" fill="#9bbc0f" />
+  <rect x="15" y="7" width="2" height="1" fill="#9bbc0f" />
+  <rect x="6" y="9" width="8" height="2" fill="#8bac0f" />
+  <rect x="8" y="11" width="4" height="1" fill="#0f380f" />
+</svg>`;
+
 let activeCritters = [];
 let critterTimer = null;
+let zoneDramas = {
+  top: { state: 'idle', cooldown: 60, beamEl: null },
+  bottom: { state: 'idle', cooldown: 110, beamEl: null }
+};
 
 function initCritterSystem() {
   const topZone = document.getElementById('critter-zone-top');
@@ -1963,21 +1971,57 @@ function initCritterSystem() {
   botZone.innerHTML = '';
   activeCritters = [];
 
+  // Create tractor beams for both zones
+  const topBeam = document.createElement('div');
+  topBeam.className = 'tractor-beam-cone hidden';
+  topZone.appendChild(topBeam);
+  zoneDramas.top.beamEl = topBeam;
+  zoneDramas.top.state = 'idle';
+  zoneDramas.top.cooldown = 45 + Math.floor(Math.random() * 35);
+
+  const botBeam = document.createElement('div');
+  botBeam.className = 'tractor-beam-cone hidden';
+  botZone.appendChild(botBeam);
+  zoneDramas.bottom.beamEl = botBeam;
+  zoneDramas.bottom.state = 'idle';
+  zoneDramas.bottom.cooldown = 70 + Math.floor(Math.random() * 45);
+
   const critterConfigs = [
-    { zone: topZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 18, dir: 1, speed: 0.22 },
-    { zone: topZone, type: 'cow', svg: CRITTER_COW_SVG, x: 50, dir: -1, speed: 0.16 },
-    { zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 82, dir: -1, speed: 0.25 },
-    { zone: botZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 15, dir: 1, speed: 0.24 },
-    { zone: botZone, type: 'cow', svg: CRITTER_COW_SVG, x: 48, dir: 1, speed: 0.17 },
-    { zone: botZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 78, dir: -1, speed: 0.26 }
+    // Top Zone: Abductor UFO, Fast Scout UFO, Alien, Cow, Human
+    { zoneKey: 'top', zone: topZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 30, dir: 1, speed: 0.32, isUfo: true, altitude: 2 },
+    { zoneKey: 'top', zone: topZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 8, dir: 1, speed: 0.58, isScoutUfo: true, altitude: 6, flightAngle: 0 },
+    { zoneKey: 'top', zone: topZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 22, dir: 1, speed: 0.36 },
+    { zoneKey: 'top', zone: topZone, type: 'cow', svg: CRITTER_COW_SVG, x: 54, dir: -1, speed: 0.26 },
+    { zoneKey: 'top', zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 82, dir: -1, speed: 0.38 },
+
+    // Bottom Zone: Abductor UFO, Fast Scout UFO, Human, Cow, Alien
+    { zoneKey: 'bottom', zone: botZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 72, dir: -1, speed: 0.32, isUfo: true, altitude: 2 },
+    { zoneKey: 'bottom', zone: botZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 88, dir: -1, speed: 0.54, isScoutUfo: true, altitude: 6, flightAngle: Math.PI },
+    { zoneKey: 'bottom', zone: botZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 18, dir: 1, speed: 0.38 },
+    { zoneKey: 'bottom', zone: botZone, type: 'cow', svg: CRITTER_COW_SVG, x: 48, dir: 1, speed: 0.25 },
+    { zoneKey: 'bottom', zone: botZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 78, dir: -1, speed: 0.37 }
   ];
 
   critterConfigs.forEach(cfg => {
     const wrap = document.createElement('div');
-    wrap.className = 'critter-sprite critter-walk';
+    if (cfg.isUfo) {
+      wrap.className = 'critter-ufo ufo-hover';
+    } else if (cfg.isScoutUfo) {
+      wrap.className = 'critter-scout-ufo ufo-scout-fly';
+    } else {
+      wrap.className = 'critter-sprite critter-walk';
+    }
     wrap.style.left = `${cfg.x}%`;
     wrap.style.transform = cfg.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
     wrap.innerHTML = cfg.svg;
+
+    // Spotlight beam under scout UFO
+    let spotlightEl = null;
+    if (cfg.isScoutUfo) {
+      spotlightEl = document.createElement('div');
+      spotlightEl.className = 'ufo-spotlight-beam';
+      wrap.appendChild(spotlightEl);
+    }
 
     const bubble = document.createElement('div');
     bubble.className = 'critter-bubble hidden';
@@ -1988,32 +2032,43 @@ function initCritterSystem() {
     activeCritters.push({
       el: wrap,
       bubbleEl: bubble,
+      spotlightEl: spotlightEl,
+      zoneKey: cfg.zoneKey,
+      zoneEl: cfg.zone,
       type: cfg.type,
+      isUfo: !!cfg.isUfo,
+      isScoutUfo: !!cfg.isScoutUfo,
       x: cfg.x,
       dir: cfg.dir,
       speed: cfg.speed,
+      altitude: cfg.altitude || 0,
+      flightAngle: cfg.flightAngle || 0,
       state: 'walk',
       idleTicks: 0,
-      nextActionTicks: 50 + Math.floor(Math.random() * 70)
+      actionTicks: 0,
+      nextActionTicks: 25 + Math.floor(Math.random() * 45)
     });
   });
 
   if (critterTimer) clearInterval(critterTimer);
-  critterTimer = setInterval(updateCrittersTick, 60);
+  critterTimer = setInterval(updateCrittersTick, 50);
 }
 
 function updateCrittersTick() {
   if (State.currentScreen !== 'game-board') return;
 
+  // Update critters standard wander & bounce & flying
   activeCritters.forEach(c => {
-    c.nextActionTicks--;
-
-    if (c.state === 'walk') {
+    // Flying Scout UFOs
+    if (c.isScoutUfo) {
       c.x += c.dir * c.speed;
+      c.flightAngle += 0.08;
+      c.altitude = 4 + Math.sin(c.flightAngle) * 5;
+      c.el.style.top = `${c.altitude}px`;
 
       // Bounce at boundary
-      if (c.x <= 4) {
-        c.x = 4;
+      if (c.x <= 2) {
+        c.x = 2;
         c.dir = 1;
         c.el.style.transform = 'scaleX(1)';
       } else if (c.x >= 92) {
@@ -2021,53 +2076,279 @@ function updateCrittersTick() {
         c.dir = -1;
         c.el.style.transform = 'scaleX(-1)';
       }
+      c.el.style.left = `${c.x}%`;
+
+      // Scout UFO close encounters with ground critters!
+      const zoneWalkers = activeCritters.filter(o => o.zoneKey === c.zoneKey && !o.isUfo && !o.isScoutUfo);
+      zoneWalkers.forEach(walker => {
+        if (Math.abs(c.x - walker.x) < 5.5 && walker.state !== 'panic' && walker.state !== 'being_abducted' && walker.state !== 'duck') {
+          if (Math.random() < 0.35) {
+            if (walker.type === 'cow') {
+              walker.state = 'duck';
+              walker.actionTicks = 16;
+              walker.el.classList.add('critter-duck');
+              showCritterBubble(walker, '🐮 WHOA!', 1000);
+            } else if (walker.type === 'human') {
+              showCritterBubble(walker, '👀 SPOTTED! 🛸', 1100);
+            } else if (walker.type === 'alien') {
+              walker.state = 'hop';
+              walker.actionTicks = 14;
+              walker.el.classList.remove('critter-walk');
+              walker.el.classList.add('critter-hop');
+              showCritterBubble(walker, '👽 YOOO!', 1000);
+            }
+          }
+        }
+      });
+      return;
+    }
+
+    // Walking / Active Ground Critters & Abductor UFO
+    if (c.state === 'walk') {
+      c.x += c.dir * c.speed;
+
+      // Bounce at screen edges
+      if (c.x <= 4) {
+        c.x = 4;
+        c.dir = 1;
+        c.el.style.transform = 'scaleX(1)';
+      } else if (c.x >= 91) {
+        c.x = 91;
+        c.dir = -1;
+        c.el.style.transform = 'scaleX(-1)';
+      }
 
       c.el.style.left = `${c.x}%`;
 
-      if (c.nextActionTicks <= 0) {
-        c.state = 'idle';
-        c.idleTicks = 20 + Math.floor(Math.random() * 30);
-        c.el.classList.remove('critter-walk');
-
-        if (Math.random() < 0.6) {
-          const emotes = c.type === 'alien' ? ['👽', '⚡', '🛸', 'HI'] :
-                         c.type === 'cow' ? ['MOO', '🌿', '💤', '🐮'] :
-                         ['🌾', '☕', '👀', '?!'];
-          showCritterBubble(c, emotes[Math.floor(Math.random() * emotes.length)], 1400);
+      c.nextActionTicks--;
+      if (c.nextActionTicks <= 0 && !c.isUfo) {
+        const randAct = Math.random();
+        if (randAct < 0.35) {
+          // Playful hop!
+          c.state = 'hop';
+          c.actionTicks = 14;
+          c.el.classList.remove('critter-walk');
+          c.el.classList.add('critter-hop');
+          if (Math.random() < 0.6) {
+            const hopEmote = c.type === 'alien' ? ['⚡ BEEP', '👽 HEHE', '🛸 HOP'] :
+                             c.type === 'cow' ? ['🐮 MOO!', '🌿 YAY', '🌾 JUMP'] :
+                             ['🏃💨', '👀 RADAR', '📡 PING'];
+            showCritterBubble(c, hopEmote[Math.floor(Math.random() * hopEmote.length)], 900);
+          }
+        } else if (randAct < 0.6) {
+          // Sprint dash!
+          c.state = 'dash';
+          c.actionTicks = 12;
+          c.el.classList.remove('critter-walk');
+          c.el.classList.add('critter-dash');
+        } else {
+          // Short pause
+          c.state = 'idle';
+          c.idleTicks = 12 + Math.floor(Math.random() * 18);
+          c.el.classList.remove('critter-walk');
+          if (Math.random() < 0.6) {
+            const emotes = c.type === 'alien' ? ['👽', '⚡', '🛸', 'HI!'] :
+                           c.type === 'cow' ? ['MOO', '🌿', '💤', '🐮'] :
+                           ['👀', 'SCAN', '🛸?!', '📸'];
+            showCritterBubble(c, emotes[Math.floor(Math.random() * emotes.length)], 1100);
+          }
         }
+      }
+    } else if (c.state === 'hop') {
+      c.x += c.dir * (c.speed * 1.2);
+      c.el.style.left = `${c.x}%`;
+      c.actionTicks--;
+      if (c.actionTicks <= 0) {
+        c.state = 'walk';
+        c.el.classList.remove('critter-hop');
+        c.el.classList.add('critter-walk');
+        c.nextActionTicks = 35 + Math.floor(Math.random() * 45);
+      }
+    } else if (c.state === 'dash') {
+      c.x += c.dir * (c.speed * 1.8);
+      if (c.x <= 4) { c.x = 4; c.dir = 1; c.el.style.transform = 'scaleX(1)'; }
+      else if (c.x >= 91) { c.x = 91; c.dir = -1; c.el.style.transform = 'scaleX(-1)'; }
+      c.el.style.left = `${c.x}%`;
+      c.actionTicks--;
+      if (c.actionTicks <= 0) {
+        c.state = 'walk';
+        c.el.classList.remove('critter-dash');
+        c.el.classList.add('critter-walk');
+        c.nextActionTicks = 40 + Math.floor(Math.random() * 45);
+      }
+    } else if (c.state === 'duck') {
+      c.actionTicks--;
+      if (c.actionTicks <= 0) {
+        c.state = 'walk';
+        c.el.classList.remove('critter-duck');
+        c.el.classList.add('critter-walk');
+        c.nextActionTicks = 30;
+      }
+    } else if (c.state === 'cheer') {
+      c.actionTicks--;
+      if (c.actionTicks <= 0) {
+        c.state = 'walk';
+        c.el.classList.remove('critter-cheer', 'critter-hop');
+        c.el.classList.add('critter-walk');
+        c.nextActionTicks = 35;
       }
     } else if (c.state === 'idle') {
       c.idleTicks--;
       if (c.idleTicks <= 0) {
         c.state = 'walk';
-        c.el.classList.add('critter-walk');
-        c.nextActionTicks = 70 + Math.floor(Math.random() * 90);
-        if (Math.random() < 0.35) {
+        if (!c.isUfo) c.el.classList.add('critter-walk');
+        c.nextActionTicks = 45 + Math.floor(Math.random() * 55);
+        if (Math.random() < 0.4) {
           c.dir = -c.dir;
           c.el.style.transform = c.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
         }
       }
     } else if (c.state === 'panic') {
-      c.x += c.dir * (c.speed * 2.4);
+      c.x += c.dir * (c.speed * 2.5);
       if (c.x <= 4) {
         c.x = 4;
         c.dir = 1;
         c.el.style.transform = 'scaleX(1)';
-      } else if (c.x >= 92) {
-        c.x = 92;
+      } else if (c.x >= 91) {
+        c.x = 91;
         c.dir = -1;
         c.el.style.transform = 'scaleX(-1)';
       }
       c.el.style.left = `${c.x}%`;
 
+      c.nextActionTicks--;
       if (c.nextActionTicks <= 0) {
         c.state = 'walk';
         c.el.classList.remove('critter-panic');
-        c.el.classList.add('critter-walk');
-        c.nextActionTicks = 60;
+        if (!c.isUfo) c.el.classList.add('critter-walk');
+        c.nextActionTicks = 45;
       }
     }
   });
+
+  // Manage UFO Abduction vs Human Defense Drama for both top and bottom zones
+  updateZoneAbductionDrama('top');
+  updateZoneAbductionDrama('bottom');
+}
+
+function updateZoneAbductionDrama(zoneKey) {
+  const drama = zoneDramas[zoneKey];
+  if (!drama) return;
+
+  const ufo = activeCritters.find(c => c.zoneKey === zoneKey && c.isUfo);
+  const cow = activeCritters.find(c => c.zoneKey === zoneKey && c.type === 'cow');
+  const human = activeCritters.find(c => c.zoneKey === zoneKey && c.type === 'human');
+  const alien = activeCritters.find(c => c.zoneKey === zoneKey && c.type === 'alien');
+
+  if (!ufo || !cow || !human) return;
+
+  if (drama.state === 'idle') {
+    drama.cooldown--;
+    if (drama.cooldown <= 0) {
+      // Start stalking the cow
+      drama.state = 'stalking';
+      drama.ticks = 0;
+      showCritterBubble(ufo, 'TARGET LOCK! 🛸', 1200);
+    }
+  } else if (drama.state === 'stalking') {
+    drama.ticks++;
+    // UFO flies toward cow
+    const diff = cow.x - ufo.x;
+    ufo.dir = diff > 0 ? 1 : -1;
+    ufo.el.style.transform = ufo.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+    ufo.x += ufo.dir * 0.5;
+    ufo.el.style.left = `${ufo.x}%`;
+
+    if (Math.abs(diff) < 4 || drama.ticks > 60) {
+      // Tractor beam activates!
+      drama.state = 'beaming';
+      drama.ticks = 0;
+
+      // Position beam under UFO
+      if (drama.beamEl) {
+        drama.beamEl.style.left = `calc(${ufo.x}% - 6px)`;
+        drama.beamEl.classList.remove('hidden');
+      }
+
+      cow.state = 'being_abducted';
+      cow.el.classList.remove('critter-walk', 'critter-hop', 'critter-dash');
+      cow.el.classList.add('critter-abduct');
+      cow.el.style.bottom = '16px';
+      showCritterBubble(cow, 'MOOO!?! 🐮', 2000);
+      showCritterBubble(ufo, 'BEAM ON! ⚡', 1400);
+      sound.playLaserZap();
+    }
+  } else if (drama.state === 'beaming') {
+    drama.ticks++;
+    // Human notices the abduction!
+    if (drama.ticks === 8) {
+      human.state = 'aiming';
+      human.dir = human.x < ufo.x ? 1 : -1;
+      human.el.style.transform = human.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+      showCritterBubble(human, 'HEY! HANDS OFF! 😠', 1400);
+    } else if (drama.ticks === 20) {
+      // Human shoots laser pellets up at the UFO!
+      drama.state = 'shooting';
+      showCritterBubble(human, 'PEW PEW! 💥', 1200);
+      sound.playLaserZap();
+
+      // Spawn laser pellet
+      fireHumanLaserAtUfo(human, ufo, drama, cow, alien);
+    }
+  }
+}
+
+function fireHumanLaserAtUfo(human, ufo, drama, cow, alien) {
+  const pellet = document.createElement('div');
+  pellet.className = 'human-laser-pellet';
+  pellet.style.left = `${human.x + (human.dir * 2)}%`;
+  pellet.style.bottom = '12px';
+  human.zoneEl.appendChild(pellet);
+
+  // Trigger flight
+  requestAnimationFrame(() => {
+    pellet.style.left = `${ufo.x + 2}%`;
+    pellet.style.bottom = '32px';
+  });
+
+  setTimeout(() => {
+    // Laser hits UFO shield!
+    if (pellet.parentElement) pellet.remove();
+
+    ufo.el.classList.remove('ufo-shield-hit');
+    void ufo.el.offsetWidth;
+    ufo.el.classList.add('ufo-shield-hit');
+    showCritterBubble(ufo, 'BZZT! OUCH! ⚡', 1600);
+    sound.playAlienBuzzer();
+
+    // Turn off tractor beam and drop the cow safely
+    if (drama.beamEl) drama.beamEl.classList.add('hidden');
+    cow.el.style.bottom = '2px';
+    cow.el.classList.remove('critter-abduct');
+    cow.state = 'panic';
+    cow.nextActionTicks = 50;
+    cow.dir = human.x < cow.x ? 1 : -1;
+    cow.el.style.transform = cow.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+    showCritterBubble(cow, 'PLOP! PHEW! ♥', 2000);
+
+    // UFO flees in panic
+    ufo.state = 'panic';
+    ufo.nextActionTicks = 55;
+    ufo.dir = ufo.x < 50 ? -1 : 1;
+    ufo.el.style.transform = ufo.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+
+    // Human celebration
+    setTimeout(() => {
+      human.state = 'walk';
+      human.el.classList.add('critter-walk');
+      showCritterBubble(human, 'HA! GOT YOU! 🎯', 1800);
+      if (alien) showCritterBubble(alien, 'HIHI! 👽', 1600);
+    }, 600);
+
+    // Cooldown before next abduction attempt
+    drama.state = 'idle';
+    drama.cooldown = 70 + Math.floor(Math.random() * 50); // ~4-6 seconds
+  }, 200);
 }
 
 function showCritterBubble(c, text, duration = 1200) {
@@ -2079,16 +2360,46 @@ function showCritterBubble(c, text, duration = 1200) {
   }, duration);
 }
 
+function triggerCritterCheer(type = 'good') {
+  const walkers = activeCritters.filter(c => !c.isUfo && !c.isScoutUfo && c.state !== 'panic' && c.state !== 'being_abducted');
+  if (walkers.length === 0) return;
+
+  // Pick 1-2 random critters to react
+  const count = Math.min(walkers.length, 1 + Math.floor(Math.random() * 2));
+  const shuffled = [...walkers].sort(() => 0.5 - Math.random());
+  for (let i = 0; i < count; i++) {
+    const c = shuffled[i];
+    c.state = 'cheer';
+    c.actionTicks = 20;
+    c.el.classList.remove('critter-walk', 'critter-hop', 'critter-dash');
+    c.el.classList.add('critter-cheer');
+
+    if (type === 'good') {
+      const cheers = c.type === 'alien' ? ['🎯 HIT!', '⚡ NICE!', '👽 WEHEE!', 'BZZT! ★', 'PEW!'] :
+                     c.type === 'cow' ? ['🐮 MOO!', '★ YES!', '🌿 GOOD!'] :
+                     ['TARGET HIT! 📡', 'BULLSEYE! 🎯', 'AREA 51! 🛸', 'SCAN OK!'];
+      showCritterBubble(c, cheers[Math.floor(Math.random() * cheers.length)], 1000);
+    } else if (type === 'shield') {
+      const shields = c.type === 'alien' ? ['DEFLECT! ✕', '🛡️ BLOCKED'] :
+                      c.type === 'cow' ? ['SAFE! 🐮', '✕ MOO'] :
+                      ['SHIELD UP! 🛡️', '✕ SAFE ZONE'];
+      showCritterBubble(c, shields[Math.floor(Math.random() * shields.length)], 1000);
+    }
+  }
+}
+
 function triggerCritterPanic() {
   activeCritters.forEach(c => {
     if (c.type === 'human' || c.type === 'cow') {
       c.state = 'panic';
       c.nextActionTicks = 45;
-      c.el.classList.remove('critter-walk');
+      c.el.classList.remove('critter-walk', 'critter-hop', 'critter-dash', 'critter-cheer');
       c.el.classList.add('critter-panic');
       showCritterBubble(c, c.type === 'cow' ? 'MOO!!' : 'ZAP?!', 2000);
     } else if (c.type === 'alien') {
       showCritterBubble(c, '⚡ HEHE', 1800);
+    } else if (c.isUfo || c.isScoutUfo) {
+      showCritterBubble(c, '🛸 BEEP!', 1600);
     }
   });
 }
@@ -2097,14 +2408,16 @@ function triggerCritterVictory() {
   activeCritters.forEach(c => {
     if (c.type === 'cow') {
       c.state = 'abduct';
-      c.el.classList.remove('critter-walk', 'critter-panic');
+      c.el.classList.remove('critter-walk', 'critter-panic', 'critter-hop', 'critter-dash');
       c.el.classList.add('critter-abduct');
-      showCritterBubble(c, '🛸 MOOO!', 4000);
+      showCritterBubble(c, '🛸 MOOO! ♥', 4000);
     } else if (c.type === 'alien') {
       c.state = 'idle';
       showCritterBubble(c, '★ YAY! ★', 4000);
     } else if (c.type === 'human') {
       showCritterBubble(c, '😮 WOW!', 4000);
+    } else if (c.isUfo || c.isScoutUfo) {
+      showCritterBubble(c, 'MISSION COMPLETE! 🛸', 4000);
     }
   });
 }
@@ -2158,14 +2471,34 @@ function renderVictoryPixelArt(grid) {
 
 let isBoardDragging = false;
 let currentDragMode = 'chisel'; // 'chisel', 'mark-x', 'erase'
-let visitedDragCells = new Set();
+let dragStrokeHistory = []; // Array of { index, prevVal, appliedVal }
+
+function revertCellToValue(index, val) {
+  const r = Math.floor(index / 10);
+  const c = index % 10;
+  const gridEl = document.getElementById('picross-grid-10');
+  if (!gridEl) return;
+  const cells = gridEl.querySelectorAll('.carved-block');
+  const cell = cells[index];
+  if (!cell) return;
+
+  State.board10.userGrid[r][c] = val;
+  cell.classList.remove('excavated-tile', 'marked-x-tile');
+  cell.innerText = '';
+
+  if (val === 1) {
+    cell.classList.add('excavated-tile');
+  } else if (val === 2) {
+    cell.classList.add('marked-x-tile');
+    cell.innerText = '✕';
+  }
+}
 
 function handleCellDragStart(e, idx) {
   if (State.board10.isCompleted) return;
   e.preventDefault();
   isBoardDragging = true;
-  visitedDragCells.clear();
-  visitedDragCells.add(idx);
+  dragStrokeHistory = [];
   updateCursor10(idx);
 
   const r = Math.floor(idx / 10);
@@ -2179,24 +2512,48 @@ function handleCellDragStart(e, idx) {
     currentDragMode = (currentVal === 2) ? 'erase' : 'mark-x';
   }
 
+  const initialVal = currentVal;
   const hadPenalty = applyCellDragAction(idx, currentDragMode);
   if (hadPenalty) {
     isBoardDragging = false;
-    visitedDragCells.clear();
+    dragStrokeHistory = [];
+  } else {
+    dragStrokeHistory.push({ index: idx, prevVal: initialVal, appliedVal: State.board10.userGrid[r][c] });
   }
 }
 
 function handleCellDragEnter(idx) {
   if (!isBoardDragging || State.board10.isCompleted) return;
   if (idx < 0 || idx >= 100) return;
-  if (visitedDragCells.has(idx)) return;
 
-  visitedDragCells.add(idx);
+  // Check if cell is already in current stroke history (User is BACKTRACKING / dragging bakåt!)
+  const historyPos = dragStrokeHistory.findIndex(step => step.index === idx);
+  if (historyPos !== -1 && historyPos < dragStrokeHistory.length - 1) {
+    // Backtracking: Revert all cells drawn after historyPos
+    while (dragStrokeHistory.length - 1 > historyPos) {
+      const revertedStep = dragStrokeHistory.pop();
+      revertCellToValue(revertedStep.index, revertedStep.prevVal);
+    }
+    updateCursor10(idx);
+    sound.playBlip();
+    return;
+  }
+
+  // Already on the current stroke tip
+  if (historyPos === dragStrokeHistory.length - 1) return;
+
+  // Moving to a new cell (framåt, bakåt, el. i valfri riktning)
+  const r = Math.floor(idx / 10);
+  const c = idx % 10;
+  const initialVal = State.board10.userGrid[r][c];
+
   updateCursor10(idx);
   const hadPenalty = applyCellDragAction(idx, currentDragMode);
   if (hadPenalty) {
     isBoardDragging = false;
-    visitedDragCells.clear();
+    dragStrokeHistory = [];
+  } else {
+    dragStrokeHistory.push({ index: idx, prevVal: initialVal, appliedVal: State.board10.userGrid[r][c] });
   }
 }
 
@@ -2206,10 +2563,13 @@ function handleGridTouchMove(e) {
   const touch = e.touches[0];
   if (!touch) return;
   const target = document.elementFromPoint(touch.clientX, touch.clientY);
-  if (target && target.classList.contains('carved-block')) {
-    const idx = parseInt(target.dataset.index, 10);
-    if (!isNaN(idx)) {
-      handleCellDragEnter(idx);
+  if (target) {
+    const cell = target.closest('.carved-block');
+    if (cell) {
+      const idx = parseInt(cell.dataset.index, 10);
+      if (!isNaN(idx)) {
+        handleCellDragEnter(idx);
+      }
     }
   }
 }
@@ -2217,7 +2577,7 @@ function handleGridTouchMove(e) {
 function handleCellDragEnd() {
   if (isBoardDragging) {
     isBoardDragging = false;
-    visitedDragCells.clear();
+    dragStrokeHistory = [];
     updateClueCompletion();
     checkSolution10();
   }
@@ -2371,6 +2731,7 @@ function applyCellDragAction(index, actionType) {
       sound.playChisel();
       hapticPulse('zap');
       triggerAlienEmotion('happy', 850);
+      triggerCritterCheer('good');
       return false;
     } else {
       // PENALTY MECHANIC
@@ -2449,6 +2810,7 @@ function applyCellDragAction(index, actionType) {
       cell.innerText = '✕';
       sound.playMarkX();
       hapticPulse('shield');
+      triggerCritterCheer('shield');
       return false;
     }
   }
@@ -2622,106 +2984,7 @@ function formatTime(totalSeconds) {
 }
 
 // ========================================================
-// 8. 15x15 GAME BOY VIEW LOGIC
-// ========================================================
-
-function initGameboyView() {
-  const grid15 = document.getElementById('gameboy-grid-15');
-  if (!grid15) return;
-  const cells = grid15.querySelectorAll('.cell-border');
-
-  let currentIdx = 7 * 15 + 7;
-
-  function updateCursor15(newIdx) {
-    if (newIdx >= 0 && newIdx < cells.length) {
-      cells[currentIdx].classList.remove('reticle-cursor');
-      currentIdx = newIdx;
-      cells[currentIdx].classList.add('reticle-cursor');
-    }
-  }
-
-  cells.forEach((cell, idx) => {
-    cell.addEventListener('pointerdown', () => {
-      updateCursor15(idx);
-      if (cell.classList.contains('bg-[#0f380f]')) {
-        cell.classList.remove('bg-[#0f380f]');
-        cell.innerText = '✕';
-        sound.playMarkX();
-        hapticPulse('shield');
-      } else if (cell.innerText === '✕') {
-        cell.innerText = '';
-        sound.playChisel();
-        hapticPulse('zap');
-      } else {
-        cell.classList.add('bg-[#0f380f]');
-        cell.innerText = '';
-        sound.playChisel();
-        hapticPulse('zap');
-      }
-    });
-  });
-
-  const gbUp = document.getElementById('gb-btn-up');
-  const gbDown = document.getElementById('gb-btn-down');
-  const gbLeft = document.getElementById('gb-btn-left');
-  const gbRight = document.getElementById('gb-btn-right');
-  const gbA = document.getElementById('gb-btn-a');
-  const gbB = document.getElementById('gb-btn-b');
-  const gbStart = document.getElementById('gb-btn-start');
-  const gbSelect = document.getElementById('gb-btn-select');
-
-  if (gbUp) gbUp.addEventListener('click', () => { sound.playBlip(); updateCursor15(currentIdx - 15); });
-  if (gbDown) gbDown.addEventListener('click', () => { sound.playBlip(); updateCursor15(currentIdx + 15); });
-  if (gbLeft) gbLeft.addEventListener('click', () => { sound.playBlip(); if (currentIdx % 15 !== 0) updateCursor15(currentIdx - 1); });
-  if (gbRight) gbRight.addEventListener('click', () => { sound.playBlip(); if (currentIdx % 15 !== 14) updateCursor15(currentIdx + 1); });
-
-  if (gbA) {
-    gbA.addEventListener('click', () => {
-      const cell = cells[currentIdx];
-      cell.innerText = '';
-      cell.classList.toggle('bg-[#0f380f]');
-      sound.playChisel();
-      hapticPulse('zap');
-    });
-  }
-
-  if (gbB) {
-    gbB.addEventListener('click', () => {
-      const cell = cells[currentIdx];
-      cell.classList.remove('bg-[#0f380f]');
-      cell.innerText = cell.innerText === '✕' ? '' : '✕';
-      sound.playMarkX();
-      hapticPulse('shield');
-    });
-  }
-
-  if (gbStart) {
-    gbStart.addEventListener('click', () => {
-      sound.playBlip();
-      openModal('pause-modal');
-    });
-  }
-
-  if (gbSelect) {
-    gbSelect.addEventListener('click', () => navigateTo('level-select'));
-  }
-}
-
-function startBoard15Timer() {
-  if (State.board15.timerInterval) clearInterval(State.board15.timerInterval);
-  const timerEl = document.getElementById('gb-timer-display');
-  State.board15.timerInterval = setInterval(() => {
-    if (State.board15.timerSeconds > 0) {
-      State.board15.timerSeconds--;
-      if (timerEl) {
-        timerEl.innerText = formatTime(State.board15.timerSeconds);
-      }
-    }
-  }, 1000);
-}
-
-// ========================================================
-// 9. MODALS & EVENTS
+// 8. MODALS & EVENTS
 // ========================================================
 
 function openModal(modalId) {
@@ -2763,7 +3026,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSettingsModal();
   initLevelSelect();
   initBoard10();
-  initGameboyView();
 
   // Navigation tab bar
   document.querySelectorAll('.nav-tab-btn').forEach(btn => {

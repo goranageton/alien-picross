@@ -74,7 +74,6 @@
       <button class="nav-tab-btn active" data-target="main-menu" title="Huvudmeny">1. MENY</button>
       <button class="nav-tab-btn" data-target="level-select" title="Nivåväljare">2. NIVÅER</button>
       <button class="nav-tab-btn" data-target="game-board" title="Spelplan 10x10">3. SPELPLAN</button>
-      <button class="nav-tab-btn" data-target="gameboy-view" title="Game Boy-vy 15x15">4. GAME BOY</button>
     </div>
 
     <!-- Control utilities -->
@@ -242,15 +241,7 @@
                   </button>
                 </div>
 
-                <!-- BUTTON 3: GAME BOY VIEW 15x15 -->
-                <div class="relative w-full flex items-center">
-                  <div class="w-6 sm:w-7 flex-shrink-0 flex items-center justify-center"></div>
-                  <button type="button" id="menu-btn-gameboy" class="stone-tablet-btn flex-1 py-2 px-2 text-center text-[8px] sm:text-[9px] font-bold text-[var(--gb-darkest)] tracking-wider uppercase opacity-90">
-                    MODERSKEPP 15x15
-                  </button>
-                </div>
-
-                <!-- BUTTON 4: SETTINGS (SPRÅK, LJUD, SVÅRIGHET) -->
+                <!-- BUTTON 3: SETTINGS (SPRÅK, LJUD, SVÅRIGHET) -->
                 <div class="relative w-full flex items-center mt-0.5">
                   <div class="w-6 sm:w-7 flex-shrink-0 flex items-center justify-center"></div>
                   <button type="button" id="menu-btn-settings" class="stone-tablet-btn flex-1 py-2 px-2.5 text-center text-[8px] sm:text-[9px] font-bold text-[var(--gb-darkest)] tracking-wider uppercase cursor-pointer flex items-center justify-between" title="Spelinställningar: Språk, Ljud, Svårighetsgrad">
@@ -549,8 +540,8 @@
         </header>
 
         <!-- Upper Critter Playground (Tomrummet ovanför spelplanen) -->
-        <div id="critter-zone-top" class="w-full h-7 sm:h-9 relative overflow-hidden pointer-events-none select-none my-0.5 border-b border-dashed border-gb-dark/30">
-          <!-- Dynamically populated with walking retro critters -->
+        <div id="critter-zone-top" class="w-full h-13 sm:h-16 min-h-[50px] relative overflow-hidden pointer-events-none select-none my-0.5 border-b border-dashed border-gb-dark/30">
+          <!-- Dynamically populated with walking retro critters, UFOs and drama -->
         </div>
 
         <!-- Game Board (Nonogram Grid & Clues) -->
@@ -587,8 +578,8 @@
         </section>
 
         <!-- Lower Critter Playground (Tomrummet under spelplanen) -->
-        <div id="critter-zone-bottom" class="w-full h-7 sm:h-9 relative overflow-hidden pointer-events-none select-none my-0.5 border-t border-dashed border-gb-dark/30">
-          <!-- Dynamically populated with walking retro critters -->
+        <div id="critter-zone-bottom" class="w-full h-13 sm:h-16 min-h-[50px] relative overflow-hidden pointer-events-none select-none my-0.5 border-t border-dashed border-gb-dark/30">
+          <!-- Dynamically populated with walking retro critters, UFOs and drama -->
         </div>
 
         <!-- Handheld Controller Section -->
@@ -637,162 +628,6 @@
             </div>
           </div>
         </footer>
-
-      </main>
-    </div>
-
-    <!-- ========================================================
-         SCREEN 4: GAME BOY-VY (Retro 8-Bit Handheld DMG 15x15)
-         ======================================================== -->
-    <div id="screen-gameboy-view" class="game-screen-wrapper w-full min-h-screen flex-1">
-      <main class="w-full min-h-screen max-w-lg mx-auto bg-[#d3d2ce] rounded-none sm:rounded-3xl p-3 sm:p-4 pt-3 pb-6 flex flex-col justify-between items-center relative overflow-hidden select-none border-0 sm:border-2 border-[#b8b7b2]">
-        
-        <!-- Top subtle curved vent indents -->
-        <div class="w-full flex justify-between px-6 mb-2 opacity-40">
-          <div class="h-1 w-12 bg-zinc-600 rounded-full"></div>
-          <div class="h-1 w-12 bg-zinc-600 rounded-full"></div>
-        </div>
-
-        <!-- Screen Bezel -->
-        <div class="w-full bg-[#757788] rounded-t-xl rounded-b-3xl p-2.5 sm:p-3 shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),0_2px_4px_rgba(255,255,255,0.4)] relative">
-          <!-- Subtle Battery LED Indicator -->
-          <div class="flex items-center justify-start mb-1 px-1">
-            <div class="w-2.5 h-2.5 rounded-full bg-red-600 shadow-[0_0_6px_#ff0000] border border-red-950 animate-pulse"></div>
-          </div>
-
-          <!-- LCD Screen Display -->
-          <section class="lcd-screen w-full aspect-[1/1] border-[3px] border-[#202028] rounded p-1.5 flex flex-col justify-between overflow-hidden relative">
-            <!-- Header Row -->
-            <header class="flex items-start justify-between border-b-2 border-[#0f380f] pb-1 mb-0.5">
-              <div class="flex items-center space-x-1.5">
-                <!-- Cute Alien Portrait -->
-                <div class="w-8 h-8 bg-[#8bac0f] border border-[#0f380f] relative overflow-hidden shrink-0 shadow-[1px_1px_0_#0f380f] flex items-center justify-center">
-                  <svg class="w-7 h-7" viewBox="0 0 16 16" fill="none" shape-rendering="crispEdges">
-                    <rect x="2" y="1" width="2" height="2" fill="#0f380f" />
-                    <rect x="12" y="1" width="2" height="2" fill="#0f380f" />
-                    <rect x="3" y="3" width="1" height="1" fill="#0f380f" />
-                    <rect x="12" y="3" width="1" height="1" fill="#0f380f" />
-                    <rect x="4" y="4" width="8" height="2" fill="#0f380f" />
-                    <rect x="3" y="6" width="10" height="6" fill="#0f380f" />
-                    <rect x="4" y="7" width="2" height="3" fill="#9bbc0f" />
-                    <rect x="10" y="7" width="2" height="3" fill="#9bbc0f" />
-                    <rect x="7" y="10" width="2" height="1" fill="#9bbc0f" />
-                  </svg>
-                </div>
-                <!-- Timer Plaque -->
-                <div class="border border-[#0f380f] bg-[#8bac0f] px-1 py-0.5 shadow-[1px_1px_0_#0f380f]">
-                  <div class="text-[6px] tracking-tight text-[#306230] leading-none mb-0.5">BEAM</div>
-                  <div class="text-[9px] tracking-tighter font-extrabold text-[#0f380f] leading-none" id="gb-timer-display">29:42</div>
-                </div>
-              </div>
-
-              <!-- Stage Indicator -->
-              <div class="text-right flex flex-col items-end">
-                <div class="flex items-center space-x-1 mb-0.5">
-                  <span class="text-[7px] bg-[#0f380f] text-[#9bbc0f] px-1 py-0.5 rounded-[1px] font-bold">GB-1</span>
-                </div>
-                <div class="text-[6px] text-[#0f380f] font-bold">15x15 MOTHERSHIP</div>
-              </div>
-            </header>
-
-            <!-- 15x15 Picross Board Area -->
-            <div class="flex-1 flex flex-col justify-center items-center">
-              <div class="w-full max-w-[240px] aspect-square border-2 border-[#0f380f] bg-[#8bac0f]/30" id="gameboy-grid-15">
-                <div class="grid grid-cols-15 w-full h-full" style="grid-template-columns: repeat(15, minmax(0, 1fr)); grid-template-rows: repeat(15, minmax(0, 1fr));">
-                  <!-- Generated 225 cells with authentic partial solve -->
-                  <script>
-                    (function(){
-                      const container = document.currentScript.parentElement;
-                      for(let i=0; i<225; i++) {
-                        const cell = document.createElement('div');
-                        const r = Math.floor(i / 15);
-                        const c = i % 15;
-                        cell.className = 'cell-border border-r border-b border-[#0f380f]/20 flex items-center justify-center font-bold text-[6px] cursor-pointer select-none';
-                        if (c % 5 === 4) cell.classList.add('border-r-2', 'border-r-[#0f380f]');
-                        if (r % 5 === 4) cell.classList.add('border-b-2', 'border-b-[#0f380f]');
-                        if ((r >= 3 && r <= 11 && c >= 3 && c <= 11) && ((r+c)%3 !== 0)) {
-                          cell.classList.add('bg-[#0f380f]');
-                        } else if ((r+c)%4 === 0) {
-                          cell.innerText = '✕';
-                        }
-                        container.appendChild(cell);
-                      }
-                    })();
-                  </script>
-                </div>
-              </div>
-            </div>
-
-            <!-- In-game Lower Status -->
-            <footer class="mt-0.5 pt-0.5 border-t border-[#0f380f]/40 flex justify-between items-center text-[6px] tracking-tight text-[#0f380f]">
-              <div class="flex items-center space-x-2">
-                <span>A: ZAP</span>
-                <span>B: SHIELD ✕</span>
-              </div>
-              <div class="font-bold">START: PAUSE</div>
-            </footer>
-          </section>
-        </div>
-
-        <!-- Brand Header & In-Screen Sound Controls -->
-        <div class="w-full flex items-center justify-between px-3 mt-3 mb-1">
-          <div class="text-[10px] font-black tracking-widest text-[#2e3160] italic">
-            ALIEN<span class="text-[#882233]">-CROSS</span> 51
-          </div>
-          <div class="flex items-center gap-2">
-            <button type="button" id="gb-music-btn" class="px-1.5 py-0.5 bg-[#bfbeb8] text-[#2e3160] rounded border border-[#8a8984] text-[8px] font-bold active:scale-95 cursor-pointer shadow-sm" title="Game Boy Musik">
-              <span id="gb-music-icon">🎵</span>
-            </button>
-            <button type="button" id="gb-sound-btn" class="px-1.5 py-0.5 bg-[#bfbeb8] text-[#2e3160] rounded border border-[#8a8984] text-[8px] font-bold active:scale-95 cursor-pointer shadow-sm" title="Game Boy SFX">
-              <span id="gb-sound-icon">🔊</span>
-            </button>
-            <div class="text-[6px] text-zinc-500 font-bold tracking-tighter">
-              DMG-01
-            </div>
-          </div>
-        </div>
-
-        <!-- Handheld Controls Panel -->
-        <section class="w-full flex justify-between items-center px-2 mt-2 relative">
-          <!-- Directional D-Pad -->
-          <div class="relative w-24 h-24 flex items-center justify-center">
-            <div class="absolute w-24 h-24 rounded-full bg-[#bfbeb8] shadow-[inset_0_3px_6px_rgba(0,0,0,0.35)]"></div>
-            <div class="relative w-20 h-20">
-              <button aria-label="Up" id="gb-btn-up" class="d-pad-btn absolute top-0 left-7 w-7 h-8 bg-[#1c1c1f] rounded-t-sm flex items-start justify-center pt-1 text-zinc-500 text-[8px]">▲</button>
-              <button aria-label="Down" id="gb-btn-down" class="d-pad-btn absolute bottom-0 left-7 w-7 h-8 bg-[#1c1c1f] rounded-b-sm flex items-end justify-center pb-1 text-zinc-500 text-[8px]">▼</button>
-              <button aria-label="Left" id="gb-btn-left" class="d-pad-btn absolute top-7 left-0 w-8 h-7 bg-[#1c1c1f] rounded-l-sm flex items-center justify-start pl-1 text-zinc-500 text-[8px]">◀</button>
-              <button aria-label="Right" id="gb-btn-right" class="d-pad-btn absolute top-7 right-0 w-8 h-7 bg-[#1c1c1f] rounded-r-sm flex items-center justify-end pr-1 text-zinc-500 text-[8px]">▶</button>
-              <div class="absolute top-7 left-7 w-7 h-7 bg-[#1c1c1f] flex items-center justify-center"><div class="w-3 h-3 rounded-full bg-[#151517] shadow-inner"></div></div>
-            </div>
-          </div>
-
-          <!-- Action Buttons A & B (Slanted) -->
-          <div class="relative w-28 h-20 flex items-center justify-center">
-            <div class="absolute w-28 h-14 bg-[#bfbeb8] rounded-full rotate-[-25deg] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
-            <div class="relative flex space-x-3 rotate-[-25deg] items-center">
-              <div class="flex flex-col items-center">
-                <button aria-label="Button B" id="gb-btn-b" class="action-btn w-9 h-9 rounded-full bg-[#8c183b] flex items-center justify-center text-white text-[9px] font-bold active:scale-95"></button>
-                <span class="text-[7px] font-black text-[#2e3160] mt-1 italic">B</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button aria-label="Button A" id="gb-btn-a" class="action-btn w-9 h-9 rounded-full bg-[#8c183b] flex items-center justify-center text-white text-[9px] font-bold active:scale-95"></button>
-                <span class="text-[7px] font-black text-[#2e3160] mt-1 italic">A</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SELECT & START Buttons -->
-        <div class="w-full flex justify-center items-center space-x-6 mt-3 mb-1">
-          <div class="flex flex-col items-center">
-            <button aria-label="Select" id="gb-btn-select" class="pill-btn w-10 h-3 bg-[#6e6e76] rounded-full border border-black/40"></button>
-            <span class="text-[6px] font-black tracking-widest text-[#2e3160] mt-1">SELECT</span>
-          </div>
-          <div class="flex flex-col items-center">
-            <button aria-label="Start" id="gb-btn-start" class="pill-btn w-10 h-3 bg-[#6e6e76] rounded-full border border-black/40"></button>
-            <span class="text-[6px] font-black tracking-widest text-[#2e3160] mt-1">START</span>
-          </div>
-        </div>
 
       </main>
     </div>

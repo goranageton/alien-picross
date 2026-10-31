@@ -560,7 +560,7 @@ body {
    CRITTER PLAYGROUNDS (Tomrummet runt spelplanen)
    ======================================================== */
 #critter-zone-top, #critter-zone-bottom {
-  min-height: 28px;
+  min-height: 48px;
   position: relative;
   overflow: hidden;
   pointer-events: none;
@@ -570,31 +570,152 @@ body {
 .critter-sprite {
   position: absolute;
   bottom: 2px;
-  will-change: transform, left;
+  will-change: transform, left, bottom;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  z-index: 2;
+  transition: bottom 0.25s ease-out;
+}
+
+.critter-ufo {
+  position: absolute;
+  top: 2px;
+  z-index: 4;
+  will-change: transform, left, top;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
+.critter-scout-ufo {
+  position: absolute;
+  top: 6px;
+  z-index: 5;
+  will-change: transform, left, top;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.ufo-hover {
+  animation: ufo-bob 0.8s ease-in-out infinite alternate;
+}
+
+.ufo-scout-fly {
+  animation: ufo-scout-tilt 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes ufo-scout-tilt {
+  0% { transform: translateY(0) rotate(-3deg); }
+  100% { transform: translateY(-4px) rotate(3deg); }
+}
+
+@keyframes ufo-bob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+.ufo-shield-hit {
+  filter: drop-shadow(0 0 6px var(--gb-glow)) brightness(1.6);
+  animation: ufo-hit-flash 0.25s steps(2) 2 alternate;
+}
+
+@keyframes ufo-hit-flash {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.2) rotate(6deg); filter: brightness(2) drop-shadow(0 0 8px #ffffff); }
+}
+
+.tractor-beam-cone {
+  position: absolute;
+  top: 14px;
+  width: 32px;
+  height: 34px;
+  background: linear-gradient(to bottom, rgba(155, 188, 15, 0.85), rgba(139, 172, 15, 0.2));
+  clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+  border-bottom: 2px dashed var(--gb-darkest);
+  z-index: 3;
+  pointer-events: none;
+  animation: beam-pulse 0.35s ease-in-out infinite alternate;
+}
+
+.ufo-spotlight-beam {
+  position: absolute;
+  top: 12px;
+  width: 24px;
+  height: 32px;
+  background: linear-gradient(to bottom, rgba(155, 188, 15, 0.45), rgba(139, 172, 15, 0.05));
+  clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+  z-index: 3;
+  pointer-events: none;
+  animation: beam-pulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes beam-pulse {
+  0% { opacity: 0.55; }
+  100% { opacity: 0.95; }
+}
+
+.human-laser-pellet {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: var(--gb-darkest);
+  box-shadow: 0 0 4px var(--gb-bright);
+  z-index: 6;
+  border-radius: 1px;
+  transition: all 0.2s linear;
+}
+
 .critter-walk {
-  animation: critter-bob 0.3s steps(2) infinite alternate;
+  animation: critter-bob 0.25s steps(2) infinite alternate;
 }
 
 .critter-panic {
-  animation: critter-shake 0.12s steps(2) infinite alternate;
+  animation: critter-shake 0.1s steps(2) infinite alternate;
 }
 
-.critter-abduct {
-  animation: critter-float 1.8s ease-in-out infinite alternate;
+.critter-hop {
+  animation: critter-jump 0.3s ease-in-out infinite alternate;
+}
+
+.critter-dash {
+  animation: critter-sprint 0.12s steps(2) infinite alternate;
+}
+
+.critter-cheer {
+  animation: critter-celebrate 0.35s ease-in-out infinite alternate;
+}
+
+.critter-duck {
+  transform: scaleY(0.7) translateY(3px);
+  transition: transform 0.15s ease-out;
 }
 
 @keyframes critter-bob {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-2px); }
+  100% { transform: translateY(-2.5px); }
+}
+
+@keyframes critter-jump {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes critter-sprint {
+  0% { transform: translateY(0) skewX(-6deg); }
+  100% { transform: translateY(-3px) skewX(6deg); }
+}
+
+@keyframes critter-celebrate {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-6px) scale(1.15); }
 }
 
 @keyframes critter-shake {
-  0% { transform: translateX(-1px) translateY(0); }
-  100% { transform: translateX(1px) translateY(-3px); }
+  0% { transform: translateX(-1.5px) translateY(0); }
+  100% { transform: translateX(1.5px) translateY(-3px); }
+}
+
+.critter-abduct {
+  animation: critter-float 1.6s ease-in-out infinite alternate;
 }
 
 @keyframes critter-float {
