@@ -808,7 +808,113 @@ body {
   background-color: var(--gb-lightest) !important;
 }
 
+.board-solved-showcase .carved-block.marked-x-tile svg {
+  display: none !important;
+}
+
 .board-solved-showcase .carved-block.excavated-tile {
   background-color: var(--gb-darkest) !important;
   box-shadow: inset 0 0 0 1px var(--gb-glow) !important;
 }
+
+/* ========================================================
+   CRITTER SCENERY BACKGROUND
+   ======================================================== */
+.critter-scenery-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* ========================================================
+   LASER & SHIELD BOARD ANIMATIONS
+   ======================================================== */
+.laser-blast-anim {
+  animation: laserBlastPulse 0.35s ease-out forwards;
+}
+
+@keyframes laserBlastPulse {
+  0% {
+    box-shadow: inset 0 0 10px #ffffff, 0 0 10px var(--gb-glow);
+    filter: brightness(2.2);
+    transform: scale(0.88);
+  }
+  50% {
+    box-shadow: inset 0 0 14px var(--gb-glow), 0 0 12px var(--gb-bright);
+    filter: brightness(1.7);
+    transform: scale(1.08);
+  }
+  100% {
+    box-shadow: inset 1px 1px 0px var(--gb-dark);
+    filter: brightness(1);
+    transform: scale(1);
+  }
+}
+
+.shield-deploy-anim {
+  animation: shieldDeployPulse 0.35s ease-out forwards;
+}
+
+@keyframes shieldDeployPulse {
+  0% {
+    transform: scale(0.5);
+    box-shadow: 0 0 10px var(--gb-glow), inset 0 0 8px var(--gb-bright);
+    filter: brightness(1.8);
+  }
+  60% {
+    transform: scale(1.15);
+    box-shadow: 0 0 14px var(--gb-glow);
+    filter: brightness(1.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+    filter: brightness(1);
+  }
+}
+
+.shield-icon-svg {
+  animation: shieldIconAppear 0.25s ease-out;
+  display: block;
+}
+
+@keyframes shieldIconAppear {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ========================================================
+   ROSWELL 1947 UFO CRASH ANIMATIONS
+   ======================================================== */
+.ufo-engine-sputter {
+  animation: ufoSputter 0.15s steps(2) infinite alternate !important;
+}
+
+@keyframes ufoSputter {
+  0% { transform: translateY(-2px) rotate(-8deg); filter: brightness(1.8) drop-shadow(0 0 4px #ffffff); }
+  100% { transform: translateY(3px) rotate(12deg); filter: brightness(0.6); }
+}
+
+.ufo-crashed {
+  transform: rotate(-24deg) translateY(6px) !important;
+  filter: drop-shadow(0 2px 0 var(--gb-darkest));
+  transition: transform 0.4s ease-out;
+}
+
+.roswell-impact-shake {
+  animation: roswellShake 0.4s ease-in-out;
+}
+
+@keyframes roswellShake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-2px, 3px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-3px, 1px); }
+  80% { transform: translate(2px, -1px); }
+}
+

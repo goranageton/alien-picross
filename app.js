@@ -8,6 +8,14 @@
  * 5. Authentic penalties (-2m, -4m, -8m, screen shake, buzzer) & Real-time clue dimming
  */
 
+// Authentic Game Boy 4-Color Pixel Forcefield Shield Badge (No 'X')
+const SHIELD_CELL_SVG = `<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 pixel-sharp pointer-events-none shield-icon-svg" viewBox="0 0 12 12" fill="none">
+  <path d="M2 1 H10 V4 C10 8 7 10.5 6 11 C5 10.5 2 8 2 4 Z" fill="#0f380f" />
+  <path d="M3 2.5 H9 V4.5 C9 7.2 6.8 9.2 6 9.8 C5.2 9.2 3 7.2 3 4.5 Z" fill="#8bac0f" />
+  <rect x="5" y="4" width="2" height="3" fill="#9bbc0f" />
+  <rect x="4" y="5" width="4" height="1" fill="#9bbc0f" />
+</svg>`;
+
 // ========================================================
 // 1. 8-BIT AUDIO & CHIPTUNE MUSIC ENGINE
 // ========================================================
@@ -848,14 +856,14 @@ function updateToolModeUI() {
 
   const badge = document.getElementById('tool-mode-text');
   if (badge) {
-    badge.innerText = isChisel ? 'LASER ⚡' : (isSv ? 'SKÖLD ✕' : 'SHIELD ✕');
+    badge.innerText = isChisel ? 'LASER ⚡' : (isSv ? 'SKÖLD 🛡️' : 'SHIELD 🛡️');
   }
 
   const icon = document.getElementById('beam-mode-icon');
   const label = document.getElementById('beam-mode-label');
   const btn = document.getElementById('toggle-input-mode');
 
-  if (icon) icon.innerText = isChisel ? '⚡' : '✕';
+  if (icon) icon.innerText = isChisel ? '⚡' : '🛡️';
   if (label) {
     label.innerText = isChisel
       ? (isSv ? 'LÄGE: LASER' : 'MODE: LASER')
@@ -1615,13 +1623,19 @@ function revealHintRowAndCol(targetRow, targetCol) {
       if (isCorrect) {
         State.board10.userGrid[r][targetCol] = 1;
         cell.classList.add('excavated-tile');
-        cell.classList.remove('marked-x-tile');
-        cell.innerText = '';
+        cell.classList.remove('marked-x-tile', 'shield-deploy-anim');
+        cell.innerHTML = '';
+        cell.classList.remove('laser-blast-anim');
+        void cell.offsetWidth;
+        cell.classList.add('laser-blast-anim');
       } else {
         State.board10.userGrid[r][targetCol] = 2;
-        cell.classList.remove('excavated-tile');
+        cell.classList.remove('excavated-tile', 'laser-blast-anim');
         cell.classList.add('marked-x-tile');
-        cell.innerText = '✕';
+        cell.innerHTML = SHIELD_CELL_SVG;
+        cell.classList.remove('shield-deploy-anim');
+        void cell.offsetWidth;
+        cell.classList.add('shield-deploy-anim');
       }
     }
   }
@@ -1635,13 +1649,19 @@ function revealHintRowAndCol(targetRow, targetCol) {
       if (isCorrect) {
         State.board10.userGrid[targetRow][c] = 1;
         cell.classList.add('excavated-tile');
-        cell.classList.remove('marked-x-tile');
-        cell.innerText = '';
+        cell.classList.remove('marked-x-tile', 'shield-deploy-anim');
+        cell.innerHTML = '';
+        cell.classList.remove('laser-blast-anim');
+        void cell.offsetWidth;
+        cell.classList.add('laser-blast-anim');
       } else {
         State.board10.userGrid[targetRow][c] = 2;
-        cell.classList.remove('excavated-tile');
+        cell.classList.remove('excavated-tile', 'laser-blast-anim');
         cell.classList.add('marked-x-tile');
-        cell.innerText = '✕';
+        cell.innerHTML = SHIELD_CELL_SVG;
+        cell.classList.remove('shield-deploy-anim');
+        void cell.offsetWidth;
+        cell.classList.add('shield-deploy-anim');
       }
     }
   }
@@ -2036,6 +2056,112 @@ const CRITTER_UFO_SCOUT_SVG = `
   <rect x="8" y="11" width="4" height="1" fill="#0f380f" />
 </svg>`;
 
+const SCENERY_TOP_SVG = `<div class="critter-scenery-bg">
+  <svg class="w-full h-full pointer-events-none" viewBox="0 0 400 50" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 32 L35 24 L70 32 L120 20 L165 30 L210 22 L260 32 L310 18 L360 28 L400 24 L400 50 L0 50 Z" fill="#8bac0f" opacity="0.45" />
+    <path d="M0 36 L45 28 L95 36 L150 26 L195 34 L255 27 L320 35 L375 29 L400 32 L400 50 L0 50 Z" fill="#8bac0f" opacity="0.65" />
+    <rect x="22" y="22" width="8" height="24" fill="#306230" />
+    <path d="M22 22 Q26 18 30 22 Z" fill="#0f380f" />
+    <rect x="32" y="24" width="22" height="22" fill="#306230" />
+    <polygon points="30,24 43,15 56,24" fill="#0f380f" />
+    <rect x="39" y="34" width="8" height="12" fill="#0f380f" />
+    <rect x="41" y="27" width="4" height="4" fill="#9bbc0f" />
+    <polygon points="77,20 74,46 82,46 79,20" fill="#306230" />
+    <circle cx="78" cy="19" r="2" fill="#0f380f" />
+    <line x1="78" y1="19" x2="68" y2="15" stroke="#0f380f" stroke-width="1.5" />
+    <line x1="78" y1="19" x2="88" y2="23" stroke="#0f380f" stroke-width="1.5" />
+    <line x1="78" y1="19" x2="74" y2="9" stroke="#0f380f" stroke-width="1.5" />
+    <line x1="78" y1="19" x2="82" y2="29" stroke="#0f380f" stroke-width="1.5" />
+    <polygon points="112,18 106,28 118,28" fill="#306230" />
+    <polygon points="112,25 104,36 120,36" fill="#0f380f" />
+    <polygon points="112,32 102,44 122,44" fill="#306230" />
+    <rect x="110" y="44" width="4" height="4" fill="#0f380f" />
+    <polygon points="126,24 121,32 131,32" fill="#306230" />
+    <polygon points="126,30 119,40 133,40" fill="#0f380f" />
+    <rect x="125" y="40" width="2" height="6" fill="#0f380f" />
+    <rect x="145" y="40" width="65" height="1.5" fill="#306230" />
+    <rect x="145" y="43" width="65" height="1.5" fill="#306230" />
+    <rect x="148" y="38" width="2" height="8" fill="#0f380f" />
+    <rect x="168" y="38" width="2" height="8" fill="#0f380f" />
+    <rect x="188" y="38" width="2" height="8" fill="#0f380f" />
+    <rect x="208" y="38" width="2" height="8" fill="#0f380f" />
+    <rect x="238" y="30" width="18" height="16" fill="#306230" />
+    <polygon points="236,30 247,21 258,30" fill="#0f380f" />
+    <rect x="244" y="36" width="5" height="10" fill="#0f380f" />
+    <rect x="251" y="32" width="3" height="3" fill="#9bbc0f" />
+    <rect x="252" y="20" width="3" height="6" fill="#0f380f" />
+    <circle cx="254" cy="17" r="1" fill="#8bac0f" />
+    <circle cx="256" cy="14" r="1.5" fill="#8bac0f" opacity="0.7" />
+    <polygon points="295,16 288,27 302,27" fill="#306230" />
+    <polygon points="295,24 286,36 304,36" fill="#0f380f" />
+    <polygon points="295,33 284,45 306,45" fill="#306230" />
+    <rect x="293" y="45" width="4" height="3" fill="#0f380f" />
+    <polygon points="312,22 307,31 317,31" fill="#306230" />
+    <polygon points="312,29 305,39 319,39" fill="#0f380f" />
+    <polygon points="312,36 303,46 321,46" fill="#306230" />
+    <rect x="311" y="46" width="3" height="2" fill="#0f380f" />
+    <ellipse cx="348" cy="43" rx="8" ry="4" fill="#306230" />
+    <rect x="358" y="40" width="37" height="1.5" fill="#306230" />
+    <rect x="358" y="43" width="37" height="1.5" fill="#306230" />
+    <rect x="362" y="38" width="2" height="8" fill="#0f380f" />
+    <rect x="382" y="38" width="2" height="8" fill="#0f380f" />
+    <line x1="0" y1="46" x2="400" y2="46" stroke="#0f380f" stroke-width="1" />
+    <path d="M15 45 L17 42 L19 45 M90 45 L92 41 L94 45 M225 45 L227 42 L229 45 M338 45 L340 42 L342 45" stroke="#306230" stroke-width="1" />
+  </svg>
+</div>`;
+
+const SCENERY_BOTTOM_SVG = `<div class="critter-scenery-bg">
+  <svg class="w-full h-full pointer-events-none" viewBox="0 0 400 50" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 34 H30 L45 25 H85 L100 34 H160 L180 22 H240 L260 34 H320 L335 26 H375 L390 34 H400 V50 H0 Z" fill="#8bac0f" opacity="0.45" />
+    <path d="M0 38 H60 L80 29 H130 L150 38 H220 L240 28 H290 L310 38 H400 V50 H0 Z" fill="#8bac0f" opacity="0.65" />
+    <rect x="18" y="24" width="4" height="22" fill="#306230" />
+    <rect x="12" y="30" width="6" height="3" fill="#306230" />
+    <rect x="12" y="26" width="3" height="6" fill="#306230" />
+    <rect x="22" y="33" width="6" height="3" fill="#306230" />
+    <rect x="25" y="28" width="3" height="7" fill="#306230" />
+    <polygon points="62,46 64,30 66,30 68,46" fill="#0f380f" />
+    <line x1="60" y1="46" x2="70" y2="46" stroke="#0f380f" stroke-width="2" />
+    <path d="M52 24 C55 12 75 14 78 28 Z" fill="#306230" stroke="#0f380f" stroke-width="1.5" />
+    <line x1="65" y1="21" x2="60" y2="12" stroke="#0f380f" stroke-width="1.5" />
+    <circle cx="59" cy="11" r="2" fill="#9bbc0f" />
+    <path d="M56 8 A 6 6 0 0 1 52 4" stroke="#8bac0f" stroke-width="1" stroke-dasharray="1 1" />
+    <path d="M53 6 A 9 9 0 0 1 48 1" stroke="#8bac0f" stroke-width="1" stroke-dasharray="1 1" />
+    <rect x="109" y="33" width="2" height="13" fill="#0f380f" />
+    <rect x="102" y="22" width="16" height="11" fill="#306230" stroke="#0f380f" stroke-width="1" />
+    <rect x="104" y="24" width="12" height="3" fill="#9bbc0f" />
+    <rect x="105" y="29" width="10" height="2" fill="#0f380f" />
+    <polygon points="140,46 155,25 180,25 195,46" fill="#306230" stroke="#0f380f" stroke-width="1" />
+    <rect x="156" y="30" width="24" height="16" fill="#0f380f" />
+    <line x1="168" y1="30" x2="168" y2="46" stroke="#8bac0f" stroke-width="1.5" />
+    <rect x="159" y="32" width="6" height="3" fill="#9bbc0f" />
+    <rect x="171" y="32" width="6" height="3" fill="#9bbc0f" />
+    <rect x="160" y="19" width="3" height="6" fill="#0f380f" />
+    <rect x="172" y="17" width="2" height="8" fill="#0f380f" />
+    <circle cx="173" cy="16" r="1.5" fill="#8bac0f" />
+    <rect x="222" y="28" width="3" height="18" fill="#306230" />
+    <rect x="218" y="33" width="5" height="2.5" fill="#306230" />
+    <rect x="218" y="29" width="2.5" height="5" fill="#306230" />
+    <line x1="254" y1="46" x2="258" y2="24" stroke="#0f380f" stroke-width="1.5" />
+    <line x1="268" y1="46" x2="264" y2="24" stroke="#0f380f" stroke-width="1.5" />
+    <line x1="255" y1="35" x2="267" y2="35" stroke="#0f380f" stroke-width="1" />
+    <rect x="256" y="18" width="10" height="7" fill="#306230" stroke="#0f380f" stroke-width="1" />
+    <rect x="258" y="20" width="6" height="2" fill="#9bbc0f" />
+    <polygon points="254,18 261,13 268,18" fill="#0f380f" />
+    <polygon points="310,22 304,31 316,31" fill="#306230" />
+    <polygon points="310,29 302,39 318,39" fill="#0f380f" />
+    <polygon points="310,36 300,46 320,46" fill="#306230" />
+    <rect x="309" y="46" width="2" height="2" fill="#0f380f" />
+    <polygon points="330,46 335,39 344,41 348,46" fill="#306230" stroke="#0f380f" stroke-width="1" />
+    <line x1="355" y1="39" x2="398" y2="39" stroke="#306230" stroke-width="1" stroke-dasharray="2 1" />
+    <line x1="355" y1="43" x2="398" y2="43" stroke="#306230" stroke-width="1" stroke-dasharray="2 1" />
+    <rect x="358" y="37" width="1.5" height="9" fill="#0f380f" />
+    <rect x="376" y="37" width="1.5" height="9" fill="#0f380f" />
+    <rect x="394" y="37" width="1.5" height="9" fill="#0f380f" />
+    <line x1="0" y1="46" x2="400" y2="46" stroke="#0f380f" stroke-width="1" />
+    <path d="M40 47 H44 M132 47 H138 M238 47 H242 M285 47 H292" stroke="#306230" stroke-width="1" />
+  </svg>
+</div>`;
+
 let activeCritters = [];
 let critterTimer = null;
 let zoneDramas = {
@@ -2043,13 +2169,16 @@ let zoneDramas = {
   bottom: { state: 'idle', cooldown: 110, beamEl: null }
 };
 
+let roswellCrashTimer = 2400; // 120 seconds (2 minutes at 50ms per tick)
+let isRoswellEventActive = false;
+
 function initCritterSystem() {
   const topZone = document.getElementById('critter-zone-top');
   const botZone = document.getElementById('critter-zone-bottom');
   if (!topZone || !botZone) return;
 
-  topZone.innerHTML = '';
-  botZone.innerHTML = '';
+  topZone.innerHTML = SCENERY_TOP_SVG;
+  botZone.innerHTML = SCENERY_BOTTOM_SVG;
   activeCritters = [];
 
   // Create tractor beams for both zones
@@ -2144,8 +2273,19 @@ function initCritterSystem() {
 function updateCrittersTick() {
   if (State.currentScreen !== 'game-board') return;
 
+  // Roswell 1947 UFO Crash countdown (every 2 minutes = 2400 ticks at 50ms)
+  if (!isRoswellEventActive) {
+    roswellCrashTimer--;
+    if (roswellCrashTimer <= 0) {
+      roswellCrashTimer = 2400;
+      triggerRoswellCrashEvent();
+    }
+  }
+
   // Update critters standard wander & bounce & flying
   activeCritters.forEach(c => {
+    if (c.state === 'roswell_crash') return;
+
     // Flying Scout UFOs
     if (c.isScoutUfo) {
       c.x += c.dir * c.speed;
@@ -2512,9 +2652,9 @@ function triggerCritterCheer(type = 'good') {
         fireAlienLaser(c);
       }
     } else if (type === 'shield') {
-      const shields = c.type === 'alien' ? ['DEFLECT! ✕', '🛡️ BLOCKED'] :
-                      c.type === 'cow' ? ['SAFE! 🐮', '✕ MOO'] :
-                      ['SHIELD UP! 🛡️', '✕ SAFE ZONE'];
+      const shields = c.type === 'alien' ? ['DEFLECT! 🛡️', '🛡️ BLOCKED'] :
+                      c.type === 'cow' ? ['SAFE! 🐮', '🛡️ MOO'] :
+                      ['SHIELD UP! 🛡️', '🛡️ SAFE ZONE'];
       showCritterBubble(c, shields[Math.floor(Math.random() * shields.length)], 1000);
     }
   }
@@ -2552,6 +2692,96 @@ function triggerCritterVictory() {
       showCritterBubble(c, 'MISSION COMPLETE! 🛸', 4000);
     }
   });
+}
+
+function triggerRoswellCrashEvent() {
+  if (isRoswellEventActive || State.currentScreen !== 'game-board') return;
+
+  const availableUfos = activeCritters.filter(c => (c.isScoutUfo || c.isUfo) && c.state !== 'abducting' && c.state !== 'roswell_crash');
+  if (availableUfos.length === 0) return;
+
+  const ufo = availableUfos[Math.floor(Math.random() * availableUfos.length)];
+  isRoswellEventActive = true;
+  const origAltitude = ufo.altitude;
+  const origState = ufo.state;
+  ufo.state = 'roswell_crash';
+
+  // Step 1: Engine failure sputtering in flight
+  ufo.el.classList.add('ufo-engine-sputter');
+  showCritterBubble(ufo, '⚠️ ENGINE FAILING! 🚨', 1400);
+
+  // Nearby critters notice and look up
+  const zoneWalkers = activeCritters.filter(w => w.zoneKey === ufo.zoneKey && !w.isUfo && !w.isScoutUfo);
+  zoneWalkers.forEach(w => {
+    if (Math.abs(w.x - ufo.x) < 25) {
+      showCritterBubble(w, w.type === 'cow' ? '🐮 LOOK UP!' : '👀 LOOK UP! 🛸', 1500);
+    }
+  });
+
+  // Step 2: Spiraling down to earth
+  setTimeout(() => {
+    if (!ufo.el) { isRoswellEventActive = false; return; }
+    ufo.el.classList.add('ufo-crashing-dive');
+    ufo.el.style.top = '28px';
+
+    // Step 3: Ground Impact! (Roswell 1947 crash)
+    setTimeout(() => {
+      if (!ufo.el) { isRoswellEventActive = false; return; }
+      ufo.el.classList.remove('ufo-crashing-dive');
+      ufo.el.classList.add('ufo-crashed');
+      if (ufo.zoneEl) {
+        ufo.zoneEl.classList.remove('roswell-impact-shake');
+        void ufo.zoneEl.offsetWidth;
+        ufo.zoneEl.classList.add('roswell-impact-shake');
+        setTimeout(() => ufo.zoneEl && ufo.zoneEl.classList.remove('roswell-impact-shake'), 400);
+      }
+      showCritterBubble(ufo, '💥 CRASH! ROSWELL 1947! 💥', 2200);
+
+      // Nearby humans and cows rush or stare
+      zoneWalkers.forEach(w => {
+        if (Math.abs(w.x - ufo.x) < 30) {
+          w.state = 'hop';
+          w.actionTicks = 20;
+          w.el.classList.add('critter-hop');
+          showCritterBubble(w, w.type === 'human' ? '📸 TOP SECRET! 🛸' : '🐮 MOOO?! @_@', 2200);
+        }
+      });
+
+      // Step 4: Dizzy Grey Alien pilot
+      setTimeout(() => {
+        if (!ufo.el) { isRoswellEventActive = false; return; }
+        showCritterBubble(ufo, '😵 @_@ DIZZY ALIEN!', 1800);
+
+        // Step 5: Repair warp drive with tools
+        setTimeout(() => {
+          if (!ufo.el) { isRoswellEventActive = false; return; }
+          showCritterBubble(ufo, '🔧 REPAIRING WARP DRIVE... ⚡', 2400);
+
+          // Step 6: Repaired, systems rebooted, takeoff!
+          setTimeout(() => {
+            if (!ufo.el) { isRoswellEventActive = false; return; }
+            showCritterBubble(ufo, '🚀 WARP ONLINE! TAKEOFF! 🛸', 1800);
+            ufo.el.classList.remove('ufo-crashed', 'ufo-engine-sputter');
+            ufo.el.style.transition = 'top 1.2s ease-out';
+            ufo.el.style.top = `${origAltitude || 4}px`;
+
+            setTimeout(() => {
+              if (!ufo.el) { isRoswellEventActive = false; return; }
+              ufo.el.style.transition = '';
+              ufo.state = origState;
+              isRoswellEventActive = false;
+              triggerCritterCheer('good');
+            }, 1200);
+
+          }, 2400);
+
+        }, 1800);
+
+      }, 2200);
+
+    }, 1200);
+
+  }, 1400);
 }
 
 // ========================================================
@@ -2615,14 +2845,14 @@ function revertCellToValue(index, val) {
   if (!cell) return;
 
   State.board10.userGrid[r][c] = val;
-  cell.classList.remove('excavated-tile', 'marked-x-tile');
-  cell.innerText = '';
+  cell.classList.remove('excavated-tile', 'marked-x-tile', 'laser-blast-anim', 'shield-deploy-anim');
+  cell.innerHTML = '';
 
   if (val === 1) {
     cell.classList.add('excavated-tile');
   } else if (val === 2) {
     cell.classList.add('marked-x-tile');
-    cell.innerText = '✕';
+    cell.innerHTML = SHIELD_CELL_SVG;
   }
 }
 
@@ -2831,14 +3061,14 @@ function applyCellDragAction(index, actionType) {
   if (actionType === 'erase') {
     if (currentVal === 1) {
       State.board10.userGrid[r][c] = 0;
-      cell.classList.remove('excavated-tile');
-      cell.innerText = '';
+      cell.classList.remove('excavated-tile', 'laser-blast-anim');
+      cell.innerHTML = '';
       sound.playChisel();
       hapticPulse('zap');
     } else if (currentVal === 2) {
       State.board10.userGrid[r][c] = 0;
-      cell.classList.remove('marked-x-tile');
-      cell.innerText = '';
+      cell.classList.remove('marked-x-tile', 'shield-deploy-anim');
+      cell.innerHTML = '';
       sound.playMarkX();
       hapticPulse('shield');
     }
@@ -2858,8 +3088,11 @@ function applyCellDragAction(index, actionType) {
     if (isCorrectSolution) {
       State.board10.userGrid[r][c] = 1;
       cell.classList.add('excavated-tile');
-      cell.classList.remove('marked-x-tile');
-      cell.innerText = '';
+      cell.classList.remove('marked-x-tile', 'shield-deploy-anim');
+      cell.innerHTML = '';
+      cell.classList.remove('laser-blast-anim');
+      void cell.offsetWidth;
+      cell.classList.add('laser-blast-anim');
       sound.playChisel();
       hapticPulse('zap');
       triggerAlienEmotion('happy', 850);
@@ -2916,9 +3149,12 @@ function applyCellDragAction(index, actionType) {
       }
 
       State.board10.userGrid[r][c] = 2;
-      cell.classList.remove('excavated-tile');
+      cell.classList.remove('excavated-tile', 'laser-blast-anim');
       cell.classList.add('marked-x-tile');
-      cell.innerText = '✕';
+      cell.innerHTML = SHIELD_CELL_SVG;
+      cell.classList.remove('shield-deploy-anim');
+      void cell.offsetWidth;
+      cell.classList.add('shield-deploy-anim');
 
       if (State.board10.timerSeconds <= 0) {
         openModal('game-over-modal');
@@ -2937,9 +3173,12 @@ function applyCellDragAction(index, actionType) {
     }
     if (currentVal === 0) {
       State.board10.userGrid[r][c] = 2;
-      cell.classList.remove('excavated-tile');
+      cell.classList.remove('excavated-tile', 'laser-blast-anim');
       cell.classList.add('marked-x-tile');
-      cell.innerText = '✕';
+      cell.innerHTML = SHIELD_CELL_SVG;
+      cell.classList.remove('shield-deploy-anim');
+      void cell.offsetWidth;
+      cell.classList.add('shield-deploy-anim');
       sound.playMarkX();
       hapticPulse('shield');
       triggerCritterCheer('shield');
