@@ -1612,79 +1612,54 @@ function getPuzzle10(key) {
 function getAlienSvg(emotion = 'normal') {
   if (emotion === 'happy') {
     return `
-      <svg class="w-8 h-8" shape-rendering="crispEdges" viewBox="0 0 24 24" fill="none">
-        <!-- Bulbous Forehead / Classic Grey Head -->
-        <rect x="7" y="1" width="10" height="2" fill="#8bac0f" />
-        <rect x="5" y="3" width="14" height="2" fill="#8bac0f" />
-        <rect x="4" y="5" width="16" height="5" fill="#8bac0f" />
-        <rect x="5" y="10" width="14" height="3" fill="#8bac0f" />
-        <rect x="7" y="13" width="10" height="3" fill="#8bac0f" />
-        <rect x="9" y="16" width="6" height="2" fill="#8bac0f" />
-        <rect x="10" y="18" width="4" height="2" fill="#8bac0f" />
-        <rect x="11" y="20" width="2" height="3" fill="#306230" />
-        <!-- Big Slanted Happy Eyes with Glint -->
-        <rect x="5" y="7" width="4" height="2" fill="#0f380f" />
-        <rect x="6" y="9" width="4" height="3" fill="#0f380f" />
-        <rect x="7" y="12" width="3" height="2" fill="#0f380f" />
-        <rect x="6" y="8" width="2" height="1" fill="#9bbc0f" />
-        <rect x="15" y="7" width="4" height="2" fill="#0f380f" />
-        <rect x="14" y="9" width="4" height="3" fill="#0f380f" />
-        <rect x="14" y="12" width="3" height="2" fill="#0f380f" />
-        <rect x="16" y="8" width="2" height="1" fill="#9bbc0f" />
-        <!-- Nostrils and Happy Smile -->
-        <rect x="11" y="14" width="2" height="1" fill="#306230" />
-        <rect x="9" y="16" width="6" height="1" fill="#0f380f" />
-        <rect x="8" y="15" width="1" height="1" fill="#0f380f" />
-        <rect x="15" y="15" width="1" height="1" fill="#0f380f" />
+      <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="15" fill="#0f380f" stroke="#306230" stroke-width="1.5" />
+        <polygon points="5,7 6,5 7,7 9,8 7,9 6,11 5,9 3,8" fill="#9bbc0f" />
+        <polygon points="26,8 27,6 28,8 30,9 28,10 27,12 26,10 24,9" fill="#9bbc0f" />
+        <path d="M14 24 L14 29 L18 29 L18 24 Z" fill="#8bac0f" stroke="#0f380f" stroke-width="0.8" />
+        <path d="M16 4 C 22.5 4, 25 8.5, 25 13.5 C 25 18, 20.5 22, 18 24.5 C 17.2 25.3, 14.8 25.3, 14 24.5 C 11.5 22, 7 18, 7 13.5 C 7 8.5, 9.5 4, 16 4 Z" fill="#8bac0f" stroke="#0f380f" stroke-width="0.9" />
+        <ellipse cx="16" cy="8" rx="5" ry="2" fill="#9bbc0f" opacity="0.7" />
+        <path d="M9.5 15.5 C 10.5 13 13 14 14 16 C 13 17.5 10.5 17.5 9.5 15.5 Z" fill="#0f380f" />
+        <path d="M22.5 15.5 C 21.5 13 19 14 18 16 C 19 17.5 21.5 17.5 22.5 15.5 Z" fill="#0f380f" />
+        <circle cx="15.3" cy="21" r="0.4" fill="#306230" />
+        <circle cx="16.7" cy="21" r="0.4" fill="#306230" />
+        <path d="M14.2 22.5 Q16 24.5 17.8 22.5" stroke="#0f380f" stroke-width="1" fill="none" stroke-linecap="round" />
       </svg>
     `;
   } else if (emotion === 'panic') {
     return `
-      <svg class="w-8 h-8" shape-rendering="crispEdges" viewBox="0 0 24 24" fill="none">
-        <rect x="7" y="1" width="10" height="2" fill="#8bac0f" />
-        <rect x="5" y="3" width="14" height="2" fill="#8bac0f" />
-        <rect x="4" y="5" width="16" height="5" fill="#8bac0f" />
-        <rect x="5" y="10" width="14" height="3" fill="#8bac0f" />
-        <rect x="7" y="13" width="10" height="3" fill="#8bac0f" />
-        <rect x="9" y="16" width="6" height="2" fill="#8bac0f" />
-        <rect x="10" y="18" width="4" height="2" fill="#8bac0f" />
-        <rect x="11" y="20" width="2" height="3" fill="#306230" />
-        <!-- Huge Dilated Almond Eyes -->
-        <rect x="4" y="7" width="5" height="3" fill="#0f380f" />
-        <rect x="5" y="10" width="5" height="3" fill="#0f380f" />
-        <rect x="7" y="13" width="3" height="1" fill="#0f380f" />
-        <rect x="15" y="7" width="5" height="3" fill="#0f380f" />
-        <rect x="14" y="10" width="5" height="3" fill="#0f380f" />
-        <rect x="14" y="13" width="3" height="1" fill="#0f380f" />
-        <!-- Sweat bead on head -->
-        <rect x="19" y="5" width="2" height="3" fill="#9bbc0f" />
-        <!-- Shocked 'O' mouth -->
-        <rect x="10" y="15" width="4" height="2" fill="#0f380f" />
+      <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="15" fill="#0f380f" stroke="#306230" stroke-width="1.5" />
+        <path d="M26 6 Q28 8 26 9 Q24 8 26 6 Z" fill="#9bbc0f" />
+        <path d="M5 8 Q7 10 5 11 Q3 10 5 8 Z" fill="#9bbc0f" />
+        <path d="M14 24 L14 29 L18 29 L18 24 Z" fill="#8bac0f" stroke="#0f380f" stroke-width="0.8" />
+        <path d="M16 4 C 22.5 4, 25 8.5, 25 13.5 C 25 18, 20.5 22, 18 24.5 C 17.2 25.3, 14.8 25.3, 14 24.5 C 11.5 22, 7 18, 7 13.5 C 7 8.5, 9.5 4, 16 4 Z" fill="#8bac0f" stroke="#0f380f" stroke-width="0.9" />
+        <ellipse cx="16" cy="8" rx="5" ry="2" fill="#9bbc0f" opacity="0.7" />
+        <path d="M9 12.5 C 8.5 16.5 11 19.5 14.5 19.5 C 15 16.5 13.5 13 9 12.5 Z" fill="#0f380f" />
+        <circle cx="11.5" cy="15.5" r="1.2" fill="#9bbc0f" />
+        <path d="M23 12.5 C 23.5 16.5 21 19.5 17.5 19.5 C 17 16.5 18.5 13 23 12.5 Z" fill="#0f380f" />
+        <circle cx="20.5" cy="15.5" r="1.2" fill="#9bbc0f" />
+        <ellipse cx="16" cy="22.8" rx="1.6" ry="1.8" fill="#0f380f" />
       </svg>
     `;
   }
   return `
-    <svg class="w-8 h-8" shape-rendering="crispEdges" viewBox="0 0 24 24" fill="none">
-      <rect x="7" y="1" width="10" height="2" fill="#8bac0f" />
-      <rect x="5" y="3" width="14" height="2" fill="#8bac0f" />
-      <rect x="4" y="5" width="16" height="5" fill="#8bac0f" />
-      <rect x="5" y="10" width="14" height="3" fill="#8bac0f" />
-      <rect x="7" y="13" width="10" height="3" fill="#8bac0f" />
-      <rect x="9" y="16" width="6" height="2" fill="#8bac0f" />
-      <rect x="10" y="18" width="4" height="2" fill="#8bac0f" />
-      <rect x="11" y="20" width="2" height="3" fill="#306230" />
-      <!-- Giant Slanted Black Almond Eyes -->
-      <rect x="5" y="7" width="4" height="2" fill="#0f380f" />
-      <rect x="6" y="9" width="4" height="3" fill="#0f380f" />
-      <rect x="7" y="12" width="3" height="2" fill="#0f380f" />
-      <rect x="6" y="8" width="1" height="1" fill="#9bbc0f" />
-      <rect x="15" y="7" width="4" height="2" fill="#0f380f" />
-      <rect x="14" y="9" width="4" height="3" fill="#0f380f" />
-      <rect x="14" y="12" width="3" height="2" fill="#0f380f" />
-      <rect x="17" y="8" width="1" height="1" fill="#9bbc0f" />
-      <!-- Nostrils and Slit Mouth -->
-      <rect x="11" y="14" width="2" height="1" fill="#306230" />
-      <rect x="10" y="16" width="4" height="1" fill="#0f380f" />
+    <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="15" fill="#0f380f" stroke="#306230" stroke-width="1.5" />
+      <rect x="5" y="8" width="1.5" height="1.5" fill="#9bbc0f" />
+      <rect x="25" y="9" width="1.5" height="1.5" fill="#9bbc0f" />
+      <rect x="4" y="19" width="1" height="1" fill="#8bac0f" />
+      <rect x="26" y="20" width="1" height="1" fill="#8bac0f" />
+      <path d="M14 24 L14 29 L18 29 L18 24 Z" fill="#8bac0f" stroke="#0f380f" stroke-width="0.8" />
+      <path d="M16 4 C 22.5 4, 25 8.5, 25 13.5 C 25 18, 20.5 22, 18 24.5 C 17.2 25.3, 14.8 25.3, 14 24.5 C 11.5 22, 7 18, 7 13.5 C 7 8.5, 9.5 4, 16 4 Z" fill="#8bac0f" stroke="#0f380f" stroke-width="0.9" />
+      <ellipse cx="16" cy="8" rx="5" ry="2" fill="#9bbc0f" opacity="0.7" />
+      <path d="M9.5 13 C 9.2 16, 11 18.8, 14 19.2 C 14.5 17, 13.5 13.5, 9.5 13 Z" fill="#0f380f" />
+      <ellipse cx="11" cy="15" rx="0.8" ry="0.5" fill="#9bbc0f" transform="rotate(-25 11 15)" />
+      <path d="M22.5 13 C 22.8 16, 21 18.8, 18 19.2 C 17.5 17, 18.5 13.5, 22.5 13 Z" fill="#0f380f" />
+      <ellipse cx="21" cy="15" rx="0.8" ry="0.5" fill="#9bbc0f" transform="rotate(25 21 15)" />
+      <circle cx="15.3" cy="21.2" r="0.4" fill="#306230" />
+      <circle cx="16.7" cy="21.2" r="0.4" fill="#306230" />
+      <path d="M14.8 23 Q16 23.5 17.2 23" stroke="#306230" stroke-width="0.7" fill="none" stroke-linecap="round" />
     </svg>
   `;
 }
