@@ -1613,83 +1613,78 @@ function getAlienSvg(emotion = 'normal') {
   if (emotion === 'happy') {
     return `
       <svg class="w-8 h-8" shape-rendering="crispEdges" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="1" width="3" height="2" fill="#0f380f" />
-        <rect x="18" y="1" width="3" height="2" fill="#0f380f" />
-        <rect x="5" y="3" width="2" height="3" fill="#306230" />
-        <rect x="17" y="3" width="2" height="3" fill="#306230" />
-        <rect x="7" y="5" width="10" height="2" fill="#0f380f" />
-        <rect x="5" y="7" width="14" height="2" fill="#0f380f" />
-        <rect x="4" y="9" width="16" height="5" fill="#306230" />
-        <!-- Happy Eyes: ^ ^ sparkles -->
-        <polygon points="7,9 8,11 6,11" fill="#0f380f" />
-        <polygon points="17,9 18,11 16,11" fill="#0f380f" />
-        <rect x="6" y="10" width="3" height="1" fill="#9bbc0f" />
-        <rect x="15" y="10" width="3" height="1" fill="#9bbc0f" />
-        <!-- Rosy Blush Cheeks -->
-        <rect x="5" y="12" width="2" height="2" fill="#8bac0f" />
-        <rect x="17" y="12" width="2" height="2" fill="#8bac0f" />
-        <!-- Wide open smiling mouth -->
-        <rect x="6" y="14" width="12" height="3" fill="#306230" />
-        <rect x="10" y="14" width="4" height="2" fill="#0f380f" />
-        <rect x="11" y="16" width="2" height="1" fill="#9bbc0f" />
-        <!-- Joyful Waving Hands -->
-        <rect x="8" y="17" width="8" height="2" fill="#0f380f" />
-        <rect x="9" y="19" width="6" height="3" fill="#306230" />
-        <rect x="3" y="16" width="3" height="2" fill="#0f380f" />
-        <rect x="18" y="16" width="3" height="2" fill="#0f380f" />
+        <!-- Bulbous Forehead / Classic Grey Head -->
+        <rect x="7" y="1" width="10" height="2" fill="#8bac0f" />
+        <rect x="5" y="3" width="14" height="2" fill="#8bac0f" />
+        <rect x="4" y="5" width="16" height="5" fill="#8bac0f" />
+        <rect x="5" y="10" width="14" height="3" fill="#8bac0f" />
+        <rect x="7" y="13" width="10" height="3" fill="#8bac0f" />
+        <rect x="9" y="16" width="6" height="2" fill="#8bac0f" />
+        <rect x="10" y="18" width="4" height="2" fill="#8bac0f" />
+        <rect x="11" y="20" width="2" height="3" fill="#306230" />
+        <!-- Big Slanted Happy Eyes with Glint -->
+        <rect x="5" y="7" width="4" height="2" fill="#0f380f" />
+        <rect x="6" y="9" width="4" height="3" fill="#0f380f" />
+        <rect x="7" y="12" width="3" height="2" fill="#0f380f" />
+        <rect x="6" y="8" width="2" height="1" fill="#9bbc0f" />
+        <rect x="15" y="7" width="4" height="2" fill="#0f380f" />
+        <rect x="14" y="9" width="4" height="3" fill="#0f380f" />
+        <rect x="14" y="12" width="3" height="2" fill="#0f380f" />
+        <rect x="16" y="8" width="2" height="1" fill="#9bbc0f" />
+        <!-- Nostrils and Happy Smile -->
+        <rect x="11" y="14" width="2" height="1" fill="#306230" />
+        <rect x="9" y="16" width="6" height="1" fill="#0f380f" />
+        <rect x="8" y="15" width="1" height="1" fill="#0f380f" />
+        <rect x="15" y="15" width="1" height="1" fill="#0f380f" />
       </svg>
     `;
   } else if (emotion === 'panic') {
     return `
       <svg class="w-8 h-8" shape-rendering="crispEdges" viewBox="0 0 24 24" fill="none">
-        <!-- Trembling antennas with warning sparks -->
-        <rect x="2" y="3" width="2" height="2" fill="#cc2222" />
-        <rect x="20" y="3" width="2" height="2" fill="#cc2222" />
-        <rect x="4" y="4" width="2" height="3" fill="#0f380f" />
-        <rect x="18" y="4" width="2" height="3" fill="#0f380f" />
-        <!-- Head Dome -->
-        <rect x="7" y="5" width="10" height="2" fill="#0f380f" />
-        <rect x="5" y="7" width="14" height="2" fill="#0f380f" />
-        <rect x="4" y="9" width="16" height="5" fill="#306230" />
-        <!-- Cross Eyes ✕ ✕ (Panic) -->
-        <rect x="6" y="9" width="1" height="4" fill="#0f380f" />
-        <rect x="8" y="9" width="1" height="4" fill="#0f380f" />
-        <rect x="7" y="10" width="1" height="2" fill="#0f380f" />
-        <rect x="15" y="9" width="1" height="4" fill="#0f380f" />
-        <rect x="17" y="9" width="1" height="4" fill="#0f380f" />
-        <rect x="16" y="10" width="1" height="2" fill="#0f380f" />
-        <!-- Sweat Drop on forehead -->
-        <rect x="19" y="7" width="2" height="3" fill="#9bbc0f" />
-        <!-- Wide open screaming 'O' mouth -->
-        <rect x="6" y="14" width="12" height="3" fill="#306230" />
-        <rect x="10" y="14" width="4" height="3" fill="#0f380f" />
-        <!-- Trembling Hands on Head -->
-        <rect x="8" y="17" width="8" height="2" fill="#0f380f" />
-        <rect x="9" y="19" width="6" height="3" fill="#306230" />
-        <rect x="4" y="17" width="3" height="2" fill="#0f380f" />
-        <rect x="17" y="17" width="3" height="2" fill="#0f380f" />
+        <rect x="7" y="1" width="10" height="2" fill="#8bac0f" />
+        <rect x="5" y="3" width="14" height="2" fill="#8bac0f" />
+        <rect x="4" y="5" width="16" height="5" fill="#8bac0f" />
+        <rect x="5" y="10" width="14" height="3" fill="#8bac0f" />
+        <rect x="7" y="13" width="10" height="3" fill="#8bac0f" />
+        <rect x="9" y="16" width="6" height="2" fill="#8bac0f" />
+        <rect x="10" y="18" width="4" height="2" fill="#8bac0f" />
+        <rect x="11" y="20" width="2" height="3" fill="#306230" />
+        <!-- Huge Dilated Almond Eyes -->
+        <rect x="4" y="7" width="5" height="3" fill="#0f380f" />
+        <rect x="5" y="10" width="5" height="3" fill="#0f380f" />
+        <rect x="7" y="13" width="3" height="1" fill="#0f380f" />
+        <rect x="15" y="7" width="5" height="3" fill="#0f380f" />
+        <rect x="14" y="10" width="5" height="3" fill="#0f380f" />
+        <rect x="14" y="13" width="3" height="1" fill="#0f380f" />
+        <!-- Sweat bead on head -->
+        <rect x="19" y="5" width="2" height="3" fill="#9bbc0f" />
+        <!-- Shocked 'O' mouth -->
+        <rect x="10" y="15" width="4" height="2" fill="#0f380f" />
       </svg>
     `;
   }
   return `
     <svg class="w-8 h-8" shape-rendering="crispEdges" viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="2" width="2" height="2" fill="#0f380f" />
-      <rect x="18" y="2" width="2" height="2" fill="#0f380f" />
-      <rect x="5" y="4" width="2" height="2" fill="#306230" />
-      <rect x="17" y="4" width="2" height="2" fill="#306230" />
-      <rect x="7" y="5" width="10" height="2" fill="#0f380f" />
-      <rect x="5" y="7" width="14" height="2" fill="#0f380f" />
-      <rect x="4" y="9" width="16" height="5" fill="#306230" />
-      <rect x="6" y="9" width="3" height="4" fill="#0f380f" />
-      <rect x="15" y="9" width="3" height="4" fill="#0f380f" />
-      <rect x="7" y="10" width="1" height="1" fill="#9bbc0f" />
-      <rect x="16" y="10" width="1" height="1" fill="#9bbc0f" />
-      <rect x="6" y="14" width="12" height="3" fill="#306230" />
-      <rect x="11" y="15" width="2" height="1" fill="#0f380f" />
-      <rect x="8" y="17" width="8" height="2" fill="#0f380f" />
-      <rect x="9" y="19" width="6" height="3" fill="#306230" />
-      <rect x="5" y="18" width="2" height="3" fill="#0f380f" />
-      <rect x="17" y="18" width="2" height="3" fill="#0f380f" />
+      <rect x="7" y="1" width="10" height="2" fill="#8bac0f" />
+      <rect x="5" y="3" width="14" height="2" fill="#8bac0f" />
+      <rect x="4" y="5" width="16" height="5" fill="#8bac0f" />
+      <rect x="5" y="10" width="14" height="3" fill="#8bac0f" />
+      <rect x="7" y="13" width="10" height="3" fill="#8bac0f" />
+      <rect x="9" y="16" width="6" height="2" fill="#8bac0f" />
+      <rect x="10" y="18" width="4" height="2" fill="#8bac0f" />
+      <rect x="11" y="20" width="2" height="3" fill="#306230" />
+      <!-- Giant Slanted Black Almond Eyes -->
+      <rect x="5" y="7" width="4" height="2" fill="#0f380f" />
+      <rect x="6" y="9" width="4" height="3" fill="#0f380f" />
+      <rect x="7" y="12" width="3" height="2" fill="#0f380f" />
+      <rect x="6" y="8" width="1" height="1" fill="#9bbc0f" />
+      <rect x="15" y="7" width="4" height="2" fill="#0f380f" />
+      <rect x="14" y="9" width="4" height="3" fill="#0f380f" />
+      <rect x="14" y="12" width="3" height="2" fill="#0f380f" />
+      <rect x="17" y="8" width="1" height="1" fill="#9bbc0f" />
+      <!-- Nostrils and Slit Mouth -->
+      <rect x="11" y="14" width="2" height="1" fill="#306230" />
+      <rect x="10" y="16" width="4" height="1" fill="#0f380f" />
     </svg>
   `;
 }
@@ -1873,21 +1868,41 @@ function renderClues10(rowClues, colClues) {
 // ========================================================
 
 const CRITTER_ALIEN_SVG = `
-<svg class="pixel-sharp" viewBox="0 0 16 16" width="18" height="18">
-  <rect x="3" y="1" width="2" height="2" fill="#0f380f" />
-  <rect x="11" y="1" width="2" height="2" fill="#0f380f" />
-  <rect x="4" y="3" width="1" height="2" fill="#0f380f" />
-  <rect x="11" y="3" width="1" height="2" fill="#0f380f" />
-  <rect x="3" y="5" width="10" height="6" fill="#8bac0f" />
-  <rect x="2" y="6" width="12" height="4" fill="#8bac0f" />
-  <rect x="4" y="6" width="3" height="3" fill="#0f380f" />
-  <rect x="9" y="6" width="3" height="3" fill="#0f380f" />
-  <rect x="5" y="7" width="1" height="1" fill="#9bbc0f" />
-  <rect x="10" y="7" width="1" height="1" fill="#9bbc0f" />
+<svg class="pixel-sharp" viewBox="0 0 16 18" width="18" height="20">
+  <!-- Bulbous Roswell Grey Alien Cranium -->
+  <rect x="4" y="0" width="8" height="2" fill="#8bac0f" />
+  <rect x="2" y="2" width="12" height="3" fill="#8bac0f" />
+  <rect x="3" y="1" width="10" height="1" fill="#9bbc0f" />
+  <rect x="2" y="5" width="12" height="3" fill="#8bac0f" />
+  <rect x="3" y="8" width="10" height="2" fill="#8bac0f" />
+  <rect x="5" y="10" width="6" height="1" fill="#8bac0f" />
+  <rect x="6" y="11" width="4" height="1" fill="#8bac0f" />
+  
+  <!-- Slanted Giant Almond Eyes (Black) -->
+  <rect x="3" y="4" width="3" height="4" fill="#0f380f" />
+  <rect x="4" y="3" width="2" height="6" fill="#0f380f" />
+  <rect x="5" y="6" width="1" height="3" fill="#0f380f" />
+  <rect x="4" y="4" width="1" height="1" fill="#9bbc0f" />
+
+  <rect x="10" y="4" width="3" height="4" fill="#0f380f" />
+  <rect x="10" y="3" width="2" height="6" fill="#0f380f" />
+  <rect x="10" y="6" width="1" height="3" fill="#0f380f" />
+  <rect x="11" y="4" width="1" height="1" fill="#9bbc0f" />
+
+  <!-- Tiny Slit Mouth -->
   <rect x="7" y="10" width="2" height="1" fill="#0f380f" />
-  <rect x="5" y="11" width="6" height="3" fill="#306230" />
-  <rect x="4" y="14" width="2" height="2" fill="#0f380f" />
-  <rect x="10" y="14" width="2" height="2" fill="#0f380f" />
+
+  <!-- Slender Body & Torso -->
+  <rect x="6" y="12" width="4" height="3" fill="#306230" />
+  
+  <!-- Blaster Raygun in Hand (pointing right) -->
+  <rect x="10" y="12" width="2" height="2" fill="#8bac0f" />
+  <rect x="12" y="12" width="3" height="2" fill="#0f380f" />
+  <rect x="14" y="11" width="1" height="4" fill="#8bac0f" />
+
+  <!-- Slender Legs -->
+  <rect x="5" y="15" width="2" height="3" fill="#0f380f" />
+  <rect x="9" y="15" width="2" height="3" fill="#0f380f" />
 </svg>`;
 
 const CRITTER_COW_SVG = `
@@ -1987,19 +2002,25 @@ function initCritterSystem() {
   zoneDramas.bottom.cooldown = 70 + Math.floor(Math.random() * 45);
 
   const critterConfigs = [
-    // Top Zone: Abductor UFO, Fast Scout UFO, Alien, Cow, Human
-    { zoneKey: 'top', zone: topZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 30, dir: 1, speed: 0.32, isUfo: true, altitude: 2 },
-    { zoneKey: 'top', zone: topZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 8, dir: 1, speed: 0.58, isScoutUfo: true, altitude: 6, flightAngle: 0 },
-    { zoneKey: 'top', zone: topZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 22, dir: 1, speed: 0.36 },
-    { zoneKey: 'top', zone: topZone, type: 'cow', svg: CRITTER_COW_SVG, x: 54, dir: -1, speed: 0.26 },
-    { zoneKey: 'top', zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 82, dir: -1, speed: 0.38 },
+    // Top Zone: Abductor UFO, Fast Scout UFO, 2 Grey Aliens, 2 Cows, 2 Humans
+    { zoneKey: 'top', zone: topZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 28, dir: 1, speed: 0.32, isUfo: true, altitude: 2 },
+    { zoneKey: 'top', zone: topZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 6, dir: 1, speed: 0.58, isScoutUfo: true, altitude: 6, flightAngle: 0 },
+    { zoneKey: 'top', zone: topZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 18, dir: 1, speed: 0.35 },
+    { zoneKey: 'top', zone: topZone, type: 'cow', svg: CRITTER_COW_SVG, x: 36, dir: 1, speed: 0.24 },
+    { zoneKey: 'top', zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 50, dir: -1, speed: 0.36 },
+    { zoneKey: 'top', zone: topZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 64, dir: -1, speed: 0.38 },
+    { zoneKey: 'top', zone: topZone, type: 'cow', svg: CRITTER_COW_SVG, x: 78, dir: -1, speed: 0.26 },
+    { zoneKey: 'top', zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 88, dir: -1, speed: 0.34 },
 
-    // Bottom Zone: Abductor UFO, Fast Scout UFO, Human, Cow, Alien
-    { zoneKey: 'bottom', zone: botZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 72, dir: -1, speed: 0.32, isUfo: true, altitude: 2 },
-    { zoneKey: 'bottom', zone: botZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 88, dir: -1, speed: 0.54, isScoutUfo: true, altitude: 6, flightAngle: Math.PI },
-    { zoneKey: 'bottom', zone: botZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 18, dir: 1, speed: 0.38 },
-    { zoneKey: 'bottom', zone: botZone, type: 'cow', svg: CRITTER_COW_SVG, x: 48, dir: 1, speed: 0.25 },
-    { zoneKey: 'bottom', zone: botZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 78, dir: -1, speed: 0.37 }
+    // Bottom Zone: Abductor UFO, Fast Scout UFO, 2 Grey Aliens, 2 Cows, 2 Humans
+    { zoneKey: 'bottom', zone: botZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 68, dir: -1, speed: 0.32, isUfo: true, altitude: 2 },
+    { zoneKey: 'bottom', zone: botZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 90, dir: -1, speed: 0.54, isScoutUfo: true, altitude: 6, flightAngle: Math.PI },
+    { zoneKey: 'bottom', zone: botZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 14, dir: 1, speed: 0.38 },
+    { zoneKey: 'bottom', zone: botZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 26, dir: 1, speed: 0.36 },
+    { zoneKey: 'bottom', zone: botZone, type: 'cow', svg: CRITTER_COW_SVG, x: 42, dir: 1, speed: 0.25 },
+    { zoneKey: 'bottom', zone: botZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 58, dir: -1, speed: 0.35 },
+    { zoneKey: 'bottom', zone: botZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 74, dir: -1, speed: 0.37 },
+    { zoneKey: 'bottom', zone: botZone, type: 'cow', svg: CRITTER_COW_SVG, x: 85, dir: -1, speed: 0.26 }
   ];
 
   critterConfigs.forEach(cfg => {
@@ -2122,35 +2143,41 @@ function updateCrittersTick() {
 
       c.nextActionTicks--;
       if (c.nextActionTicks <= 0 && !c.isUfo) {
-        const randAct = Math.random();
-        if (randAct < 0.35) {
-          // Playful hop!
-          c.state = 'hop';
-          c.actionTicks = 14;
-          c.el.classList.remove('critter-walk');
-          c.el.classList.add('critter-hop');
-          if (Math.random() < 0.6) {
-            const hopEmote = c.type === 'alien' ? ['⚡ BEEP', '👽 HEHE', '🛸 HOP'] :
-                             c.type === 'cow' ? ['🐮 MOO!', '🌿 YAY', '🌾 JUMP'] :
-                             ['🏃💨', '👀 RADAR', '📡 PING'];
-            showCritterBubble(c, hopEmote[Math.floor(Math.random() * hopEmote.length)], 900);
-          }
-        } else if (randAct < 0.6) {
-          // Sprint dash!
-          c.state = 'dash';
-          c.actionTicks = 12;
-          c.el.classList.remove('critter-walk');
-          c.el.classList.add('critter-dash');
+        // Alien raygun laser shooting chance!
+        if (c.type === 'alien' && Math.random() < 0.45) {
+          fireAlienLaser(c);
+          c.nextActionTicks = 35 + Math.floor(Math.random() * 35);
         } else {
-          // Short pause
-          c.state = 'idle';
-          c.idleTicks = 12 + Math.floor(Math.random() * 18);
-          c.el.classList.remove('critter-walk');
-          if (Math.random() < 0.6) {
-            const emotes = c.type === 'alien' ? ['👽', '⚡', '🛸', 'HI!'] :
-                           c.type === 'cow' ? ['MOO', '🌿', '💤', '🐮'] :
-                           ['👀', 'SCAN', '🛸?!', '📸'];
-            showCritterBubble(c, emotes[Math.floor(Math.random() * emotes.length)], 1100);
+          const randAct = Math.random();
+          if (randAct < 0.35) {
+            // Playful hop!
+            c.state = 'hop';
+            c.actionTicks = 14;
+            c.el.classList.remove('critter-walk');
+            c.el.classList.add('critter-hop');
+            if (Math.random() < 0.6) {
+              const hopEmote = c.type === 'alien' ? ['⚡ BEEP', '👽 HEHE', '🛸 HOP'] :
+                               c.type === 'cow' ? ['🐮 MOO!', '🌿 YAY', '🌾 JUMP'] :
+                               ['🏃💨', '👀 RADAR', '📡 PING'];
+              showCritterBubble(c, hopEmote[Math.floor(Math.random() * hopEmote.length)], 900);
+            }
+          } else if (randAct < 0.6) {
+            // Sprint dash!
+            c.state = 'dash';
+            c.actionTicks = 12;
+            c.el.classList.remove('critter-walk');
+            c.el.classList.add('critter-dash');
+          } else {
+            // Short pause
+            c.state = 'idle';
+            c.idleTicks = 12 + Math.floor(Math.random() * 18);
+            c.el.classList.remove('critter-walk');
+            if (Math.random() < 0.6) {
+              const emotes = c.type === 'alien' ? ['👽', '⚡', '🛸', 'HI!'] :
+                             c.type === 'cow' ? ['MOO', '🌿', '💤', '🐮'] :
+                             ['👀', 'SCAN', '🛸?!', '📸'];
+              showCritterBubble(c, emotes[Math.floor(Math.random() * emotes.length)], 1100);
+            }
           }
         }
       }
@@ -2236,23 +2263,24 @@ function updateZoneAbductionDrama(zoneKey) {
   if (!drama) return;
 
   const ufo = activeCritters.find(c => c.zoneKey === zoneKey && c.isUfo);
-  const cow = activeCritters.find(c => c.zoneKey === zoneKey && c.type === 'cow');
-  const human = activeCritters.find(c => c.zoneKey === zoneKey && c.type === 'human');
-  const alien = activeCritters.find(c => c.zoneKey === zoneKey && c.type === 'alien');
+  const cows = activeCritters.filter(c => c.zoneKey === zoneKey && c.type === 'cow');
+  const humans = activeCritters.filter(c => c.zoneKey === zoneKey && c.type === 'human');
+  const aliens = activeCritters.filter(c => c.zoneKey === zoneKey && c.type === 'alien');
 
-  if (!ufo || !cow || !human) return;
+  if (!ufo || cows.length === 0 || humans.length === 0) return;
 
   if (drama.state === 'idle') {
     drama.cooldown--;
     if (drama.cooldown <= 0) {
-      // Start stalking the cow
+      // Pick a cow to stalk
+      drama.targetCow = cows[Math.floor(Math.random() * cows.length)];
       drama.state = 'stalking';
       drama.ticks = 0;
       showCritterBubble(ufo, 'TARGET LOCK! 🛸', 1200);
     }
   } else if (drama.state === 'stalking') {
     drama.ticks++;
-    // UFO flies toward cow
+    const cow = drama.targetCow || cows[0];
     const diff = cow.x - ufo.x;
     ufo.dir = diff > 0 ? 1 : -1;
     ufo.el.style.transform = ufo.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
@@ -2276,21 +2304,24 @@ function updateZoneAbductionDrama(zoneKey) {
       cow.el.style.bottom = '16px';
       showCritterBubble(cow, 'MOOO!?! 🐮', 2000);
       showCritterBubble(ufo, 'BEAM ON! ⚡', 1400);
-      sound.playLaserZap();
+      // All character sounds removed per user request
     }
   } else if (drama.state === 'beaming') {
     drama.ticks++;
+    const cow = drama.targetCow || cows[0];
+    const human = humans.slice().sort((a, b) => Math.abs(a.x - ufo.x) - Math.abs(b.x - ufo.x))[0];
+    const alien = aliens[0];
+
     // Human notices the abduction!
-    if (drama.ticks === 8) {
+    if (drama.ticks === 8 && human) {
       human.state = 'aiming';
       human.dir = human.x < ufo.x ? 1 : -1;
       human.el.style.transform = human.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
       showCritterBubble(human, 'HEY! HANDS OFF! 😠', 1400);
-    } else if (drama.ticks === 20) {
-      // Human shoots laser pellets up at the UFO!
+    } else if (drama.ticks === 20 && human) {
+      // Human shoots laser pellets up at the UFO (silent)
       drama.state = 'shooting';
       showCritterBubble(human, 'PEW PEW! 💥', 1200);
-      sound.playLaserZap();
 
       // Spawn laser pellet
       fireHumanLaserAtUfo(human, ufo, drama, cow, alien);
@@ -2319,7 +2350,7 @@ function fireHumanLaserAtUfo(human, ufo, drama, cow, alien) {
     void ufo.el.offsetWidth;
     ufo.el.classList.add('ufo-shield-hit');
     showCritterBubble(ufo, 'BZZT! OUCH! ⚡', 1600);
-    sound.playAlienBuzzer();
+    // Silent - all character audio removed
 
     // Turn off tractor beam and drop the cow safely
     if (drama.beamEl) drama.beamEl.classList.add('hidden');
@@ -2351,6 +2382,38 @@ function fireHumanLaserAtUfo(human, ufo, drama, cow, alien) {
   }, 200);
 }
 
+function fireAlienLaser(alien) {
+  if (!alien || !alien.zoneEl) return;
+
+  const pellet = document.createElement('div');
+  pellet.className = 'alien-laser-pellet';
+  pellet.style.left = `${alien.x + (alien.dir === 1 ? 3 : -2)}%`;
+  pellet.style.bottom = '10px';
+  alien.zoneEl.appendChild(pellet);
+
+  const targetX = alien.dir === 1 ? Math.min(94, alien.x + 32) : Math.max(3, alien.x - 32);
+  requestAnimationFrame(() => {
+    pellet.style.left = `${targetX}%`;
+  });
+
+  const laserEmotes = ['PEW! ⚡', 'ZAP! 👽', 'BZZT!', 'RAYGUN! 🔫', 'PEW PEW!'];
+  showCritterBubble(alien, laserEmotes[Math.floor(Math.random() * laserEmotes.length)], 900);
+
+  setTimeout(() => {
+    if (pellet.parentElement) pellet.remove();
+
+    // Check if near human to cause a surprise jump!
+    const nearbyHumans = activeCritters.filter(c => c.zoneKey === alien.zoneKey && c.type === 'human' && Math.abs(c.x - targetX) < 8);
+    if (nearbyHumans.length > 0 && Math.random() < 0.6) {
+      const h = nearbyHumans[0];
+      h.state = 'hop';
+      h.actionTicks = 12;
+      h.el.classList.add('critter-hop');
+      showCritterBubble(h, 'YIKES! ⚡', 1000);
+    }
+  }, 260);
+}
+
 function showCritterBubble(c, text, duration = 1200) {
   if (!c.bubbleEl) return;
   c.bubbleEl.innerText = text;
@@ -2379,6 +2442,9 @@ function triggerCritterCheer(type = 'good') {
                      c.type === 'cow' ? ['🐮 MOO!', '★ YES!', '🌿 GOOD!'] :
                      ['TARGET HIT! 📡', 'BULLSEYE! 🎯', 'AREA 51! 🛸', 'SCAN OK!'];
       showCritterBubble(c, cheers[Math.floor(Math.random() * cheers.length)], 1000);
+      if (c.type === 'alien' && Math.random() < 0.5) {
+        fireAlienLaser(c);
+      }
     } else if (type === 'shield') {
       const shields = c.type === 'alien' ? ['DEFLECT! ✕', '🛡️ BLOCKED'] :
                       c.type === 'cow' ? ['SAFE! 🐮', '✕ MOO'] :
