@@ -2198,8 +2198,8 @@ function initCritterSystem() {
 
   const critterConfigs = [
     // Top Zone: Abductor UFO, Fast Scout UFO, 2 Grey Aliens, 2 Cows, 2 Humans
-    { zoneKey: 'top', zone: topZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 28, dir: 1, speed: 0.32, isUfo: true, altitude: 2 },
-    { zoneKey: 'top', zone: topZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 6, dir: 1, speed: 0.58, isScoutUfo: true, altitude: 6, flightAngle: 0 },
+    { zoneKey: 'top', zone: topZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 28, dir: 1, speed: 0.32, isUfo: true, altitude: 18 },
+    { zoneKey: 'top', zone: topZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 6, dir: 1, speed: 0.58, isScoutUfo: true, altitude: 18, flightAngle: 0 },
     { zoneKey: 'top', zone: topZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 18, dir: 1, speed: 0.35 },
     { zoneKey: 'top', zone: topZone, type: 'cow', svg: CRITTER_COW_SVG, x: 36, dir: 1, speed: 0.24 },
     { zoneKey: 'top', zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 50, dir: -1, speed: 0.36 },
@@ -2208,8 +2208,8 @@ function initCritterSystem() {
     { zoneKey: 'top', zone: topZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 88, dir: -1, speed: 0.34 },
 
     // Bottom Zone: Abductor UFO, Fast Scout UFO, 2 Grey Aliens, 2 Cows, 2 Humans
-    { zoneKey: 'bottom', zone: botZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 68, dir: -1, speed: 0.32, isUfo: true, altitude: 2 },
-    { zoneKey: 'bottom', zone: botZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 90, dir: -1, speed: 0.54, isScoutUfo: true, altitude: 6, flightAngle: Math.PI },
+    { zoneKey: 'bottom', zone: botZone, type: 'ufo', svg: CRITTER_UFO_SVG, x: 68, dir: -1, speed: 0.32, isUfo: true, altitude: 18 },
+    { zoneKey: 'bottom', zone: botZone, type: 'scout_ufo', svg: CRITTER_UFO_SCOUT_SVG, x: 90, dir: -1, speed: 0.54, isScoutUfo: true, altitude: 18, flightAngle: Math.PI },
     { zoneKey: 'bottom', zone: botZone, type: 'human', svg: CRITTER_HUMAN_SVG, x: 14, dir: 1, speed: 0.38 },
     { zoneKey: 'bottom', zone: botZone, type: 'alien', svg: CRITTER_ALIEN_SVG, x: 26, dir: 1, speed: 0.36 },
     { zoneKey: 'bottom', zone: botZone, type: 'cow', svg: CRITTER_COW_SVG, x: 42, dir: 1, speed: 0.25 },
@@ -2290,7 +2290,7 @@ function updateCrittersTick() {
     if (c.isScoutUfo) {
       c.x += c.dir * c.speed;
       c.flightAngle += 0.08;
-      c.altitude = 4 + Math.sin(c.flightAngle) * 5;
+      c.altitude = 18 + Math.sin(c.flightAngle) * 3;
       c.el.style.top = `${c.altitude}px`;
 
       // Bounce at boundary
@@ -2620,10 +2620,38 @@ function fireAlienLaser(alien) {
   }, 260);
 }
 
-function showCritterBubble(c, text, duration = 1200) {
+function showCritterBubble(c, text, duration = 1400) {
   if (!c.bubbleEl) return;
   c.bubbleEl.innerText = text;
   c.bubbleEl.classList.remove('hidden');
+
+  if (c.isUfo || c.isScoutUfo) {
+    c.bubbleEl.classList.add('ufo-bubble');
+    // If UFO altitude is too close to the top boundary, place bubble cleanly below the saucer!
+    if ((c.altitude || 0) < 16) {
+      c.bubbleEl.classList.remove('bubble-above');
+      c.bubbleEl.classList.add('bubble-below');
+    } else {
+      c.bubbleEl.classList.remove('bubble-below');
+      c.bubbleEl.classList.add('bubble-above');
+    }
+  } else {
+    c.bubbleEl.classList.remove('ufo-bubble', 'bubble-above', 'bubble-below');
+  }
+
+  // Prevent horizontal flipping when parent sprite faces left!
+  const flip = c.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+
+  // Clamp bubble horizontally if near screen boundary so text is never cut off on the sides
+  let xShift = '-50%';
+  if (c.x < 14) {
+    xShift = '-10%';
+  } else if (c.x > 82) {
+    xShift = '-90%';
+  }
+
+  c.bubbleEl.style.transform = `translateX(${xShift}) ${flip}`;
+
   setTimeout(() => {
     if (c.bubbleEl) c.bubbleEl.classList.add('hidden');
   }, duration);
@@ -2763,7 +2791,7 @@ function triggerRoswellCrashEvent() {
             showCritterBubble(ufo, '🚀 WARP ONLINE! TAKEOFF! 🛸', 1800);
             ufo.el.classList.remove('ufo-crashed', 'ufo-engine-sputter');
             ufo.el.style.transition = 'top 1.2s ease-out';
-            ufo.el.style.top = `${origAltitude || 4}px`;
+            ufo.el.style.top = `${origAltitude || 18}px`;
 
             setTimeout(() => {
               if (!ufo.el) { isRoswellEventActive = false; return; }

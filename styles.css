@@ -580,7 +580,7 @@ body {
    CRITTER PLAYGROUNDS (Tomrummet runt spelplanen)
    ======================================================== */
 #critter-zone-top, #critter-zone-bottom {
-  min-height: 48px;
+  min-height: 60px;
   position: relative;
   overflow: hidden;
   pointer-events: none;
@@ -599,7 +599,7 @@ body {
 
 .critter-ufo {
   position: absolute;
-  top: 2px;
+  top: 18px;
   z-index: 4;
   will-change: transform, left, top;
   image-rendering: pixelated;
@@ -608,7 +608,7 @@ body {
 
 .critter-scout-ufo {
   position: absolute;
-  top: 6px;
+  top: 18px;
   z-index: 5;
   will-change: transform, left, top;
   image-rendering: pixelated;
@@ -645,9 +645,9 @@ body {
 
 .tractor-beam-cone {
   position: absolute;
-  top: 14px;
+  top: 28px;
   width: 32px;
-  height: 34px;
+  height: 32px;
   background: linear-gradient(to bottom, rgba(155, 188, 15, 0.85), rgba(139, 172, 15, 0.2));
   clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
   z-index: 3;
@@ -756,26 +756,70 @@ body {
 
 .critter-bubble {
   position: absolute;
-  top: -11px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--gb-darkest);
   color: var(--gb-bright);
-  font-size: 6.5px;
+  font-size: 7.5px;
   font-family: monospace;
   font-weight: 900;
-  padding: 0 3px;
+  padding: 1px 4px;
   border-radius: 2px;
   border: 1px solid var(--gb-bright);
   pointer-events: none;
   white-space: nowrap;
   animation: bubble-pop 0.2s ease-out;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  z-index: 30;
+}
+
+.critter-bubble.ufo-bubble {
+  font-size: 8.5px;
+  padding: 2px 6px;
+  background-color: #0f380f;
+  color: #9bbc0f;
+  border: 1.5px solid #8bac0f;
+  border-radius: 3px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 6px rgba(155, 188, 15, 0.5), 0 2px 5px rgba(0, 0, 0, 0.7);
+  z-index: 50;
+}
+
+.critter-bubble.ufo-bubble.bubble-above {
+  top: -17px;
+}
+
+.critter-bubble.ufo-bubble.bubble-below {
+  top: 20px;
+}
+
+.critter-bubble.ufo-bubble.bubble-above::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 3px 3px 0 3px;
+  border-style: solid;
+  border-color: #0f380f transparent transparent transparent;
+}
+
+.critter-bubble.ufo-bubble.bubble-below::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 3px 3px 3px;
+  border-style: solid;
+  border-color: transparent transparent #0f380f transparent;
 }
 
 @keyframes bubble-pop {
-  0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
-  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 /* ========================================================
