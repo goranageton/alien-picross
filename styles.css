@@ -464,6 +464,26 @@ body {
   line-height: 1;
 }
 
+.slot-locked {
+  background-color: rgba(48, 98, 48, 0.2) !important;
+  color: rgba(15, 56, 15, 0.45) !important;
+  border-color: rgba(15, 56, 15, 0.35) !important;
+  border-style: dashed !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  box-shadow: none !important;
+}
+
+@keyframes slotLockedShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-2.5px); }
+  40%, 80% { transform: translateX(2.5px); }
+}
+
+.slot-shake {
+  animation: slotLockedShake 0.24s ease-in-out !important;
+}
+
 @keyframes roulettePulse {
   0%, 100% { background-color: var(--gb-bright); color: var(--gb-darkest); outline: 2px solid var(--gb-glow); }
   50% { background-color: var(--gb-darkest); color: var(--gb-bright); outline: 2px solid var(--gb-dark); }

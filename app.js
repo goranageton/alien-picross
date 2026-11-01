@@ -1157,6 +1157,10 @@ function initLevelSelect() {
 }
 
 function openLevelBriefing(levelId) {
+  if (!isLevelUnlocked(levelId)) {
+    sound.playAlienBuzzer();
+    return;
+  }
   State.selectedLevelId = levelId;
   const puzzle = getPuzzle10(levelId);
   const stat = State.stats[levelId] || {
@@ -1255,13 +1259,56 @@ function openLevelBriefing(levelId) {
   openModal('level-briefing-modal');
 }
 
+const ALL_LEVEL_KEYS = [
+  '1-A','1-B','1-C','1-D','1-E','1-F','1-G','1-H',
+  '2-A','2-B','2-C','2-D','2-E','2-F','2-G','2-H',
+  '3-A','3-B','3-C','3-D','3-E','3-F','3-G','3-H',
+  '4-A','4-B','4-C','4-D','4-E','4-F','4-G','4-H',
+  '5-A','5-B','5-C','5-D','5-E','5-F','5-G','5-H',
+  '6-A','6-B','6-C','6-D','6-E','6-F','6-G','6-H',
+  '7-A','7-B','7-C','7-D','7-E','7-F','7-G','7-H',
+  '8-A','8-B','8-C','8-D','8-E','8-F','8-G','8-H'
+];
+
+function isLevelUnlocked(levelId) {
+  // First level 1-A is always unlocked
+  if (levelId === '1-A') return true;
+  const idx = ALL_LEVEL_KEYS.indexOf(levelId);
+  if (idx <= 0) return true;
+  const prevId = ALL_LEVEL_KEYS[idx - 1];
+  // Previous level in sequence must be cleared
+  return !!(State.stats[prevId] && State.stats[prevId].cleared);
+}
+
+function getPreviousLevelKey(levelId) {
+  const idx = ALL_LEVEL_KEYS.indexOf(levelId);
+  if (idx <= 0) return null;
+  return ALL_LEVEL_KEYS[idx - 1];
+}
+
+function getFirstPlayableLevel() {
+  for (const id of ALL_LEVEL_KEYS) {
+    if (!State.stats[id]?.cleared && isLevelUnlocked(id)) {
+      return id;
+    }
+  }
+  return '1-A';
+}
+
 function renderLevelMatrix() {
   const gridContainer = document.getElementById('level-matrix-grid');
   if (!gridContainer) return;
   gridContainer.innerHTML = '';
 
+  // Ensure selectedLevelId is an unlocked level
+  if (!isLevelUnlocked(State.selectedLevelId)) {
+    State.selectedLevelId = getFirstPlayableLevel();
+  }
+
   const rows = ['1', '2', '3', '4', '5', '6', '7', '8'];
   const cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const isSv = State.lang === 'sv';
+  const t = getTranslations();
 
   rows.forEach(r => {
     const rowDiv = document.createElement('div');
@@ -1278,6 +1325,8 @@ function renderLevelMatrix() {
       const id = `${r}-${c}`;
       const puzzle = getPuzzle10(id);
       const stat = State.stats[id] || { cleared: false, first: '--:--', best: '--:--', times: 0 };
+      const unlocked = isLevelUnlocked(id);
+      const prevId = getPreviousLevelKey(id);
 
       const cellWrap = document.createElement('div');
       cellWrap.className = 'relative flex items-center justify-center';
@@ -1285,15 +1334,26 @@ function renderLevelMatrix() {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.dataset.levelId = id;
-      btn.className = 'level-slot-btn w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 border-gb-darkest flex items-center justify-center text-[7.5px] cursor-pointer font-bold transition-transform active:scale-95';
+      btn.className = 'level-slot-btn w-[26px] h-[21px] sm:w-[28px] sm:h-[23px] border-2 flex items-center justify-center text-[7.5px] font-bold transition-transform active:scale-95';
 
       if (stat.cleared) {
         // Solved stamp appearance
-        btn.classList.add('slot-cleared');
+        btn.classList.add('slot-cleared', 'border-gb-darkest', 'cursor-pointer');
         btn.innerHTML = `<span class="text-[8px] text-[var(--gb-glow)] leading-none">■</span>`;
         btn.title = `[ABDUCTED] ${id} - ${puzzle.name}`;
+      } else if (!unlocked) {
+        // Locked level appearance with padlock
+        btn.classList.add('slot-locked');
+        btn.innerHTML = `
+          <svg class="w-2.5 h-2.5 pixel-sharp" viewBox="0 0 10 11" fill="currentColor">
+            <rect x="3" y="1" width="4" height="4" fill="none" stroke="currentColor" stroke-width="1.2" rx="1"/>
+            <rect x="1" y="4" width="8" height="6" fill="currentColor" rx="1"/>
+            <circle cx="5" cy="7" r="0.8" fill="#8bac0f"/>
+          </svg>`;
+        btn.title = (t.levelLockedTitle || 'LÅST (Klara {prev} först)').replace('{prev}', prevId);
       } else {
-        btn.classList.add('bg-gb-lightest', 'hover:bg-gb-light/60');
+        // Unlocked and ready to play!
+        btn.classList.add('bg-gb-lightest', 'hover:bg-gb-light/60', 'border-gb-darkest', 'cursor-pointer');
         btn.innerText = c;
         btn.title = `TARGET ${id} - ${puzzle.name}`;
       }
@@ -1302,8 +1362,35 @@ function renderLevelMatrix() {
         btn.classList.add('outline', 'outline-1', 'outline-gb-darkest');
       }
 
-      btn.addEventListener('mouseenter', () => updateLevelHover(btn, id));
+      btn.addEventListener('mouseenter', () => {
+        if (unlocked) {
+          updateLevelHover(btn, id);
+        }
+      });
+
       btn.addEventListener('click', () => {
+        if (!isLevelUnlocked(id)) {
+          // Play locked buzzer sound & haptic shake
+          sound.playAlienBuzzer();
+          btn.classList.remove('slot-shake');
+          void btn.offsetWidth;
+          btn.classList.add('slot-shake');
+
+          // Flash locked warning on grid hint banner
+          const hintEl = document.getElementById('level-select-grid-hint');
+          if (hintEl) {
+            const msg = (t.levelLockedHint || '🔒 LÅST! KLARA {prev} FÖRST!').replace('{prev}', prevId);
+            hintEl.innerText = msg;
+            hintEl.classList.add('text-red-700', 'font-black');
+            if (hintEl._lockedTimer) clearTimeout(hintEl._lockedTimer);
+            hintEl._lockedTimer = setTimeout(() => {
+              hintEl.classList.remove('text-red-700', 'font-black');
+              hintEl.innerText = t.levelSelectGridHint || (isSv ? 'TRYCK PÅ EN NIVÅ (1-A TILL 8-H)' : 'CHOOSE A TARGET (1-A TO 8-H)');
+            }, 1800);
+          }
+          return;
+        }
+
         State.selectedLevelId = id;
         sound.playBlip();
         openLevelBriefing(id);
@@ -1440,6 +1527,10 @@ function renderTop5Modal(levelId) {
 // ========================================================
 
 function promptHintAndStartLevel(levelId) {
+  if (!isLevelUnlocked(levelId)) {
+    sound.playAlienBuzzer();
+    return;
+  }
   State.selectedLevelId = levelId;
   loadLevelIntoBoard10(levelId);
   openModal('hint-prompt-modal');
