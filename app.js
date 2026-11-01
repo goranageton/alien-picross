@@ -3299,7 +3299,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     // 3. Web browser fallback
-    if (confirm("Vill du avsluta och stänga Alien Picross?")) {
+    if (confirm("Vill du avsluta och stänga Extraterrestrial Picross?")) {
       window.close();
       document.body.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0c240c;color:#9bbc0f;font-family:monospace;text-align:center;padding:24px;">

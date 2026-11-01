@@ -9,7 +9,7 @@
     "build": "node -e \"const fs = require('fs'); if (!fs.existsSync('www')) fs.mkdirSync('www'); ['index.html','styles.css','app.js','puzzles.js','translations.js','manifest.json','icon.svg','icon-192.png','icon-512.png'].forEach(f => { if (fs.existsSync(f)) fs.copyFileSync(f, 'www/' + f); }); console.log('Built www successfully');\"",
     "cap:sync": "npm run build && npx cap sync android",
     "cap:open": "npx cap open android",
-    "build:apk": "npm run cap:sync && powershell -Command \"$env:JAVA_HOME = (Join-Path (Get-Location) 'tools/jdk-21.0.12.1+1'); cd android; .\\gradlew.bat assembleDebug; Copy-Item app/build/outputs/apk/debug/app-debug.apk ../Alien-Picross-debug.apk -Force; Write-Host 'APK generated at: Alien-Picross-debug.apk'\""
+    "build:apk": "npm run cap:sync && powershell -Command \"$env:JAVA_HOME = (Join-Path (Get-Location) 'tools/jdk-21.0.12.1+1'); cd android; .\\gradlew.bat assembleDebug; Copy-Item app/build/outputs/apk/debug/app-debug.apk ../Alien-Picross-debug.apk -Force; Copy-Item app/build/outputs/apk/debug/app-debug.apk ../Extraterrestrial-Picross-debug.apk -Force; Write-Host 'APK generated at: Extraterrestrial-Picross-debug.apk'\""
   },
   "keywords": [
     "picross",
