@@ -249,7 +249,7 @@
                       <span>⚙️</span>
                       <span id="menu-settings-text">INSTÄLLNINGAR</span>
                     </span>
-                    <span id="menu-settings-badge" class="text-[6.5px] bg-[var(--gb-darkest)] text-[var(--gb-bright)] px-1.5 py-0.5 rounded font-mono font-bold">🟢 30M • 🇸🇪</span>
+                    <span id="menu-settings-badge" class="text-[6.5px] bg-[var(--gb-darkest)] text-[var(--gb-bright)] px-1.5 py-0.5 rounded font-mono font-bold">🟢 20M • 🇸🇪</span>
                   </button>
                 </div>
 
@@ -344,7 +344,7 @@
             </div>
             <div class="flex items-center justify-between text-[7px] sm:text-[7.5px] font-bold px-1 py-0.5 border-b border-dashed border-gb-dark/60 text-gb-darkest">
               <span id="level-select-grid-hint">TRYCK PÅ EN NIVÅ (1-A TILL 8-H)</span>
-              <span class="font-mono bg-gb-darkest text-gb-lightest px-1.5 py-0.2 rounded text-[6.5px]" id="level-select-active-diff">🟢 LÄTT (30M)</span>
+              <span class="font-mono bg-gb-darkest text-gb-lightest px-1.5 py-0.2 rounded text-[6.5px]" id="level-select-active-diff">🟢 LÄTT (20M)</span>
             </div>
           </header>
 
@@ -537,7 +537,7 @@
             <!-- Timer Frame -->
             <div class="px-2 py-1 bg-[#0f380f] rounded border border-[var(--gb-dark)] flex flex-col items-center">
               <span class="text-[7px] text-[#8bac0f] tracking-tighter uppercase font-mono">Beam Time</span>
-              <span class="text-[#9bbc0f] font-mono font-bold tracking-wider text-sm leading-none" id="picross-timer-10">30:00</span>
+              <span class="text-[#9bbc0f] font-mono font-bold tracking-wider text-sm leading-none" id="picross-timer-10">20:00</span>
             </div>
           </div>
 
@@ -844,21 +844,21 @@
       <div class="flex flex-col gap-1 bg-[#8bac0f]/30 p-2 rounded border border-[var(--gb-darkest)]">
         <div class="flex items-center justify-between">
           <span class="text-[7.5px] sm:text-[8px] font-extrabold uppercase" id="settings-diff-title">🎯 SVÅRIGHETSGRAD (STRÅLTID):</span>
-          <span id="settings-diff-current-badge" class="text-[7px] font-bold bg-[var(--gb-darkest)] text-[var(--gb-bright)] px-1.5 py-0.5 rounded font-mono">30 MIN</span>
+          <span id="settings-diff-current-badge" class="text-[7px] font-bold bg-[var(--gb-darkest)] text-[var(--gb-bright)] px-1.5 py-0.5 rounded font-mono">20 MIN</span>
         </div>
         <div class="grid grid-cols-3 gap-1.5 mt-1">
           <button type="button" class="diff-select-btn stone-tablet-btn py-2 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer" data-diff="easy" id="diff-btn-easy">
-            🟢 LÄTT<br/><span class="text-[6.5px] opacity-80 font-mono">30 MIN</span>
+            🟢 LÄTT<br/><span class="text-[6.5px] opacity-80 font-mono">20 MIN</span>
           </button>
           <button type="button" class="diff-select-btn stone-tablet-btn py-2 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer" data-diff="medium" id="diff-btn-medium">
-            🟡 MEDEL<br/><span class="text-[6.5px] opacity-80 font-mono">20 MIN</span>
+            🟡 MEDEL<br/><span class="text-[6.5px] opacity-80 font-mono">15 MIN</span>
           </button>
           <button type="button" class="diff-select-btn stone-tablet-btn py-2 text-center text-[7.5px] sm:text-[8px] font-bold uppercase cursor-pointer" data-diff="hard" id="diff-btn-hard">
-            🔴 SVÅR<br/><span class="text-[6.5px] opacity-80 font-mono">15 MIN</span>
+            🔴 SVÅR<br/><span class="text-[6.5px] opacity-80 font-mono">10 MIN</span>
           </button>
         </div>
         <p id="settings-diff-desc" class="text-[6.5px] sm:text-[7px] text-[var(--gb-darkest)] leading-tight mt-1 opacity-90 text-center font-mono">
-          🟢 LÄTT: 30 MINUTER STRÅLTID (AVSLAPPNAD)
+          🟢 LÄTT: 20 MINUTER STRÅLTID (AVSLAPPNAD)
         </p>
       </div>
 
@@ -949,30 +949,30 @@
         </div>
 
         <div class="grid grid-cols-3 gap-1.5 mt-0.5">
-          <!-- LÄTT (30M) -->
+          <!-- LÄTT (20M) -->
           <div class="bg-[var(--gb-lightest)] border-2 border-[var(--gb-darkest)] p-1.5 rounded text-center flex flex-col justify-between shadow-sm">
             <span class="text-[6.5px] font-black uppercase text-[var(--gb-darkest)] leading-tight">🟢 LÄTT</span>
-            <span class="text-[5.5px] opacity-75 font-mono">30 MIN</span>
+            <span class="text-[5.5px] opacity-75 font-mono">20 MIN</span>
             <div class="border-t border-dashed border-[var(--gb-dark)]/40 my-1"></div>
             <span class="text-[6px] opacity-80 uppercase" id="briefing-easy-label">BÄST:</span>
             <span class="text-[8.5px] font-black font-mono tracking-tight mt-0.5" id="briefing-best-easy">--:--</span>
             <span class="text-[5.5px] opacity-70 font-mono mt-0.5" id="briefing-times-easy">0 ggr</span>
           </div>
 
-          <!-- MEDEL (20M) -->
+          <!-- MEDEL (15M) -->
           <div class="bg-[var(--gb-lightest)] border-2 border-[var(--gb-darkest)] p-1.5 rounded text-center flex flex-col justify-between shadow-sm">
             <span class="text-[6.5px] font-black uppercase text-[var(--gb-darkest)] leading-tight">🟡 MEDEL</span>
-            <span class="text-[5.5px] opacity-75 font-mono">20 MIN</span>
+            <span class="text-[5.5px] opacity-75 font-mono">15 MIN</span>
             <div class="border-t border-dashed border-[var(--gb-dark)]/40 my-1"></div>
             <span class="text-[6px] opacity-80 uppercase" id="briefing-medium-label">BÄST:</span>
             <span class="text-[8.5px] font-black font-mono tracking-tight mt-0.5" id="briefing-best-medium">--:--</span>
             <span class="text-[5.5px] opacity-70 font-mono mt-0.5" id="briefing-times-medium">0 ggr</span>
           </div>
 
-          <!-- SVÅR (15M) -->
+          <!-- SVÅR (10M) -->
           <div class="bg-[var(--gb-lightest)] border-2 border-[var(--gb-darkest)] p-1.5 rounded text-center flex flex-col justify-between shadow-sm">
             <span class="text-[6.5px] font-black uppercase text-[var(--gb-darkest)] leading-tight">🔴 SVÅR</span>
-            <span class="text-[5.5px] opacity-75 font-mono">15 MIN</span>
+            <span class="text-[5.5px] opacity-75 font-mono">10 MIN</span>
             <div class="border-t border-dashed border-[var(--gb-dark)]/40 my-1"></div>
             <span class="text-[6px] opacity-80 uppercase" id="briefing-hard-label">BÄST:</span>
             <span class="text-[8.5px] font-black font-mono tracking-tight mt-0.5" id="briefing-best-hard">--:--</span>
@@ -1031,11 +1031,11 @@
       <!-- Body: 3 Distinct Categories (LÄTT, MEDEL, SVÅR) -->
       <div class="text-[7.5px] flex flex-col gap-2 max-h-[65vh] overflow-y-auto pr-0.5 py-1">
         
-        <!-- Category 1: LÄTT (30 MIN) -->
+        <!-- Category 1: LÄTT (20 MIN) -->
         <div class="border border-[var(--gb-darkest)] bg-[#8bac0f]/30 p-1.5 rounded flex flex-col gap-1">
           <div class="flex items-center justify-between font-extrabold text-[8px] border-b border-[var(--gb-darkest)] pb-0.5">
             <span class="flex items-center gap-1 text-[#0f380f]" id="top5-easy-title">
-              <span>🟢</span> <span>LÄTT (30 MIN STRÅLTID)</span>
+              <span>🟢</span> <span>LÄTT (20 MIN STRÅLTID)</span>
             </span>
             <span class="text-[6.5px] opacity-80 font-mono" id="top5-easy-times">SPELAT: 0</span>
           </div>
@@ -1044,11 +1044,11 @@
           </div>
         </div>
 
-        <!-- Category 2: MEDEL (20 MIN) -->
+        <!-- Category 2: MEDEL (15 MIN) -->
         <div class="border border-[var(--gb-darkest)] bg-[#8bac0f]/30 p-1.5 rounded flex flex-col gap-1">
           <div class="flex items-center justify-between font-extrabold text-[8px] border-b border-[var(--gb-darkest)] pb-0.5">
             <span class="flex items-center gap-1 text-[#0f380f]" id="top5-medium-title">
-              <span>🟡</span> <span>MEDEL (20 MIN STRÅLTID)</span>
+              <span>🟡</span> <span>MEDEL (15 MIN STRÅLTID)</span>
             </span>
             <span class="text-[6.5px] opacity-80 font-mono" id="top5-medium-times">SPELAT: 0</span>
           </div>
@@ -1057,11 +1057,11 @@
           </div>
         </div>
 
-        <!-- Category 3: SVÅR (15 MIN) -->
+        <!-- Category 3: SVÅR (10 MIN) -->
         <div class="border border-[var(--gb-darkest)] bg-[#8bac0f]/30 p-1.5 rounded flex flex-col gap-1">
           <div class="flex items-center justify-between font-extrabold text-[8px] border-b border-[var(--gb-darkest)] pb-0.5">
             <span class="flex items-center gap-1 text-[#0f380f]" id="top5-hard-title">
-              <span>🔴</span> <span>SVÅR (15 MIN STRÅLTID)</span>
+              <span>🔴</span> <span>SVÅR (10 MIN STRÅLTID)</span>
             </span>
             <span class="text-[6.5px] opacity-80 font-mono" id="top5-hard-times">SPELAT: 0</span>
           </div>

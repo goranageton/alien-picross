@@ -463,29 +463,29 @@ const STORAGE_KEY = 'retro_picross_archaeo_save_v1';
 
 const DIFFICULTY_CONFIG = {
   easy: {
-    minutes: 30,
-    seconds: 1800,
-    badge: '30M'
-  },
-  medium: {
     minutes: 20,
     seconds: 1200,
     badge: '20M'
   },
-  hard: {
+  medium: {
     minutes: 15,
     seconds: 900,
     badge: '15M'
+  },
+  hard: {
+    minutes: 10,
+    seconds: 600,
+    badge: '10M'
   }
 };
 
 function getStartingSeconds(diff = State.difficulty) {
-  return DIFFICULTY_CONFIG[diff]?.seconds || 1800;
+  return DIFFICULTY_CONFIG[diff]?.seconds || 1200;
 }
 
 const State = {
   lang: 'sv', // 'sv' (default) or 'en'
-  difficulty: 'easy', // 'easy' (30m), 'medium' (20m), 'hard' (15m)
+  difficulty: 'easy', // 'easy' (20m), 'medium' (15m), 'hard' (10m)
   statsDifficultyTab: 'easy', // 'easy', 'medium', 'hard', 'all'
   currentScreen: 'main-menu',
   selectedLevelId: '1-A',
@@ -495,7 +495,7 @@ const State = {
     puzzleKey: '1-A',
     userGrid: [], // 0 = empty, 1 = dug, 2 = X
     cursorIndex: 74,
-    timerSeconds: 1800,
+    timerSeconds: 1200,
     timerInterval: null,
     isPaused: false,
     isCompleted: false,
@@ -609,7 +609,7 @@ function updateDifficultyUI() {
   // Main menu settings button badge
   const menuBadge = document.getElementById('menu-settings-badge');
   if (menuBadge) {
-    const diffEmoji = diff === 'easy' ? '🟢 30M' : diff === 'medium' ? '🟡 20M' : '🔴 15M';
+    const diffEmoji = diff === 'easy' ? '🟢 20M' : diff === 'medium' ? '🟡 15M' : '🔴 10M';
     const flag = isSv ? '🇸🇪' : '🇬🇧';
     menuBadge.innerText = `${diffEmoji} • ${flag}`;
   }
@@ -624,17 +624,17 @@ function updateDifficultyUI() {
   const lvlActiveDiff = document.getElementById('level-select-active-diff');
   if (lvlActiveDiff) {
     const diffEmoji = diff === 'easy' ? '🟢' : diff === 'medium' ? '🟡' : '🔴';
-    const diffName = diff === 'easy' ? (isSv ? 'LÄTT (30M)' : 'EASY (30M)') :
-                     diff === 'medium' ? (isSv ? 'MEDEL (20M)' : 'MED (20M)') :
-                     (isSv ? 'SVÅR (15M)' : 'HARD (15M)');
+    const diffName = diff === 'easy' ? (isSv ? 'LÄTT (20M)' : 'EASY (20M)') :
+                     diff === 'medium' ? (isSv ? 'MEDEL (15M)' : 'MED (15M)') :
+                     (isSv ? 'SVÅR (10M)' : 'HARD (10M)');
     lvlActiveDiff.innerText = `${diffEmoji} ${diffName}`;
   }
 
   const descEl = document.getElementById('settings-diff-desc');
   if (descEl) {
-    if (diff === 'easy') descEl.innerText = t.diffEasyDesc || '🟢 LÄTT: 30 MINUTER STRÅLTID (AVSLAPPNAD)';
-    else if (diff === 'medium') descEl.innerText = t.diffMediumDesc || '🟡 MEDEL: 20 MINUTER STRÅLTID (STANDARD)';
-    else if (diff === 'hard') descEl.innerText = t.diffHardDesc || '🔴 SVÅR: 15 MINUTER STRÅLTID (EXPERTRUSCH!)';
+    if (diff === 'easy') descEl.innerText = t.diffEasyDesc || '🟢 LÄTT: 20 MINUTER STRÅLTID (AVSLAPPNAD)';
+    else if (diff === 'medium') descEl.innerText = t.diffMediumDesc || '🟡 MEDEL: 15 MINUTER STRÅLTID (STANDARD)';
+    else if (diff === 'hard') descEl.innerText = t.diffHardDesc || '🔴 SVÅR: 10 MINUTER STRÅLTID (EXPERTRUSCH!)';
   }
 
   // Active language buttons in settings modal
@@ -691,11 +691,11 @@ function updateLanguageUI() {
   if (setDiffTitle) setDiffTitle.innerText = t.settingsDiffTitle || '🎯 SVÅRIGHETSGRAD (STRÅLTID):';
 
   const diffBtnEasy = document.getElementById('diff-btn-easy');
-  if (diffBtnEasy) diffBtnEasy.innerHTML = `🟢 ${t.diffEasy || 'LÄTT (30M)'}<br/><span class="text-[6.5px] opacity-80 font-mono">30 MIN</span>`;
+  if (diffBtnEasy) diffBtnEasy.innerHTML = `🟢 ${t.diffEasy || 'LÄTT (20M)'}<br/><span class="text-[6.5px] opacity-80 font-mono">20 MIN</span>`;
   const diffBtnMed = document.getElementById('diff-btn-medium');
-  if (diffBtnMed) diffBtnMed.innerHTML = `🟡 ${t.diffMedium || 'MEDEL (20M)'}<br/><span class="text-[6.5px] opacity-80 font-mono">20 MIN</span>`;
+  if (diffBtnMed) diffBtnMed.innerHTML = `🟡 ${t.diffMedium || 'MEDEL (15M)'}<br/><span class="text-[6.5px] opacity-80 font-mono">15 MIN</span>`;
   const diffBtnHard = document.getElementById('diff-btn-hard');
-  if (diffBtnHard) diffBtnHard.innerHTML = `🔴 ${t.diffHard || 'SVÅR (15M)'}<br/><span class="text-[6.5px] opacity-80 font-mono">15 MIN</span>`;
+  if (diffBtnHard) diffBtnHard.innerHTML = `🔴 ${t.diffHard || 'SVÅR (10M)'}<br/><span class="text-[6.5px] opacity-80 font-mono">10 MIN</span>`;
 
   const setLangTitle = document.getElementById('settings-lang-title');
   if (setLangTitle) setLangTitle.innerText = t.settingsLangTitle || '🌐 SPRÅK / LANGUAGE:';
@@ -738,11 +738,11 @@ function updateLanguageUI() {
   const top5Close = document.getElementById('top5-close-btn');
   if (top5Close) top5Close.innerText = t.top5CloseBtn || 'TILLBAKA (B)';
   const top5EasyH = document.getElementById('top5-easy-title');
-  if (top5EasyH) top5EasyH.innerHTML = `<span>🟢</span> <span>${t.top5EasyHeader || 'LÄTT (30 MIN STRÅLTID)'}</span>`;
+  if (top5EasyH) top5EasyH.innerHTML = `<span>🟢</span> <span>${t.top5EasyHeader || 'LÄTT (20 MIN STRÅLTID)'}</span>`;
   const top5MedH = document.getElementById('top5-medium-title');
-  if (top5MedH) top5MedH.innerHTML = `<span>🟡</span> <span>${t.top5MediumHeader || 'MEDEL (20 MIN STRÅLTID)'}</span>`;
+  if (top5MedH) top5MedH.innerHTML = `<span>🟡</span> <span>${t.top5MediumHeader || 'MEDEL (15 MIN STRÅLTID)'}</span>`;
   const top5HardH = document.getElementById('top5-hard-title');
-  if (top5HardH) top5HardH.innerHTML = `<span>🔴</span> <span>${t.top5HardHeader || 'SVÅR (15 MIN STRÅLTID)'}</span>`;
+  if (top5HardH) top5HardH.innerHTML = `<span>🔴</span> <span>${t.top5HardHeader || 'SVÅR (10 MIN STRÅLTID)'}</span>`;
 
   // Board Screen
   const scannerBanner = document.querySelector('#game-board-container div div.py-1\\.5 span:first-child');
@@ -1377,9 +1377,9 @@ function updateStatsDashboard(levelId) {
     if (statsBest) statsBest.innerText = diffStat.best || '--:--';
 
     let label = '';
-    if (tab === 'easy') label = t.top5EasyHeader || '🟢 LÄTT (30 MIN)';
-    else if (tab === 'medium') label = t.top5MediumHeader || '🟡 MEDEL (20 MIN)';
-    else if (tab === 'hard') label = t.top5HardHeader || '🔴 SVÅR (15 MIN)';
+    if (tab === 'easy') label = t.top5EasyHeader || '🟢 LÄTT (20 MIN)';
+    else if (tab === 'medium') label = t.top5MediumHeader || '🟡 MEDEL (15 MIN)';
+    else if (tab === 'hard') label = t.top5HardHeader || '🔴 SVÅR (10 MIN)';
     if (catIndicator) catIndicator.innerText = `${t.categoryLabel || 'KATEGORI:'} ${label}`;
   }
 }
@@ -1762,7 +1762,7 @@ function loadLevelIntoBoard10(levelKey) {
 
   const titleEl = document.getElementById('current-level-badge');
   const t = getTranslations();
-  const diffBadge = State.difficulty === 'easy' ? '🟢 30M' : State.difficulty === 'medium' ? '🟡 20M' : '🔴 15M';
+  const diffBadge = State.difficulty === 'easy' ? '🟢 20M' : State.difficulty === 'medium' ? '🟡 15M' : '🔴 10M';
   if (titleEl) {
     titleEl.innerText = `${t.ufoScanPrefix} [${levelKey}: ${puzzle.name} • ${diffBadge}]`;
   }
@@ -2966,7 +2966,7 @@ function checkSolution10() {
 
     setTimeout(() => {
       const victoryName = document.getElementById('victory-relic-name');
-      const diffTag = curDiff === 'easy' ? '🟢 LÄTT (30M)' : curDiff === 'medium' ? '🟡 MEDEL (20M)' : '🔴 SVÅR (15M)';
+      const diffTag = curDiff === 'easy' ? '🟢 LÄTT (20M)' : curDiff === 'medium' ? '🟡 MEDEL (15M)' : '🔴 SVÅR (10M)';
       if (victoryName) {
         victoryName.innerHTML = `${puzzle.name}<br/><span class="text-[7px] text-[var(--gb-bright)] font-mono font-normal">TID: ${timeFormatted} • ${diffTag}${isNewCatBest ? ' ★ NYTT REKORD!' : ''}</span>`;
       }
